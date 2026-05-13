@@ -1,3 +1,12 @@
+import type { ComponentType } from 'react';
+
+export interface DrillConfig {
+  id: string;
+  title: string;
+  description: string;
+  component: ComponentType;
+}
+
 export interface CompassPoint {
   index: number;
   abbr: string; // e.g., NxE or "Stbd Bow"

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { COMPASS_POINTS, RELATIVE_POINTS } from '../constants';
-import { CompassPoint, GameState, GameMode, GameType } from '../types';
+import { COMPASS_POINTS, RELATIVE_POINTS } from './constants';
+import { CompassPoint, GameState, GameMode, GameType } from '../../types';
 
 interface CompassRoseProps {
   targetPoint: CompassPoint | null;

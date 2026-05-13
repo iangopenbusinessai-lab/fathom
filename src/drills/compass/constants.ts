@@ -1,4 +1,4 @@
-import { CompassPoint } from './types';
+import { CompassPoint } from '../../types';
 
 // Helper to categorize point types based on index (0-31)
 const getPointType = (index: number): CompassPoint['type'] => {

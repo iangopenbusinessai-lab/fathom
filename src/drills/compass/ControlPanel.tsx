@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Play, Timer, ArrowLeft, Medal, Clock, Ship, Compass, XCircle } from 'lucide-react';
-import { GameState, GameStats, CompassPoint, GameMode, GameType } from '../types';
+import { GameState, GameStats, CompassPoint, GameMode, GameType } from '../../types';
 
 interface ControlPanelProps {
   gameState: GameState;
