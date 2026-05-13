@@ -21,16 +21,16 @@ export const CompassRose: React.FC<CompassRoseProps> = ({
   gameMode,
   gameType
 }) => {
-  
+
   const isHardVisuals = gameMode === 'timed' || gameMode === 'exam';
   const isCompass = gameType === 'compass';
   const activePoints = isCompass ? COMPASS_POINTS : RELATIVE_POINTS;
 
   // Helper to calculate Cubic Bezier point
   const cubicBezier = (t: number, p0: number, p1: number, p2: number, p3: number) => {
-    return Math.pow(1 - t, 3) * p0 + 
-           3 * Math.pow(1 - t, 2) * t * p1 + 
-           3 * (1 - t) * Math.pow(t, 2) * p2 + 
+    return Math.pow(1 - t, 3) * p0 +
+           3 * Math.pow(1 - t, 2) * t * p1 +
+           3 * (1 - t) * Math.pow(t, 2) * p2 +
            Math.pow(t, 3) * p3;
   };
 
@@ -38,45 +38,45 @@ export const CompassRose: React.FC<CompassRoseProps> = ({
     // Ship Shape Definition:
     // Right Side Curve: Start(50, 4) -> C1(85, 20) -> C2(85, 70) -> End(70, 96)
     // Bottom: Line from (70, 96) to (30, 96)
-    
+
     // Key Indices:
     // 0: Dead Ahead (50, 4)
     // 8: Stbd Beam (should be near mid t)
     // 14: Corner? (70, 96)
     // 16: Dead Astern (50, 96)
-    
+
     if (index === 0) return { x: 50, y: 4 };
     if (index === 16) return { x: 50, y: 96 };
 
     // Starboard (Right) Side: Indices 1 to 15
     // Port (Left) Side: Indices 31 down to 17
-    
+
     const isStarboard = index > 0 && index < 16;
     const i = isStarboard ? index : (32 - index);
-    
+
     let x, y;
 
     // Distribute points 1..13 along the Bezier curve
     // Point 14 is the Corner
     // Point 15 is on the flat Stern line
-    
+
     if (i === 14) {
         // Corner
         x = 70;
         y = 96;
     } else if (i === 15) {
-        // Between Corner(70) and Center(50). 
+        // Between Corner(70) and Center(50).
         // 16 is Center. 14 is Corner. 15 is mid way.
         x = 60;
         y = 96;
     } else {
         // Points 1 to 13 along the curve.
-        // We map 1..13 to t values. 
+        // We map 1..13 to t values.
         // To distribute them nicely, we shouldn't use purely linear t, but linear is a good start.
         // t=0 is Index 0 (Top). t=1 is Index 14 (Corner).
         // So t = i / 14.
-        const t = i / 14; 
-        
+        const t = i / 14;
+
         // P0(50,4), P1(85,20), P2(85,70), P3(70,96)
         x = cubicBezier(t, 50, 85, 85, 70);
         y = cubicBezier(t, 4, 20, 70, 96);
@@ -95,7 +95,7 @@ export const CompassRose: React.FC<CompassRoseProps> = ({
   const points = useMemo(() => {
     return activePoints.map((point) => {
       let x, y;
-      
+
       if (isCompass) {
           // Convert degrees to radians. Subtract 90 degrees so 0 is North (top)
           const radians = (point.angle - 90) * (Math.PI / 180);
@@ -107,7 +107,7 @@ export const CompassRose: React.FC<CompassRoseProps> = ({
           x = coords.x;
           y = coords.y;
       }
-      
+
       let sizeClass = '';
       let colorClass = '';
       let zIndex = 'z-10';
@@ -167,7 +167,7 @@ export const CompassRose: React.FC<CompassRoseProps> = ({
       if (clickedIndex !== null) {
         // Dim everything by default
         colorClass = 'bg-slate-700 opacity-30';
-        
+
         if (point.index === targetPoint?.index) {
             // Correct answer -> Green highlight
             colorClass = 'bg-green-400 shadow-[0_0_30px_rgba(34,197,94,1)] scale-150 border-2 border-white z-30';
@@ -190,19 +190,19 @@ export const CompassRose: React.FC<CompassRoseProps> = ({
   }, [targetPoint, clickedIndex, isHardVisuals, rotation, isCompass, activePoints]);
 
   return (
-    <div 
+    <div
       className="relative w-full max-w-[600px] aspect-square mx-auto transition-transform duration-700 ease-out"
       style={{ transform: `rotate(${rotation}deg)` }}
     >
       {/* Visual Container */}
-      
+
       {isCompass ? (
         <>
             {/* Background Decorative Rings for Compass */}
             <div className="absolute inset-0 rounded-full border border-slate-700/30 scale-[0.85]"></div>
             <div className="absolute inset-0 rounded-full border border-slate-800 scale-[0.6]"></div>
             <div className="absolute inset-0 rounded-full border-4 border-slate-800/50 shadow-inner bg-slate-900/40 backdrop-blur-sm"></div>
-            
+
             {/* Central Hub */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-slate-700 rounded-full z-0"></div>
 
@@ -230,26 +230,26 @@ export const CompassRose: React.FC<CompassRoseProps> = ({
                         <stop offset="100%" stopColor="rgb(30, 41, 59)" stopOpacity="0.8" />
                       </linearGradient>
                     </defs>
-                    
-                    {/* 
-                       Hull Shape: 
+
+                    {/*
+                       Hull Shape:
                        Starts at Bow (50, 4).
                        Curves wide to Beam.
                        Squares off at Stern (y=96).
                     */}
-                    <path 
-                      d="M 50 4 C 85 20, 85 70, 70 96 L 30 96 C 15 70, 15 20, 50 4 Z" 
-                      fill="url(#hullGradient)" 
-                      stroke="rgba(71, 85, 105, 0.5)" 
+                    <path
+                      d="M 50 4 C 85 20, 85 70, 70 96 L 30 96 C 15 70, 15 20, 50 4 Z"
+                      fill="url(#hullGradient)"
+                      stroke="rgba(71, 85, 105, 0.5)"
                       strokeWidth="0.5"
                     />
-                    
+
                     {/* Deck Detail: Center line */}
                     <line x1="50" y1="8" x2="50" y2="92" stroke="rgba(148, 163, 184, 0.1)" strokeWidth="0.5" />
-                    
+
                     {/* Transom detail (Squared off bottom) */}
                     <path d="M 32 94 L 68 94" stroke="rgba(148, 163, 184, 0.2)" strokeWidth="0.5" />
-                    
+
                     {/* Bow detail */}
                     <path d="M 50 4 L 50 15" stroke="rgba(148, 163, 184, 0.3)" strokeWidth="0.5" />
                  </svg>
@@ -270,7 +270,7 @@ export const CompassRose: React.FC<CompassRoseProps> = ({
           style={{ left: `${p.x}%`, top: `${p.y}%` }}
         >
           {isCompass && isHardVisuals && p.index === 0 && (
-            <span 
+            <span
               className="select-none text-[10px] pointer-events-none"
               style={{ transform: `rotate(${-rotation}deg)` }}
             >

@@ -29,13 +29,13 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   examProgress,
   isTitleScreen = false
 }) => {
-  
+
   const [menuState, setMenuState] = useState<MenuState>('root');
 
   // Format time
   const seconds = Math.ceil(timeLeft / 1000);
-  const isWarning = seconds <= 5; 
-  
+  const isWarning = seconds <= 5;
+
   const getTimerColor = () => {
     if (isWarning) return 'text-red-500 animate-pulse';
     if (gameMode === 'exam') return 'text-yellow-400';
@@ -51,7 +51,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 
   return (
     <div className={`flex flex-col items-center justify-start ${isTitleScreen ? 'space-y-12' : 'space-y-6'} w-full max-w-md mx-auto p-4 z-10 transition-all duration-500`}>
-      
+
       {/* Stats Bar - Hidden on Title Screen */}
       {!isTitleScreen && (
         <div className="flex w-full justify-between items-end text-slate-400 font-mono border-b border-slate-800 pb-3 relative animate-in fade-in slide-in-from-top-4">
@@ -59,7 +59,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
               <span className="text-[10px] uppercase tracking-widest opacity-60">Score</span>
               <span className="text-3xl font-bold text-cyan-400 leading-none">{stats.score}</span>
           </div>
-          
+
           {gameState === 'playing' && (
               <div className="absolute left-1/2 -translate-x-1/2 bottom-3">
                 <div className={`flex flex-col items-center ${getTimerColor()}`}>
@@ -67,7 +67,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                       <span className="text-3xl font-bold font-mono leading-none">{seconds}s</span>
                 </div>
                 {/* Quit Button */}
-                <button 
+                <button
                     onClick={onQuit}
                     className="absolute -right-24 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] uppercase tracking-wider text-red-500 hover:text-red-400 opacity-60 hover:opacity-100 transition-all"
                 >
@@ -94,11 +94,11 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 
       {/* Main Action Area */}
       <div className={`flex flex-col items-center justify-center w-full relative ${isTitleScreen ? 'min-h-[auto]' : 'min-h-[250px]'}`}>
-        
+
         {/* Start Screen / Menus */}
         {gameState === 'idle' && (
           <div className="text-center space-y-6 animate-in fade-in zoom-in-95 w-full">
-            
+
             {/* Header - Only visible on Root menu in Title Screen */}
             {menuState === 'root' && isTitleScreen && (
                 <div className="mb-12">
@@ -117,7 +117,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             {/* ROOT MENU: Compass vs Relative */}
             {menuState === 'root' && (
                 <div className="grid grid-cols-1 gap-4 w-full max-w-sm mx-auto">
-                    <button 
+                    <button
                         onClick={() => setMenuState('compass-main')}
                         className="group relative flex items-center gap-5 px-6 py-6 rounded-2xl border border-cyan-900/30 bg-slate-800/40 hover:bg-slate-800/80 hover:border-cyan-500/50 transition-all text-left backdrop-blur-sm shadow-lg hover:shadow-cyan-900/20"
                     >
@@ -130,7 +130,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                         </div>
                     </button>
 
-                    <button 
+                    <button
                         onClick={() => setMenuState('relative-main')}
                         className="group relative flex items-center gap-5 px-6 py-6 rounded-2xl border border-indigo-900/30 bg-slate-800/40 hover:bg-slate-800/80 hover:border-indigo-500/50 transition-all text-left backdrop-blur-sm shadow-lg hover:shadow-indigo-900/20"
                     >
@@ -139,7 +139,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                         </div>
                         <div>
                             <span className="block font-bold text-xl text-white group-hover:text-indigo-300 transition-colors">Relative Bearings</span>
-                            <span className="text-xs text-slate-500 group-hover:text-slate-400">Port & Starboard relative.</span>
+                            <span className="text-xs text-slate-500 group-hover:text-slate-400">Port &amp; Starboard relative.</span>
                         </div>
                     </button>
                 </div>
@@ -149,7 +149,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             {menuState === 'compass-main' && (
                 <>
                     <div className="relative w-full mb-6">
-                        <button 
+                        <button
                             onClick={handleBack}
                             className="absolute left-0 top-1/2 -translate-y-1/2 p-2 text-slate-500 hover:text-white transition-colors hover:bg-slate-800 rounded-full"
                         >
@@ -159,7 +159,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 w-full max-w-xs mx-auto">
-                        <button 
+                        <button
                             onClick={() => onStart('practice', 'compass')}
                             className="group flex flex-col items-center gap-2 px-6 py-5 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 hover:border-cyan-500/50 transition-all"
                         >
@@ -167,7 +167,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                             <span className="text-xs text-slate-500">North is up. 60s timer.</span>
                         </button>
 
-                        <button 
+                        <button
                             onClick={() => setMenuState('compass-challenge')}
                             className="group flex flex-col items-center gap-2 px-6 py-5 rounded-xl border border-red-900/30 bg-slate-800/80 hover:bg-red-950/30 hover:border-red-500/50 transition-all"
                         >
@@ -182,7 +182,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             {menuState === 'compass-challenge' && (
                 <>
                      <div className="relative w-full mb-6">
-                        <button 
+                        <button
                             onClick={handleBack}
                             className="absolute left-0 top-1/2 -translate-y-1/2 p-2 text-slate-500 hover:text-white transition-colors hover:bg-slate-800 rounded-full"
                         >
@@ -192,7 +192,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                      </div>
 
                      <div className="grid grid-cols-1 gap-4 w-full max-w-xs mx-auto">
-                        <button 
+                        <button
                             onClick={() => onStart('timed', 'compass')}
                             className="flex items-center gap-4 p-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all group"
                         >
@@ -205,7 +205,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                             </div>
                         </button>
 
-                        <button 
+                        <button
                             onClick={() => onStart('exam', 'compass')}
                             className="flex items-center gap-4 p-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all group"
                         >
@@ -225,7 +225,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             {menuState === 'relative-main' && (
                 <>
                     <div className="relative w-full mb-6">
-                        <button 
+                        <button
                             onClick={handleBack}
                             className="absolute left-0 top-1/2 -translate-y-1/2 p-2 text-slate-500 hover:text-white transition-colors hover:bg-slate-800 rounded-full"
                         >
@@ -235,7 +235,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 w-full max-w-xs mx-auto">
-                        <button 
+                        <button
                             onClick={() => onStart('practice', 'relative')}
                             className="group flex flex-col items-center gap-2 px-6 py-5 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 hover:border-indigo-500/50 transition-all"
                         >
@@ -243,7 +243,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                             <span className="text-xs text-slate-500">Color coded. 60s timer.</span>
                         </button>
 
-                        <button 
+                        <button
                             onClick={() => setMenuState('relative-challenge')}
                             className="group flex flex-col items-center gap-2 px-6 py-5 rounded-xl border border-red-900/30 bg-slate-800/80 hover:bg-red-950/30 hover:border-red-500/50 transition-all"
                         >
@@ -258,7 +258,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             {menuState === 'relative-challenge' && (
                 <>
                      <div className="relative w-full mb-6">
-                        <button 
+                        <button
                             onClick={handleBack}
                             className="absolute left-0 top-1/2 -translate-y-1/2 p-2 text-slate-500 hover:text-white transition-colors hover:bg-slate-800 rounded-full"
                         >
@@ -268,7 +268,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                      </div>
 
                      <div className="grid grid-cols-1 gap-4 w-full max-w-xs mx-auto">
-                        <button 
+                        <button
                             onClick={() => onStart('timed', 'relative')}
                             className="flex items-center gap-4 p-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all group"
                         >
@@ -281,7 +281,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                             </div>
                         </button>
 
-                        <button 
+                        <button
                             onClick={() => onStart('exam', 'relative')}
                             className="flex items-center gap-4 p-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all group"
                         >
@@ -329,18 +329,18 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                         {gameMode === 'exam' ? 'Correct / 32' : 'Score'}
                     </div>
                 </div>
-                
+
                 <div className="h-px w-full bg-slate-800"></div>
-                
-                <button 
-                    onClick={() => onStart(gameMode, gameType)} 
+
+                <button
+                    onClick={() => onStart(gameMode, gameType)}
                     className="w-full py-3 bg-white text-slate-900 hover:bg-cyan-50 font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
                 >
                     <Play size={18} />
                     Try Again
                 </button>
-                
-                <button 
+
+                <button
                     onClick={() => {
                         setMenuState('root');
                         onQuit(); // Use quit handler to reset generic state
