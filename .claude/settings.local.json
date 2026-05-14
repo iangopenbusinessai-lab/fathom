@@ -4,7 +4,8 @@
       "Bash(npm install *)",
       "Bash(npx vite *)",
       "Bash(npm run *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(npx gh-pages *)"
     ]
   }
 }
