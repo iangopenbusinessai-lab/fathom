@@ -63,5 +63,5 @@ npx gh-pages -d dist --nojekyll
 - vite.config.ts is finalized — do not modify it under any circumstances
 - base path is /nauticalmaster/ in vite.config.ts — do not remove
 - Do not use @/ path aliases — they are not configured
-- index.html loads Tailwind from CDN — do not move to PostCSS
+- index.html is finalized - do not modify it under any circumstances
 - Always run `npm run build` after changes and fix all TS errors before finishing
