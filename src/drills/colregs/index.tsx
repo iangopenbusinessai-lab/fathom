@@ -31,10 +31,16 @@ const QUESTION_LIGHTS: Partial<Record<string, LightName[]>> = {
 };
 
 const QUESTION_SCENARIOS: Partial<Record<string, ScenarioType>> = {
+  'vh-01': 'priority-nuc',
+  'vh-02': 'sail-keeps-clear-ram',
   'vh-03': 'crossing-stbd',
   'vh-04': 'head-on',
   'vh-05': 'overtaking',
   'vh-06': 'overtaking',
+  'vh-07': 'crossing-port',
+  'vh-08': 'standon-may-act',
+  'vh-09': 'fishing-over-sailing',
+  'vh-10': 'hierarchy-ladder',
 };
 
 function shuffle<T>(arr: T[]): T[] {

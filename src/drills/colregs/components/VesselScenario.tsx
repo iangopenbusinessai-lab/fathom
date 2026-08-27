@@ -2,10 +2,15 @@ import React from 'react';
 
 export type ScenarioType =
   | 'head-on'
-  | 'crossing-stbd'    // other vessel on own starboard → own vessel is give-way
-  | 'crossing-port'    // other vessel on own port → own vessel is stand-on
-  | 'overtaking'       // own vessel overtaking another from astern
-  | 'being-overtaken';
+  | 'crossing-stbd'         // other vessel on own starboard → own vessel is give-way
+  | 'crossing-port'         // other vessel on own port → own vessel is stand-on
+  | 'overtaking'            // own vessel overtaking another from astern
+  | 'being-overtaken'
+  | 'standon-may-act'       // give-way vessel is not acting → stand-on may manoeuvre
+  | 'priority-nuc'          // Rule 18 — all vessels keep clear of a NUC vessel
+  | 'sail-keeps-clear-ram'  // Rule 18 — sailing vessel keeps clear of a RAM vessel
+  | 'fishing-over-sailing'  // Rule 18 — sailing vessel keeps clear of a fishing vessel
+  | 'hierarchy-ladder';     // Rule 18 — the full responsibilities ordering
 
 interface VesselScenarioProps {
   scenario: ScenarioType;
@@ -61,6 +66,45 @@ const SCENARIOS: Record<ScenarioType, { vessels: VesselDef[]; caption: string }>
     vessels: [
       { x: 100, y: 85,  rotation: 0,   role: 'give-way',  label: 'Overtaking (Give-Way)', showArrow: true, arrowDx: 0, arrowDy: -24 },
       { x: 100, y: 195, rotation: 0,   role: 'stand-on',  label: 'Own (Stand-On)',         showArrow: true, arrowDx: 0, arrowDy: -24 },
+    ],
+  },
+  'standon-may-act': {
+    caption: 'Give-way vessel is not acting — the stand-on vessel may take avoiding action (Rule 17).',
+    vessels: [
+      { x: 190, y: 190, rotation: 0,   role: 'stand-on', label: 'Own (Stand-On)',   showArrow: true, arrowDx: 0,  arrowDy: -28 },
+      { x: 110, y: 120, rotation: 90,  role: 'give-way', label: 'Other (Give-Way)', showArrow: true, arrowDx: 28, arrowDy: 0   },
+    ],
+  },
+  'priority-nuc': {
+    caption: 'Rule 18 — every other vessel keeps clear of a vessel Not Under Command.',
+    vessels: [
+      { x: 200, y: 105, rotation: 25, role: 'stand-on', label: 'NUC (Stand-On)',    showArrow: false },
+      { x: 95,  y: 195, rotation: 0,  role: 'give-way', label: 'Power (Give-Way)',  showArrow: true, arrowDx: 0, arrowDy: -28 },
+    ],
+  },
+  'sail-keeps-clear-ram': {
+    caption: 'Rule 18 — a sailing vessel keeps clear of a RAM vessel, and must not impede one constrained by her draft.',
+    vessels: [
+      { x: 205, y: 110, rotation: -90, role: 'stand-on', label: 'RAM (Stand-On)',     showArrow: true, arrowDx: -28, arrowDy: 0 },
+      { x: 90,  y: 190, rotation: 0,   role: 'give-way', label: 'Sailing (Give-Way)', showArrow: true, arrowDx: 0,   arrowDy: -28 },
+    ],
+  },
+  'fishing-over-sailing': {
+    caption: 'Rule 18 — a sailing vessel keeps clear of a vessel engaged in fishing.',
+    vessels: [
+      { x: 95,  y: 110, rotation: 90, role: 'stand-on', label: 'Fishing (Stand-On)', showArrow: true, arrowDx: 28, arrowDy: 0 },
+      { x: 205, y: 190, rotation: 0,  role: 'give-way', label: 'Sailing (Give-Way)', showArrow: true, arrowDx: 0,  arrowDy: -28 },
+    ],
+  },
+  'hierarchy-ladder': {
+    caption: 'Rule 18 order of responsibility — least burdened at the top, most burdened at the bottom.',
+    vessels: [
+      { x: 150, y: 34,  rotation: 0, role: 'stand-on', label: 'NUC' },
+      { x: 150, y: 74,  rotation: 0, role: 'stand-on', label: 'RAM' },
+      { x: 150, y: 114, rotation: 0, role: 'neutral',  label: 'CBD' },
+      { x: 150, y: 154, rotation: 0, role: 'neutral',  label: 'Fishing' },
+      { x: 150, y: 194, rotation: 0, role: 'give-way', label: 'Sailing' },
+      { x: 150, y: 234, rotation: 0, role: 'give-way', label: 'Power-Driven' },
     ],
   },
 };
