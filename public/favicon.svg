@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>NauticalMaster</title>
+  <!-- Ship's wheel: rim, hub, and eight spokes running out into handles. -->
+  <g transform="translate(32,32)" fill="none" stroke="#22d3ee"
+     stroke-linecap="round" stroke-width="3.5">
+    <circle r="19" />
+    <g>
+      <g transform="rotate(0)">
+        <line x1="0" y1="-7" x2="0" y2="-19" />
+        <line x1="0" y1="-19" x2="0" y2="-28" stroke-width="4.5" />
+      </g>
+      <g transform="rotate(45)">
+        <line x1="0" y1="-7" x2="0" y2="-19" />
+        <line x1="0" y1="-19" x2="0" y2="-28" stroke-width="4.5" />
+      </g>
+      <g transform="rotate(90)">
+        <line x1="0" y1="-7" x2="0" y2="-19" />
+        <line x1="0" y1="-19" x2="0" y2="-28" stroke-width="4.5" />
+      </g>
+      <g transform="rotate(135)">
+        <line x1="0" y1="-7" x2="0" y2="-19" />
+        <line x1="0" y1="-19" x2="0" y2="-28" stroke-width="4.5" />
+      </g>
+      <g transform="rotate(180)">
+        <line x1="0" y1="-7" x2="0" y2="-19" />
+        <line x1="0" y1="-19" x2="0" y2="-28" stroke-width="4.5" />
+      </g>
+      <g transform="rotate(225)">
+        <line x1="0" y1="-7" x2="0" y2="-19" />
+        <line x1="0" y1="-19" x2="0" y2="-28" stroke-width="4.5" />
+      </g>
+      <g transform="rotate(270)">
+        <line x1="0" y1="-7" x2="0" y2="-19" />
+        <line x1="0" y1="-19" x2="0" y2="-28" stroke-width="4.5" />
+      </g>
+      <g transform="rotate(315)">
+        <line x1="0" y1="-7" x2="0" y2="-19" />
+        <line x1="0" y1="-19" x2="0" y2="-28" stroke-width="4.5" />
+      </g>
+    </g>
+    <circle r="6.5" fill="#22d3ee" stroke="none" />
+    <circle r="2.4" fill="#020617" stroke="none" />
+  </g>
+</svg>
