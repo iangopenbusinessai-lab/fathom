@@ -250,9 +250,9 @@ const vesselHierarchyQuestions: ColregsQuestion[] = [
       'A power-driven vessel',
       'A vessel restricted in ability to maneuver',
       'A vessel constrained by her draft',
-      'Both B and C',
+      'Both a RAM vessel and a vessel constrained by her draft',
     ],
-    correctAnswer: 'Both B and C',
+    correctAnswer: 'Both a RAM vessel and a vessel constrained by her draft',
     explanation:
       'Rule 18: A sailing vessel must keep out of the way of vessels not under command, restricted in ability to maneuver, and engaged in fishing. She must also keep clear of a vessel constrained by her draft.',
   },
