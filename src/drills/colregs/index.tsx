@@ -10,6 +10,12 @@ import {
 import { ScenarioCard } from './components/ScenarioCard';
 import { LightDisplay, LightName } from './components/LightDisplay';
 import { VesselScenario, ScenarioType } from './components/VesselScenario';
+import {
+  DayShapeDisplay,
+  DayShapeName,
+  MastPosition,
+  ShapeArrangement,
+} from './components/DayShapeDisplay';
 
 type DrillState = 'idle' | 'playing' | 'finished';
 type DrillMode = 'practice' | 'exam';
@@ -28,6 +34,33 @@ const QUESTION_LIGHTS: Partial<Record<string, LightName[]>> = {
   'nl-08': ['masthead', 'masthead2', 'masthead3', 'port', 'starboard', 'stern'],
   'nl-09': ['masthead', 'port', 'starboard', 'stern', 'allRoundRed1', 'allRoundRed2', 'allRoundRed3'],
   'nl-10': ['allRoundWhite', 'allRoundRed1'],
+};
+
+interface DayShapeSpec {
+  shapes: DayShapeName[];
+  position: MastPosition;
+  arrangement?: ShapeArrangement;
+}
+
+// Shapes listed top-down (first entry is the uppermost shape).
+const QUESTION_SHAPES: Partial<Record<string, DayShapeSpec>> = {
+  // Rule 30(a): at anchor — one ball in the forepart.
+  'ds-01': { shapes: ['ball'], position: 'forward' },
+  // Rule 27(a): not under command — two balls in a vertical line.
+  'ds-02': { shapes: ['ball', 'ball'], position: 'main' },
+  // Rule 25(e): sail + machinery — one cone, apex downwards, forward.
+  'ds-03': { shapes: ['cone-down'], position: 'forward' },
+  // Rule 24(a)(iv): tow exceeding 200 m — one diamond.
+  'ds-04': { shapes: ['diamond'], position: 'main' },
+  // Rule 27(b): restricted in ability to manoeuvre — ball, diamond, ball.
+  'ds-05': { shapes: ['ball', 'diamond', 'ball'], position: 'main' },
+  // Rule 28: constrained by draft — one cylinder.
+  'ds-06': { shapes: ['cylinder'], position: 'main' },
+  // Rule 30(d): aground — three balls in a vertical line.
+  'ds-07': { shapes: ['ball', 'ball', 'ball'], position: 'forward' },
+  // Rule 27(f): minesweeping — one ball at the foremast head and one at each
+  // end of the fore yardarm.
+  'ds-08': { shapes: ['ball', 'ball', 'ball'], position: 'forward', arrangement: 'yardarm' },
 };
 
 const QUESTION_SCENARIOS: Partial<Record<string, ScenarioType>> = {
@@ -233,7 +266,9 @@ export default function ColregsDrill() {
 
   const activeLights = current ? (QUESTION_LIGHTS[current.id] ?? null) : null;
   const activeScenario = current ? (QUESTION_SCENARIOS[current.id] ?? null) : null;
-  const hasVisual = activeLights !== null || activeScenario !== null;
+  const activeShapes = current ? (QUESTION_SHAPES[current.id] ?? null) : null;
+  const hasVisual =
+    activeLights !== null || activeScenario !== null || activeShapes !== null;
 
   const timerSeconds = Math.ceil(timeLeft / 1000);
   const timerWarning = timerSeconds <= 5;
@@ -386,7 +421,15 @@ export default function ColregsDrill() {
                 {activeLights && (
                   <LightDisplay active={activeLights} label="Vessel Lights" />
                 )}
-                {activeScenario && !activeLights && (
+                {activeShapes && !activeLights && (
+                  <DayShapeDisplay
+                    shapes={activeShapes.shapes}
+                    position={activeShapes.position}
+                    arrangement={activeShapes.arrangement}
+                    label="Day Shapes"
+                  />
+                )}
+                {activeScenario && !activeLights && !activeShapes && (
                   <VesselScenario scenario={activeScenario} label="Scenario" />
                 )}
               </div>
