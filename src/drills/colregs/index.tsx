@@ -10,6 +10,7 @@ import {
 import { ScenarioCard } from './components/ScenarioCard';
 import { LightDisplay, LightName } from './components/LightDisplay';
 import { VesselScenario, ScenarioType } from './components/VesselScenario';
+import { SoundSignalDisplay, BlastMark } from './components/SoundSignalDisplay';
 import {
   DayShapeDisplay,
   DayShapeName,
@@ -61,6 +62,26 @@ const QUESTION_SHAPES: Partial<Record<string, DayShapeSpec>> = {
   // Rule 27(f): minesweeping — one ball at the foremast head and one at each
   // end of the fore yardarm.
   'ds-08': { shapes: ['ball', 'ball', 'ball'], position: 'forward', arrangement: 'yardarm' },
+};
+
+// Blast sequences in order, left to right.
+const QUESTION_SOUNDS: Partial<Record<string, BlastMark[]>> = {
+  // Rule 34(a): "I am altering my course to starboard."
+  'ss-01': ['short'],
+  // Rule 34(a): "I am altering my course to port."
+  'ss-02': ['short', 'short'],
+  // Rule 34(a): "I am operating astern propulsion."
+  'ss-03': ['short', 'short', 'short'],
+  // Rule 35(a): power-driven, making way in restricted visibility.
+  'ss-04': ['prolonged'],
+  // Rule 35(b): power-driven, underway but stopped.
+  'ss-05': ['prolonged', 'prolonged'],
+  // Rule 35(c): NUC / RAM / constrained by draft / sailing / fishing / towing.
+  'ss-06': ['prolonged', 'short', 'short'],
+  // Rule 32(a): the definition of a short blast - one is shown for reference.
+  'ss-07': ['short'],
+  // Rule 35(g): at anchor - rapid ringing of the bell for about 5 seconds.
+  'ss-08': ['bell'],
 };
 
 const QUESTION_SCENARIOS: Partial<Record<string, ScenarioType>> = {
@@ -267,8 +288,9 @@ export default function ColregsDrill() {
   const activeLights = current ? (QUESTION_LIGHTS[current.id] ?? null) : null;
   const activeScenario = current ? (QUESTION_SCENARIOS[current.id] ?? null) : null;
   const activeShapes = current ? (QUESTION_SHAPES[current.id] ?? null) : null;
+  const activeSounds = current ? (QUESTION_SOUNDS[current.id] ?? null) : null;
   const hasVisual =
-    activeLights !== null || activeScenario !== null || activeShapes !== null;
+    activeLights !== null || activeScenario !== null || activeShapes !== null || activeSounds !== null;
 
   const timerSeconds = Math.ceil(timeLeft / 1000);
   const timerWarning = timerSeconds <= 5;
@@ -421,7 +443,14 @@ export default function ColregsDrill() {
                 {activeLights && (
                   <LightDisplay active={activeLights} label="Vessel Lights" />
                 )}
-                {activeShapes && !activeLights && (
+                {activeSounds && !activeLights && (
+                  <SoundSignalDisplay
+                    key={current.id}
+                    sequence={activeSounds}
+                    label="Blast Sequence"
+                  />
+                )}
+                {activeShapes && !activeLights && !activeSounds && (
                   <DayShapeDisplay
                     shapes={activeShapes.shapes}
                     position={activeShapes.position}
@@ -429,7 +458,7 @@ export default function ColregsDrill() {
                     label="Day Shapes"
                   />
                 )}
-                {activeScenario && !activeLights && !activeShapes && (
+                {activeScenario && !activeLights && !activeShapes && !activeSounds && (
                   <VesselScenario scenario={activeScenario} label="Scenario" />
                 )}
               </div>
