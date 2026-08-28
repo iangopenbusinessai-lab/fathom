@@ -7,6 +7,7 @@ import {
   ColregsCategory,
   ColregsQuestion,
 } from './constants';
+import { bestScoreKey, readBestScore, writeBestScore } from '../../lib/storage';
 import { ScenarioCard } from './components/ScenarioCard';
 import { LightDisplay, LightName } from './components/LightDisplay';
 import { VesselScenario, ScenarioType } from './components/VesselScenario';
@@ -154,7 +155,13 @@ export default function ColregsDrill() {
   const [drillMode, setDrillMode] = useState<DrillMode>('practice');
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
-  const [bestScore, setBestScore] = useState(0);
+
+  // Bests are kept per category+mode: an 8-question Day Shapes exam and a
+  // 36-question All-COLREGS exam are not comparable, so they get their own
+  // keys rather than overwriting one shared number.
+  const bestKey = bestScoreKey('colregs', categoryFilter, drillMode);
+  const [bestScore, setBestScore] = useState(() => readBestScore(bestKey));
+
   const [timeLeft, setTimeLeft] = useState(EXAM_QUESTION_MS);
 
   const advanceRef = useRef<number | null>(null);
@@ -278,8 +285,23 @@ export default function ColregsDrill() {
     setSelectedAnswer(null);
   };
 
+  // Swap in the stored best whenever the category+mode pair changes, so the
+  // figure on screen always belongs to the combination being played.
+  useEffect(() => {
+    setBestScore(readBestScore(bestKey));
+  }, [bestKey]);
+
+  // Persist on the spot when a run beats the stored best. Writing here rather
+  // than from an effect on bestScore keeps the value and the key it is written
+  // under from ever drifting apart when the category or mode changes.
+  const recordBest = (value: number) => {
+    if (value <= bestScore) return;
+    setBestScore(value);
+    writeBestScore(bestKey, value);
+  };
+
   const handleFinish = () => {
-    setBestScore(prev => Math.max(prev, score));
+    recordBest(score);
     setDrillState('finished');
     clearTimers();
   };
@@ -287,7 +309,7 @@ export default function ColregsDrill() {
   // Sync finished state when exam deck empties
   useEffect(() => {
     if (drillState === 'finished') {
-      setBestScore(prev => Math.max(prev, score));
+      recordBest(score);
     }
   }, [drillState, score]);
 

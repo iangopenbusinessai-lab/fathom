@@ -4,6 +4,7 @@ import { CompassRose } from './CompassRose';
 import { ControlPanel } from './ControlPanel';
 import { COMPASS_POINTS, RELATIVE_POINTS } from './constants';
 import { CompassPoint, GameState, GameStats, GameMode, GameType } from '../../types';
+import { bestScoreKey, readBestScore, writeBestScore } from '../../lib/storage';
 
 // Standalone Application - No External Services
 
@@ -24,12 +25,18 @@ export default function CompassDrill() {
   const [examDeck, setExamDeck] = useState<number[]>([]);
   const [questionsTotal, setQuestionsTotal] = useState(0);
 
-  // Stats
-  const [stats, setStats] = useState<GameStats>({
+  // Bests are kept per type+mode, as in the colregs drill: a 32-question exam
+  // and a 60-second timed run are not comparable, so they get their own keys
+  // rather than overwriting one shared number.
+  const bestKey = bestScoreKey('compass', gameType, gameMode);
+
+  // Stats - the best score is seeded from storage on mount, so a reload picks
+  // up where the last session left off instead of restarting at 0.
+  const [stats, setStats] = useState<GameStats>(() => ({
     score: 0,
-    bestScore: 0,
+    bestScore: readBestScore(bestKey),
     totalAttempts: 0
-  });
+  }));
   const [timeLeft, setTimeLeft] = useState(GLOBAL_GAME_DURATION_MS);
 
   // Refs
@@ -63,6 +70,24 @@ export default function CompassDrill() {
     setRotation(0);
     if (timerRef.current) cancelAnimationFrame(timerRef.current);
   }, []);
+
+  // Swap in the stored best whenever the type+mode pair changes, so the figure
+  // on screen always belongs to the combination being played.
+  useEffect(() => {
+    setStats(prev => ({ ...prev, bestScore: readBestScore(bestKey) }));
+  }, [bestKey]);
+
+  // Persist once a game is over, when bestScore has settled. Gating on the
+  // finished state is what makes this key-safe: the key only ever changes in
+  // startGame, which moves the game to 'playing' in the same commit, so this
+  // can never fire with a new key while bestScore still holds the previous
+  // combination's value. Keeping it out of the setStats updater above also
+  // leaves that updater pure, which React requires - it invokes it twice under
+  // StrictMode.
+  useEffect(() => {
+    if (gameState !== 'finished') return;
+    if (stats.bestScore > 0) writeBestScore(bestKey, stats.bestScore);
+  }, [gameState, stats.bestScore, bestKey]);
 
   const resetToMenu = () => {
     setGameState('idle');
