@@ -15,12 +15,22 @@ export type ScenarioType =
 interface VesselScenarioProps {
   scenario: ScenarioType;
   label?: string;
+  // False until the player has answered. Everything that states or colour-codes
+  // the give-way outcome is withheld until then - see REVEALED_ONLY below.
+  revealed?: boolean;
 }
 
 // A simple top-down vessel silhouette as an SVG path in a local 0–20 coordinate space.
 // Bow points upward (negative y). The path is centered at (0,0).
 const HULL_PATH = 'M 0 -9 C 5 -6, 6 2, 4 9 L -4 9 C -6 2, -5 -6, 0 -9 Z';
 
+// REVEALED_ONLY - three things here give the answer away, and all three are
+// held back until the player has answered:
+//   1. the role suffix on a vessel's label ("Fishing (Stand-On)"),
+//   2. the caption, which states the rule and its outcome outright, and
+//   3. the give-way/stand-on hull colours and the legend decoding them.
+// The vessel TYPE half of a label ("Fishing", "RAM") stays visible throughout:
+// it sets up the question, and without knowing Rule 18 it does not answer it.
 interface VesselDef {
   x: number;
   y: number;
@@ -31,6 +41,12 @@ interface VesselDef {
   arrowDx?: number;
   arrowDy?: number;
 }
+
+const ROLE_SUFFIX: Record<VesselDef['role'], string> = {
+  'give-way': ' (Give-Way)',
+  'stand-on': ' (Stand-On)',
+  'neutral': '',
+};
 
 const SCENARIOS: Record<ScenarioType, { vessels: VesselDef[]; caption: string }> = {
   'head-on': {
@@ -43,57 +59,57 @@ const SCENARIOS: Record<ScenarioType, { vessels: VesselDef[]; caption: string }>
   'crossing-stbd': {
     caption: 'Crossing — other vessel on own starboard. Own vessel gives way.',
     vessels: [
-      { x: 90,  y: 170, rotation: 0,    role: 'give-way',  label: 'Own (Give-Way)',  showArrow: true, arrowDx: 0,   arrowDy: -28 },
-      { x: 210, y: 110, rotation: -90,  role: 'stand-on',  label: 'Other (Stand-On)', showArrow: true, arrowDx: -28, arrowDy: 0   },
+      { x: 90,  y: 170, rotation: 0,    role: 'give-way',  label: 'Own',  showArrow: true, arrowDx: 0,   arrowDy: -28 },
+      { x: 210, y: 110, rotation: -90,  role: 'stand-on',  label: 'Other', showArrow: true, arrowDx: -28, arrowDy: 0   },
     ],
   },
   'crossing-port': {
     caption: 'Crossing — other vessel on own port. Own vessel stands on.',
     vessels: [
-      { x: 210, y: 170, rotation: 0,    role: 'stand-on',  label: 'Own (Stand-On)', showArrow: true, arrowDx: 0,   arrowDy: -28 },
-      { x: 90,  y: 110, rotation: 90,   role: 'give-way',  label: 'Other (Give-Way)', showArrow: true, arrowDx: 28,  arrowDy: 0   },
+      { x: 210, y: 170, rotation: 0,    role: 'stand-on',  label: 'Own', showArrow: true, arrowDx: 0,   arrowDy: -28 },
+      { x: 90,  y: 110, rotation: 90,   role: 'give-way',  label: 'Other', showArrow: true, arrowDx: 28,  arrowDy: 0   },
     ],
   },
   'overtaking': {
     caption: 'Overtaking — the vessel coming up from astern must keep clear.',
     vessels: [
-      { x: 100, y: 85,  rotation: 0,   role: 'stand-on',  label: 'Ahead (Stand-On)',    showArrow: true, arrowDx: 0, arrowDy: -24 },
-      { x: 100, y: 195, rotation: 0,   role: 'give-way',  label: 'Overtaking (Give-Way)', showArrow: true, arrowDx: 0, arrowDy: -24 },
+      { x: 100, y: 85,  rotation: 0,   role: 'stand-on',  label: 'Ahead',    showArrow: true, arrowDx: 0, arrowDy: -24 },
+      { x: 100, y: 195, rotation: 0,   role: 'give-way',  label: 'Overtaking', showArrow: true, arrowDx: 0, arrowDy: -24 },
     ],
   },
   'being-overtaken': {
     caption: 'Being Overtaken — the vessel being overtaken is the stand-on vessel.',
     vessels: [
-      { x: 100, y: 85,  rotation: 0,   role: 'give-way',  label: 'Overtaking (Give-Way)', showArrow: true, arrowDx: 0, arrowDy: -24 },
-      { x: 100, y: 195, rotation: 0,   role: 'stand-on',  label: 'Own (Stand-On)',         showArrow: true, arrowDx: 0, arrowDy: -24 },
+      { x: 100, y: 85,  rotation: 0,   role: 'give-way',  label: 'Overtaking', showArrow: true, arrowDx: 0, arrowDy: -24 },
+      { x: 100, y: 195, rotation: 0,   role: 'stand-on',  label: 'Own',         showArrow: true, arrowDx: 0, arrowDy: -24 },
     ],
   },
   'standon-may-act': {
     caption: 'Give-way vessel is not acting — the stand-on vessel may take avoiding action (Rule 17).',
     vessels: [
-      { x: 190, y: 190, rotation: 0,   role: 'stand-on', label: 'Own (Stand-On)',   showArrow: true, arrowDx: 0,  arrowDy: -28 },
-      { x: 110, y: 120, rotation: 90,  role: 'give-way', label: 'Other (Give-Way)', showArrow: true, arrowDx: 28, arrowDy: 0   },
+      { x: 190, y: 190, rotation: 0,   role: 'stand-on', label: 'Own',   showArrow: true, arrowDx: 0,  arrowDy: -28 },
+      { x: 110, y: 120, rotation: 90,  role: 'give-way', label: 'Other', showArrow: true, arrowDx: 28, arrowDy: 0   },
     ],
   },
   'priority-nuc': {
     caption: 'Rule 18 — every other vessel keeps clear of a vessel Not Under Command.',
     vessels: [
-      { x: 200, y: 105, rotation: 25, role: 'stand-on', label: 'NUC (Stand-On)',    showArrow: false },
-      { x: 95,  y: 195, rotation: 0,  role: 'give-way', label: 'Power (Give-Way)',  showArrow: true, arrowDx: 0, arrowDy: -28 },
+      { x: 200, y: 105, rotation: 25, role: 'stand-on', label: 'NUC',    showArrow: false },
+      { x: 95,  y: 195, rotation: 0,  role: 'give-way', label: 'Power',  showArrow: true, arrowDx: 0, arrowDy: -28 },
     ],
   },
   'sail-keeps-clear-ram': {
     caption: 'Rule 18 — a sailing vessel keeps clear of a RAM vessel, and must not impede one constrained by her draft.',
     vessels: [
-      { x: 205, y: 110, rotation: -90, role: 'stand-on', label: 'RAM (Stand-On)',     showArrow: true, arrowDx: -28, arrowDy: 0 },
-      { x: 90,  y: 190, rotation: 0,   role: 'give-way', label: 'Sailing (Give-Way)', showArrow: true, arrowDx: 0,   arrowDy: -28 },
+      { x: 205, y: 110, rotation: -90, role: 'stand-on', label: 'RAM',     showArrow: true, arrowDx: -28, arrowDy: 0 },
+      { x: 90,  y: 190, rotation: 0,   role: 'give-way', label: 'Sailing', showArrow: true, arrowDx: 0,   arrowDy: -28 },
     ],
   },
   'fishing-over-sailing': {
     caption: 'Rule 18 — a sailing vessel keeps clear of a vessel engaged in fishing.',
     vessels: [
-      { x: 95,  y: 110, rotation: 90, role: 'stand-on', label: 'Fishing (Stand-On)', showArrow: true, arrowDx: 28, arrowDy: 0 },
-      { x: 205, y: 190, rotation: 0,  role: 'give-way', label: 'Sailing (Give-Way)', showArrow: true, arrowDx: 0,  arrowDy: -28 },
+      { x: 95,  y: 110, rotation: 90, role: 'stand-on', label: 'Fishing', showArrow: true, arrowDx: 28, arrowDy: 0 },
+      { x: 205, y: 190, rotation: 0,  role: 'give-way', label: 'Sailing', showArrow: true, arrowDx: 0,  arrowDy: -28 },
     ],
   },
   'hierarchy-ladder': {
@@ -133,7 +149,7 @@ const ROLE_COLORS = {
   },
 };
 
-export const VesselScenario: React.FC<VesselScenarioProps> = ({ scenario, label }) => {
+export const VesselScenario: React.FC<VesselScenarioProps> = ({ scenario, label, revealed = false }) => {
   const { vessels, caption } = SCENARIOS[scenario];
 
   return (
@@ -172,8 +188,11 @@ export const VesselScenario: React.FC<VesselScenarioProps> = ({ scenario, label 
           <circle cx="150" cy="140" r="65"  fill="none" stroke="rgba(34,211,238,0.03)" strokeWidth="1" />
 
           {vessels.map((v, i) => {
-            const colors = ROLE_COLORS[v.role];
-            const markerId = `arrow-${v.role}`;
+            // Until the answer is in, every hull is drawn neutral so the
+            // colour coding cannot be read as the answer.
+            const shownRole = revealed ? v.role : 'neutral';
+            const colors = ROLE_COLORS[shownRole];
+            const markerId = `arrow-${shownRole}`;
 
             // Arrow endpoint — shorten by arrowhead (~8px from hull)
             const ax = v.x + (v.arrowDx ?? 0);
@@ -219,7 +238,7 @@ export const VesselScenario: React.FC<VesselScenarioProps> = ({ scenario, label 
                   fontFamily="monospace"
                   opacity="0.85"
                 >
-                  {v.label}
+                  {revealed ? `${v.label}${ROLE_SUFFIX[v.role]}` : v.label}
                 </text>
               </g>
             );
@@ -227,21 +246,27 @@ export const VesselScenario: React.FC<VesselScenarioProps> = ({ scenario, label 
         </svg>
       </div>
 
-      {/* Caption */}
-      <p className="text-[11px] text-slate-400 text-center leading-snug max-w-[260px] font-mono">
-        {caption}
-      </p>
+      {/* Caption and legend both state the outcome, so they are the answer.
+          Reserve the space either way to stop the diagram jumping on reveal. */}
+      <div className="min-h-[58px] flex flex-col items-center gap-3">
+        {revealed && (
+          <>
+            <p className="text-[11px] text-slate-400 text-center leading-snug max-w-[260px] font-mono animate-in fade-in duration-300">
+              {caption}
+            </p>
 
-      {/* Legend */}
-      <div className="flex gap-5 text-[10px] font-mono uppercase tracking-wider">
-        <span className="flex items-center gap-1.5 text-orange-400">
-          <span className="w-2.5 h-2.5 rounded-sm bg-orange-700 border border-orange-400 inline-block" />
-          Give-Way
-        </span>
-        <span className="flex items-center gap-1.5 text-cyan-400">
-          <span className="w-2.5 h-2.5 rounded-sm bg-cyan-950 border border-cyan-400 inline-block" />
-          Stand-On
-        </span>
+            <div className="flex gap-5 text-[10px] font-mono uppercase tracking-wider animate-in fade-in duration-300">
+              <span className="flex items-center gap-1.5 text-orange-400">
+                <span className="w-2.5 h-2.5 rounded-sm bg-orange-700 border border-orange-400 inline-block" />
+                Give-Way
+              </span>
+              <span className="flex items-center gap-1.5 text-cyan-400">
+                <span className="w-2.5 h-2.5 rounded-sm bg-cyan-950 border border-cyan-400 inline-block" />
+                Stand-On
+              </span>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

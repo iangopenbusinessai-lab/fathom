@@ -494,7 +494,11 @@ export default function ColregsDrill() {
                   />
                 )}
                 {activeScenario && !activeLights && !activeShapes && !activeSounds && (
-                  <VesselScenario scenario={activeScenario} label="Scenario" />
+                  <VesselScenario
+                    scenario={activeScenario}
+                    label="Scenario"
+                    revealed={selectedAnswer !== null}
+                  />
                 )}
               </div>
             )}
