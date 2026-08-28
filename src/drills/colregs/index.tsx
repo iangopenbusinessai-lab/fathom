@@ -119,6 +119,15 @@ function getPool(filter: CategoryFilter): ColregsQuestion[] {
   return filter === 'all' ? COLREGS_QUESTIONS : COLREGS_QUESTIONS_BY_CATEGORY[filter];
 }
 
+// Practice draws with replacement, so without this the same question can come
+// up twice running. Excluding the one just answered fixes that; falling back to
+// the unfiltered pool keeps a one-question category from having nothing to draw.
+function pickExcluding(pool: ColregsQuestion[], excludeId: string | null): ColregsQuestion {
+  const candidates = excludeId === null ? pool : pool.filter(q => q.id !== excludeId);
+  const from = candidates.length > 0 ? candidates : pool;
+  return from[Math.floor(Math.random() * from.length)];
+}
+
 const CATEGORY_ORDER: CategoryFilter[] = [
   'all',
   'navigation-lights',
@@ -173,13 +182,10 @@ export default function ColregsDrill() {
     if (timerRef.current) cancelAnimationFrame(timerRef.current);
   }, []);
 
-  // --- Deck helpers ---
-
-  const pickNext = useCallback((remainingDeck: ColregsQuestion[], mode: DrillMode): ColregsQuestion | null => {
-    if (mode === 'exam') return remainingDeck.length > 0 ? remainingDeck[remainingDeck.length - 1] : null;
-    const pool = getPool(categoryFilter);
-    return pool[Math.floor(Math.random() * pool.length)];
-  }, [categoryFilter]);
+  // Lets advance exclude the outgoing question without taking `current` as a
+  // dependency, which would re-create it and restart the exam timer effect.
+  const currentIdRef = useRef<string | null>(null);
+  useEffect(() => { currentIdRef.current = current?.id ?? null; }, [current]);
 
   // --- Advance to next question ---
 
@@ -199,9 +205,7 @@ export default function ColregsDrill() {
       setCurrent(next[next.length - 1]);
       setTimeLeft(EXAM_QUESTION_MS);
     } else {
-      const pool = getPool(categoryFilter);
-      const next = pool[Math.floor(Math.random() * pool.length)];
-      setCurrent(next);
+      setCurrent(pickExcluding(getPool(categoryFilter), currentIdRef.current));
     }
   }, [categoryFilter]);
 

@@ -11,6 +11,14 @@ import { bestScoreKey, readBestScore, writeBestScore } from '../../lib/storage';
 const GLOBAL_GAME_DURATION_MS = 60000; // 60 seconds for Practice/Timed
 const EXAM_QUESTION_DURATION_MS = 15000; // 15 seconds per question for Exam
 
+// Draw an index in [0, length) that is not the one just used. Falls back to the
+// full range if excluding would leave nothing, so a single-point set still runs.
+function pickIndexExcluding(length: number, exclude: number | null): number {
+  if (length <= 1 || exclude === null) return Math.floor(Math.random() * length);
+  const roll = Math.floor(Math.random() * (length - 1));
+  return roll >= exclude ? roll + 1 : roll;
+}
+
 export default function CompassDrill() {
   const [gameState, setGameState] = useState<GameState>('idle');
   const [gameMode, setGameMode] = useState<GameMode>('practice');
@@ -42,6 +50,10 @@ export default function CompassDrill() {
   // Refs
   const timerRef = useRef<number | null>(null);
   const timeoutRef = useRef<number | null>(null);
+
+  // The point asked last round, held in a ref so generateRound can exclude it
+  // without taking a dependency that would re-create it every round.
+  const lastTargetIndexRef = useRef<number | null>(null);
 
   // --- Helpers ---
 
@@ -117,10 +129,12 @@ export default function CompassDrill() {
         // Reset timer for the new question
         setTimeLeft(EXAM_QUESTION_DURATION_MS);
     } else {
-        // Practice/Timed: Random with replacement
-        nextTargetIndex = Math.floor(Math.random() * activePoints.length);
+        // Practice/Timed: random with replacement, minus the point just asked,
+        // which could otherwise be drawn twice in a row.
+        nextTargetIndex = pickIndexExcluding(activePoints.length, lastTargetIndexRef.current);
     }
 
+    lastTargetIndexRef.current = nextTargetIndex;
     setTargetPoint(activePoints[nextTargetIndex]);
 
     // 2. Determine Rotation (For all Challenge modes - Timed or Exam)
@@ -161,7 +175,9 @@ export default function CompassDrill() {
         setTimeLeft(GLOBAL_GAME_DURATION_MS);
         setGameState('playing');
         setClickedIndex(null);
-        const targetIdx = Math.floor(Math.random() * activePoints.length);
+        // A fresh run has no previous point to exclude.
+        const targetIdx = pickIndexExcluding(activePoints.length, null);
+        lastTargetIndexRef.current = targetIdx;
         setTargetPoint(activePoints[targetIdx]);
         // Apply rotation for timed mode (Compass OR Relative)
         setRotation((mode !== 'practice') ? Math.floor(Math.random() * 360) : 0);
