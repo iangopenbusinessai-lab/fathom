@@ -49,7 +49,7 @@ const QUESTION_LIGHTS: Partial<Record<string, LightName[]>> = {
   'nl-15': ['allRoundRed1', 'allRoundWhite2'],
   // Rule 27(b)(i): RAM - red, white, red in a vertical line.
   'nl-16': ['allRoundRed1', 'allRoundWhite2', 'allRoundRed3'],
-  // Rule 24(a)(v): towing - yellow towing light above the sternlight.
+  // Rule 24(a)(iv): towing - yellow towing light above the sternlight.
   'nl-17': ['masthead', 'port', 'starboard', 'stern', 'allRoundYellow'],
   // Rule 30(a): at anchor, 50 m or more - forward light and a lower one aft.
   'nl-18': ['anchor', 'allRoundWhite'],
@@ -73,7 +73,7 @@ const QUESTION_SHAPES: Partial<Record<string, DayShapeSpec>> = {
   'ds-02': { shapes: ['ball', 'ball'], position: 'main' },
   // Rule 25(e): sail + machinery — one cone, apex downwards, forward.
   'ds-03': { shapes: ['cone-down'], position: 'forward' },
-  // Rule 24(a)(iv): tow exceeding 200 m — one diamond.
+  // Rule 24(a)(v): tow exceeding 200 m — one diamond.
   'ds-04': { shapes: ['diamond'], position: 'main' },
   // Rule 27(b): restricted in ability to manoeuvre — ball, diamond, ball.
   'ds-05': { shapes: ['ball', 'diamond', 'ball'], position: 'main' },
@@ -88,7 +88,7 @@ const QUESTION_SHAPES: Partial<Record<string, DayShapeSpec>> = {
   'ds-09': { shapes: ['cone-down', 'cone-up'], position: 'main' },
   // Rule 26(c)(ii): gear extending over 150 m - a cone apex up toward the gear.
   'ds-10': { shapes: ['cone-up'], position: 'forward' },
-  // Rule 24(e)(i): the vessel being towed, tow over 200 m - one diamond.
+  // Rule 24(e)(iii): the vessel being towed, tow over 200 m - one diamond.
   'ds-11': { shapes: ['diamond'], position: 'main' },
   // Rule 30(g): the anchor ball a small vessel need not exhibit.
   'ds-12': { shapes: ['ball'], position: 'forward' },
@@ -116,7 +116,7 @@ const QUESTION_SOUNDS: Partial<Record<string, BlastMark[]>> = {
   'ss-05': ['prolonged', 'prolonged'],
   // Rule 35(c): NUC / RAM / constrained by draft / sailing / fishing / towing.
   'ss-06': ['prolonged', 'short', 'short'],
-  // Rule 32(a): the definition of a short blast - one is shown for reference.
+  // Rule 32(b): the definition of a short blast - one is shown for reference.
   'ss-07': ['short'],
   // Rule 35(g): at anchor - rapid ringing of the bell for about 5 seconds.
   'ss-08': ['bell'],

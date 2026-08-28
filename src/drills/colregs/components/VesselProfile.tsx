@@ -7,7 +7,7 @@ export type VesselTypeName =
   | 'cbd'       // Rule 28    — constrained by her draft
   | 'fishing'   // Rule 26(b) — engaged in fishing (trawling)
   | 'sailing'   // Rule 25    — under sail alone
-  | 'towing';   // Rule 24(a)(iv) — towing, tow exceeding 200 m
+  | 'towing';   // Rule 24(a)(v) — towing, tow exceeding 200 m
 
 interface VesselProfileProps {
   type: VesselTypeName;
@@ -20,12 +20,12 @@ interface VesselProfileProps {
 //
 // Every cue below is a real COLREGS signal, not a drawing convention invented
 // to make the types look different:
-//   nuc      two balls in a vertical line            Rule 27(a)(i)
-//   ram      ball over diamond over ball             Rule 27(b)(i)
+//   nuc      two balls in a vertical line            Rule 27(a)(ii)
+//   ram      ball over diamond over ball             Rule 27(b)(ii)
 //   cbd      one cylinder                            Rule 28
 //   fishing  two cones, apexes together, plus gear   Rule 26(b)(i)
 //   sailing  the rig itself; no day shape is carried Rule 25
-//   towing   one diamond, plus the tow astern        Rule 24(a)(iv)
+//   towing   one diamond, plus the tow astern        Rule 24(a)(v)
 //
 // Power-driven is deliberately absent: a power-driven vessel underway carries
 // no day shape at all, so on a bare hull she is indistinguishable from a

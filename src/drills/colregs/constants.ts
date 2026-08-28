@@ -228,7 +228,7 @@ const navigationLightsQuestions: ColregsQuestion[] = [
     ],
     correctAnswer: 'A yellow towing light',
     explanation:
-      'Rule 24(a)(v): A vessel towing exhibits a yellow towing light in a vertical line above her sternlight. It has the same 135 degree arc as the sternlight it sits above.',
+      'Rule 24(a)(iv): A vessel towing exhibits a yellow towing light in a vertical line above her sternlight. It has the same 135 degree arc as the sternlight it sits above.',
   },
   {
     id: 'nl-18',
@@ -348,7 +348,7 @@ const soundSignalsQuestions: ColregsQuestion[] = [
     options: ['About 1 second', 'About 2 seconds', '4 to 6 seconds', '8 to 10 seconds'],
     correctAnswer: 'About 1 second',
     explanation:
-      'Rule 32: A short blast is a blast of about one second duration.',
+      'Rule 32(b): A short blast is a blast of about one second duration.',
   },
   {
     id: 'ss-08',
@@ -898,7 +898,7 @@ const dayShapesQuestions: ColregsQuestion[] = [
     ],
     correctAnswer: 'One black diamond',
     explanation:
-      'Rule 24(e)(i): A vessel being towed displays a diamond shape when the length of the tow exceeds 200 metres. Both ends of the tow carry the diamond - the towing vessel under Rule 24(a)(iv) and the towed vessel under 24(e)(i).',
+      'Rule 24(e)(iii): A vessel being towed displays a diamond shape when the length of the tow exceeds 200 metres. Both ends of the tow carry the diamond - the towing vessel under Rule 24(a)(v) and the towed vessel under 24(e)(iii).',
   },
   {
     id: 'ds-12',
@@ -987,7 +987,7 @@ const vesselTypesQuestions: ColregsQuestion[] = [
     ],
     correctAnswer: 'A vessel not under command',
     explanation:
-      'Rule 27(a)(i): A vessel not under command displays two black balls in a vertical line. She is unable to manoeuvre through some exceptional circumstance, and every other vessel keeps clear of her.',
+      'Rule 27(a)(ii): A vessel not under command displays two black balls in a vertical line. She is unable to manoeuvre through some exceptional circumstance, and every other vessel keeps clear of her.',
   },
   {
     id: 'vt-02',
@@ -1001,7 +1001,7 @@ const vesselTypesQuestions: ColregsQuestion[] = [
     ],
     correctAnswer: 'A vessel restricted in her ability to manoeuvre',
     explanation:
-      'Rule 27(b)(i): A vessel restricted in her ability to manoeuvre displays three shapes in a vertical line - ball, diamond, ball. The work she is engaged in, such as dredging or laying cable, prevents her from keeping out of the way.',
+      'Rule 27(b)(ii): A vessel restricted in her ability to manoeuvre displays three shapes in a vertical line - ball, diamond, ball. The work she is engaged in, such as dredging or laying cable, prevents her from keeping out of the way.',
   },
   {
     id: 'vt-03',
@@ -1057,7 +1057,7 @@ const vesselTypesQuestions: ColregsQuestion[] = [
     ],
     correctAnswer: 'A vessel towing, where the length of the tow exceeds 200 metres',
     explanation:
-      'Rule 24(a)(iv): When the length of the tow, measured from the stern of the towing vessel to the after end of the tow, exceeds 200 metres, a diamond shape is displayed. Rule 24(e)(i) requires the towed vessel to display one as well.',
+      'Rule 24(a)(v): When the length of the tow, measured from the stern of the towing vessel to the after end of the tow, exceeds 200 metres, a diamond shape is displayed. Rule 24(e)(iii) requires the towed vessel to display one as well.',
   },
 ];
 
