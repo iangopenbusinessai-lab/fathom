@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type DayShapeName = 'ball' | 'cone-down' | 'diamond' | 'cylinder';
+export type DayShapeName = 'ball' | 'cone-down' | 'cone-up' | 'diamond' | 'cylinder';
 export type MastPosition = 'forward' | 'main' | 'aft';
 export type ShapeArrangement = 'vertical' | 'yardarm';
 
@@ -28,7 +28,9 @@ const MAST_POSITIONS: Record<MastPosition, { x: number; deckY: number; label: st
 const SHAPE_SPACING = 26;
 const MAST_CLEARANCE = 20; // gap between deck and the lowest shape
 
-function shapeNode(shape: DayShapeName, cx: number, cy: number, key: string) {
+// Exported so VesselProfile draws the same shapes with the same geometry
+// rather than keeping a second, drifting copy.
+export function shapeNode(shape: DayShapeName, cx: number, cy: number, key: string) {
   const common = {
     fill: SHAPE_FILL,
     stroke: SHAPE_STROKE,
@@ -54,6 +56,15 @@ function shapeNode(shape: DayShapeName, cx: number, cy: number, key: string) {
           {...common}
         />
       );
+    case 'cone-up':
+      // Apex upwards — the lower cone of the Rule 26 fishing pair
+      return (
+        <polygon
+          key={key}
+          points={`${cx - 9.5},${cy + 8.5} ${cx + 9.5},${cy + 8.5} ${cx},${cy - 10.5}`}
+          {...common}
+        />
+      );
     case 'cylinder':
       return (
         <g key={key}>
@@ -68,6 +79,7 @@ const SHAPE_LABELS: Record<DayShapeName, string> = {
   'ball':      'Ball',
   'diamond':   'Diamond',
   'cone-down': 'Cone ▼',
+  'cone-up':   'Cone ▲',
   'cylinder':  'Cylinder',
 };
 

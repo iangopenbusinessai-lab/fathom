@@ -9,6 +9,7 @@ import {
 } from './constants';
 import { bestScoreKey, readBestScore, writeBestScore } from '../../lib/storage';
 import { ScenarioCard } from './components/ScenarioCard';
+import { VesselProfile, VesselTypeName } from './components/VesselProfile';
 import { LightDisplay, LightName } from './components/LightDisplay';
 import { VesselScenario, ScenarioType } from './components/VesselScenario';
 import { SoundSignalDisplay, BlastMark } from './components/SoundSignalDisplay';
@@ -93,6 +94,17 @@ const QUESTION_SOUND_GAPS: Partial<Record<string, number>> = {
   'ss-05': 2,
 };
 
+// Vessel shown for the type-identification questions. No text in the diagram
+// names the type - the day shapes and rig are the whole question.
+const QUESTION_VESSEL_TYPES: Partial<Record<string, VesselTypeName>> = {
+  'vt-01': 'nuc',
+  'vt-02': 'ram',
+  'vt-03': 'cbd',
+  'vt-04': 'fishing',
+  'vt-05': 'sailing',
+  'vt-06': 'towing',
+};
+
 const QUESTION_SCENARIOS: Partial<Record<string, ScenarioType>> = {
   'vh-01': 'priority-nuc',
   'vh-02': 'sail-keeps-clear-ram',
@@ -134,14 +146,18 @@ const CATEGORY_ORDER: CategoryFilter[] = [
   'sound-signals',
   'vessel-hierarchy',
   'day-shapes',
+  'vessel-types',
 ];
 
+// `sub` is the descriptor only - the question count is prepended at render
+// time from the pool itself, so adding questions cannot leave a stale number.
 const CATEGORY_META: Record<CategoryFilter, { label: string; sub: string; accent: string }> = {
-  'all':               { label: 'All COLREGS',        sub: '36 questions across all topics',    accent: 'cyan'   },
-  'navigation-lights': { label: 'Navigation Lights',  sub: '10 questions — lights & arcs',      accent: 'amber'  },
-  'sound-signals':     { label: 'Sound Signals',      sub: '8 questions — blasts & fog signals', accent: 'green'  },
-  'vessel-hierarchy':  { label: 'Vessel Hierarchy',   sub: '10 questions — give-way rules',     accent: 'indigo' },
-  'day-shapes':        { label: 'Day Shapes',         sub: '8 questions — shapes & marks',      accent: 'rose'   },
+  'all':               { label: 'All COLREGS',        sub: 'across all topics',        accent: 'cyan'   },
+  'navigation-lights': { label: 'Navigation Lights',  sub: 'lights & arcs',            accent: 'amber'  },
+  'sound-signals':     { label: 'Sound Signals',      sub: 'blasts & fog signals',     accent: 'green'  },
+  'vessel-hierarchy':  { label: 'Vessel Hierarchy',   sub: 'give-way rules',           accent: 'indigo' },
+  'day-shapes':        { label: 'Day Shapes',         sub: 'shapes & marks',           accent: 'rose'   },
+  'vessel-types':      { label: 'Vessel Types',       sub: 'identify by shape & rig',  accent: 'violet' },
 };
 
 const ACCENT_CLASSES: Record<string, { border: string; bg: string; text: string; hover: string }> = {
@@ -150,6 +166,7 @@ const ACCENT_CLASSES: Record<string, { border: string; bg: string; text: string;
   green:  { border: 'border-green-900/40',  bg: 'from-green-500/15 to-green-900/15', text: 'text-green-400',  hover: 'hover:border-green-500/50'  },
   indigo: { border: 'border-indigo-900/40', bg: 'from-indigo-500/15 to-indigo-900/15',text: 'text-indigo-400',hover: 'hover:border-indigo-500/50' },
   rose:   { border: 'border-rose-900/40',   bg: 'from-rose-500/15 to-rose-900/15',   text: 'text-rose-400',   hover: 'hover:border-rose-500/50'   },
+  violet: { border: 'border-violet-900/40', bg: 'from-violet-500/15 to-violet-900/15',text: 'text-violet-400',hover: 'hover:border-violet-500/50' },
 };
 
 export default function ColregsDrill() {
@@ -323,8 +340,13 @@ export default function ColregsDrill() {
   const activeScenario = current ? (QUESTION_SCENARIOS[current.id] ?? null) : null;
   const activeShapes = current ? (QUESTION_SHAPES[current.id] ?? null) : null;
   const activeSounds = current ? (QUESTION_SOUNDS[current.id] ?? null) : null;
+  const activeVesselType = current ? (QUESTION_VESSEL_TYPES[current.id] ?? null) : null;
   const hasVisual =
-    activeLights !== null || activeScenario !== null || activeShapes !== null || activeSounds !== null;
+    activeLights !== null ||
+    activeScenario !== null ||
+    activeShapes !== null ||
+    activeSounds !== null ||
+    activeVesselType !== null;
 
   const timerSeconds = Math.ceil(timeLeft / 1000);
   const timerWarning = timerSeconds <= 5;
@@ -374,7 +396,9 @@ export default function ColregsDrill() {
                       </div>
                       <div>
                         <span className={`block font-bold text-base text-white group-hover:${ac.text} transition-colors`}>{meta.label}</span>
-                        <span className="text-xs text-slate-500">{meta.sub}</span>
+                        <span className="text-xs text-slate-500">
+                          {getPool(cat).length} questions — {meta.sub}
+                        </span>
                       </div>
                     </button>
                   );
@@ -474,10 +498,13 @@ export default function ColregsDrill() {
             {/* Visual aid */}
             {hasVisual && (
               <div className="w-full md:w-64 shrink-0 flex items-center justify-center">
-                {activeLights && (
+                {activeVesselType && (
+                  <VesselProfile type={activeVesselType} label="Vessel" />
+                )}
+                {activeLights && !activeVesselType && (
                   <LightDisplay active={activeLights} label="Vessel Lights" />
                 )}
-                {activeSounds && !activeLights && (
+                {activeSounds && !activeLights && !activeVesselType && (
                   <SoundSignalDisplay
                     key={current.id}
                     sequence={activeSounds}
@@ -485,7 +512,7 @@ export default function ColregsDrill() {
                     label="Blast Sequence"
                   />
                 )}
-                {activeShapes && !activeLights && !activeSounds && (
+                {activeShapes && !activeLights && !activeSounds && !activeVesselType && (
                   <DayShapeDisplay
                     shapes={activeShapes.shapes}
                     position={activeShapes.position}
@@ -493,7 +520,7 @@ export default function ColregsDrill() {
                     label="Day Shapes"
                   />
                 )}
-                {activeScenario && !activeLights && !activeShapes && !activeSounds && (
+                {activeScenario && !activeLights && !activeShapes && !activeSounds && !activeVesselType && (
                   <VesselScenario
                     scenario={activeScenario}
                     label="Scenario"

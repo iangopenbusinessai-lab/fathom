@@ -2,7 +2,8 @@ export type ColregsCategory =
   | 'navigation-lights'
   | 'sound-signals'
   | 'vessel-hierarchy'
-  | 'day-shapes';
+  | 'day-shapes'
+  | 'vessel-types';
 
 export interface ColregsQuestion {
   id: string;
@@ -472,6 +473,100 @@ const dayShapesQuestions: ColregsQuestion[] = [
   },
 ];
 
+// --- VESSEL TYPES (6 questions) ---
+//
+// Identify the vessel from what she is showing, with no text label naming the
+// type. Each cue is a real COLREGS signal - see VesselProfile.tsx. A
+// power-driven vessel is deliberately not asked: underway she carries no day
+// shape, so there is nothing to draw that would distinguish her.
+
+const vesselTypesQuestions: ColregsQuestion[] = [
+  {
+    id: 'vt-01',
+    category: 'vessel-types',
+    prompt: 'This vessel is showing two black balls in a vertical line. What is she?',
+    options: [
+      'A vessel not under command',
+      'A vessel restricted in her ability to manoeuvre',
+      'A vessel at anchor',
+      'A vessel aground',
+    ],
+    correctAnswer: 'A vessel not under command',
+    explanation:
+      'Rule 27(a)(i): A vessel not under command displays two black balls in a vertical line. She is unable to manoeuvre through some exceptional circumstance, and every other vessel keeps clear of her.',
+  },
+  {
+    id: 'vt-02',
+    category: 'vessel-types',
+    prompt: 'This vessel displays a ball, a diamond and a ball in a vertical line. What is she?',
+    options: [
+      'A vessel restricted in her ability to manoeuvre',
+      'A vessel not under command',
+      'A vessel constrained by her draft',
+      'A vessel engaged in fishing',
+    ],
+    correctAnswer: 'A vessel restricted in her ability to manoeuvre',
+    explanation:
+      'Rule 27(b)(i): A vessel restricted in her ability to manoeuvre displays three shapes in a vertical line - ball, diamond, ball. The work she is engaged in, such as dredging or laying cable, prevents her from keeping out of the way.',
+  },
+  {
+    id: 'vt-03',
+    category: 'vessel-types',
+    prompt: 'This vessel displays a single black cylinder. What is she?',
+    options: [
+      'A vessel constrained by her draft',
+      'A vessel restricted in her ability to manoeuvre',
+      'A vessel engaged in towing',
+      'A vessel not under command',
+    ],
+    correctAnswer: 'A vessel constrained by her draft',
+    explanation:
+      'Rule 28: A vessel constrained by her draft may display a cylinder. Her draft in relation to the depth and width of navigable water severely restricts her ability to deviate from her course.',
+  },
+  {
+    id: 'vt-04',
+    category: 'vessel-types',
+    prompt: 'This vessel displays two cones with their apexes together, and has gear streaming astern. What is she?',
+    options: [
+      'A vessel engaged in fishing',
+      'A vessel restricted in her ability to manoeuvre',
+      'A vessel engaged in dredging',
+      'A vessel constrained by her draft',
+    ],
+    correctAnswer: 'A vessel engaged in fishing',
+    explanation:
+      'Rule 26(b)(i): A vessel engaged in fishing displays two cones with their apexes together in a vertical line. Rule 26(c)(ii) adds a cone pointing towards outlying gear extending more than 150 metres horizontally.',
+  },
+  {
+    id: 'vt-05',
+    category: 'vessel-types',
+    prompt: 'This vessel is under sail and carries no day shape at all. What is she?',
+    options: [
+      'A sailing vessel under sail alone',
+      'A sailing vessel under sail and machinery',
+      'A vessel not under command',
+      'A vessel engaged in fishing',
+    ],
+    correctAnswer: 'A sailing vessel under sail alone',
+    explanation:
+      'Rule 25: A sailing vessel proceeding under sail alone carries no day shape. It is only when she is under sail AND being propelled by machinery that Rule 25(e) requires a cone, apex downwards - she is then treated as a power-driven vessel.',
+  },
+  {
+    id: 'vt-06',
+    category: 'vessel-types',
+    prompt: 'This vessel displays a single black diamond and has another vessel on a towline astern. What is she?',
+    options: [
+      'A vessel towing, where the length of the tow exceeds 200 metres',
+      'A vessel restricted in her ability to manoeuvre',
+      'A vessel constrained by her draft',
+      'A vessel engaged in fishing',
+    ],
+    correctAnswer: 'A vessel towing, where the length of the tow exceeds 200 metres',
+    explanation:
+      'Rule 24(a)(iv): When the length of the tow, measured from the stern of the towing vessel to the after end of the tow, exceeds 200 metres, a diamond shape is displayed. Rule 24(e)(i) requires the towed vessel to display one as well.',
+  },
+];
+
 // --- COMBINED EXPORT ---
 
 export const COLREGS_QUESTIONS: ColregsQuestion[] = [
@@ -479,6 +574,7 @@ export const COLREGS_QUESTIONS: ColregsQuestion[] = [
   ...soundSignalsQuestions,
   ...vesselHierarchyQuestions,
   ...dayShapesQuestions,
+  ...vesselTypesQuestions,
 ];
 
 export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuestion[]> = {
@@ -486,6 +582,7 @@ export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuest
   'sound-signals': soundSignalsQuestions,
   'vessel-hierarchy': vesselHierarchyQuestions,
   'day-shapes': dayShapesQuestions,
+  'vessel-types': vesselTypesQuestions,
 };
 
 export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
@@ -493,4 +590,5 @@ export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
   'sound-signals': 'Sound Signals',
   'vessel-hierarchy': 'Vessel Hierarchy',
   'day-shapes': 'Day Shapes',
+  'vessel-types': 'Vessel Types',
 };
