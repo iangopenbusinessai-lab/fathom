@@ -6,6 +6,9 @@ export type BlastMark = 'short' | 'prolonged' | 'bell';
 interface SoundSignalDisplayProps {
   sequence: BlastMark[];
   label?: string;
+  // Silence between blasts, in seconds. Defaults to GAP_S; Rule 35(b) sets its
+  // own interval, so that signal passes an override rather than reusing this.
+  gapS?: number;
 }
 
 // Rule 32 durations, in seconds.
@@ -38,20 +41,28 @@ function markWidth(mark: BlastMark): number {
   return BELL_W;
 }
 
-export const SoundSignalDisplay: React.FC<SoundSignalDisplayProps> = ({ sequence, label }) => {
+export const SoundSignalDisplay: React.FC<SoundSignalDisplayProps> = ({
+  sequence,
+  label,
+  gapS = GAP_S,
+}) => {
   const [playing, setPlaying] = useState(false);
   const ctxRef = useRef<AudioContext | null>(null);
   const stopRef = useRef<number | null>(null);
 
+  // Keep the drawn gap proportional to the played one, so a longer interval
+  // reads as a wider space rather than silently diverging from the audio.
+  const gapPx = GAP_PX * (gapS / GAP_S);
+
   // Lay the marks out left to right with a consistent gap, centred in the view.
   const widths = sequence.map(markWidth);
-  const marksW = widths.reduce((a, b) => a + b, 0) + GAP_PX * Math.max(0, sequence.length - 1);
+  const marksW = widths.reduce((a, b) => a + b, 0) + gapPx * Math.max(0, sequence.length - 1);
   const totalW = Math.max(marksW + PAD_X * 2, MIN_W);
 
   let cursor = (totalW - marksW) / 2;
   const placed = sequence.map((mark, i) => {
     const x = cursor;
-    cursor += widths[i] + GAP_PX;
+    cursor += widths[i] + gapPx;
     return { mark, x, w: widths[i] };
   });
 
@@ -151,7 +162,7 @@ export const SoundSignalDisplay: React.FC<SoundSignalDisplayProps> = ({ sequence
         scheduleHorn(ctx, t, duration);
         t += duration;
       }
-      if (i < sequence.length - 1) t += GAP_S;
+      if (i < sequence.length - 1) t += gapS;
     });
 
     const totalMs = (t - ctx.currentTime) * 1000;

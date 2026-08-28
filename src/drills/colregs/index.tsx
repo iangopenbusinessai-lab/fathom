@@ -84,6 +84,14 @@ const QUESTION_SOUNDS: Partial<Record<string, BlastMark[]>> = {
   'ss-08': ['bell'],
 };
 
+// Gap between blasts, in seconds, for signals whose rule states its own
+// interval. Anything absent here uses SoundSignalDisplay's default 1s gap.
+const QUESTION_SOUND_GAPS: Partial<Record<string, number>> = {
+  // Rule 35(b): "two prolonged blasts in succession, with an interval of
+  // about 2 seconds between them."
+  'ss-05': 2,
+};
+
 const QUESTION_SCENARIOS: Partial<Record<string, ScenarioType>> = {
   'vh-01': 'priority-nuc',
   'vh-02': 'sail-keeps-clear-ram',
@@ -447,6 +455,7 @@ export default function ColregsDrill() {
                   <SoundSignalDisplay
                     key={current.id}
                     sequence={activeSounds}
+                    gapS={QUESTION_SOUND_GAPS[current.id]}
                     label="Blast Sequence"
                   />
                 )}
