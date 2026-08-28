@@ -48,14 +48,21 @@ Every drill follows this structure:
 ## Deployment
 ```
 npm run build
-npx gh-pages -d dist --nojekyll
+npm run deploy
 ```
+
+`npm run deploy` is `gh-pages -d dist --nojekyll` plus an explicit `--remove`
+glob. gh-pages' default remove pattern (`.`) does not match dotfiles, so any
+dotfile that ever lands on the gh-pages branch survives every later deploy —
+that is how `.claude/settings.local.json` and `.gitignore` stayed publicly
+served. The glob wipes stray dotfiles (but not `.git`); `.nojekyll` is
+recreated after the remove step. Never deploy with `-d .` or `--dotfiles`.
 
 ## Planned Drills
 - [x] compass — Compass & Relative Bearing
 - [x] colregs — Rules of the Road
   - Navigation lights (visual ID)
-  - Sound signals (identify)
+  - Sound signals (blast-pattern diagram + Web Audio playback)
   - Vessel hierarchy (give-way scenarios)
   - Day shapes (visual ID)
 
