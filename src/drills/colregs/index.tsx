@@ -37,6 +37,26 @@ const QUESTION_LIGHTS: Partial<Record<string, LightName[]>> = {
   'nl-08': ['masthead', 'masthead2', 'masthead3', 'port', 'starboard', 'stern'],
   'nl-09': ['masthead', 'port', 'starboard', 'stern', 'allRoundRed1', 'allRoundRed2', 'allRoundRed3'],
   'nl-10': ['allRoundWhite', 'allRoundRed1'],
+  // Rule 25(a): sailing vessel underway - sidelights and sternlight, no masthead.
+  'nl-11': ['port', 'starboard', 'stern'],
+  // Rule 23(d)(i): power-driven under 12 m - all-round white plus sidelights.
+  'nl-12': ['allRoundWhite', 'port', 'starboard'],
+  // Rule 25(b): tricolour lantern - an observer sees these same three sectors.
+  'nl-13': ['port', 'starboard', 'stern'],
+  // Rule 26(b)(i): trawling - green over white, plus sidelights and sternlight.
+  'nl-14': ['allRoundGreen1', 'allRoundWhite2', 'port', 'starboard', 'stern'],
+  // Rule 26(c)(i): fishing other than trawling - red over white.
+  'nl-15': ['allRoundRed1', 'allRoundWhite2'],
+  // Rule 27(b)(i): RAM - red, white, red in a vertical line.
+  'nl-16': ['allRoundRed1', 'allRoundWhite2', 'allRoundRed3'],
+  // Rule 24(a)(v): towing - yellow towing light above the sternlight.
+  'nl-17': ['masthead', 'port', 'starboard', 'stern', 'allRoundYellow'],
+  // Rule 30(a): at anchor, 50 m or more - forward light and a lower one aft.
+  'nl-18': ['anchor', 'allRoundWhite'],
+  // Rule 23(b): air-cushion in non-displacement mode - all-round flashing yellow.
+  'nl-19': ['masthead', 'port', 'starboard', 'stern', 'allRoundYellow'],
+  // Rule 21(b): the sidelight arcs themselves are the question.
+  'nl-20': ['port', 'starboard'],
 };
 
 interface DayShapeSpec {
@@ -64,6 +84,22 @@ const QUESTION_SHAPES: Partial<Record<string, DayShapeSpec>> = {
   // Rule 27(f): minesweeping — one ball at the foremast head and one at each
   // end of the fore yardarm.
   'ds-08': { shapes: ['ball', 'ball', 'ball'], position: 'forward', arrangement: 'yardarm' },
+  // Rule 26(b)(i): fishing - two cones, apexes together.
+  'ds-09': { shapes: ['cone-down', 'cone-up'], position: 'main' },
+  // Rule 26(c)(ii): gear extending over 150 m - a cone apex up toward the gear.
+  'ds-10': { shapes: ['cone-up'], position: 'forward' },
+  // Rule 24(e)(i): the vessel being towed, tow over 200 m - one diamond.
+  'ds-11': { shapes: ['diamond'], position: 'main' },
+  // Rule 30(g): the anchor ball a small vessel need not exhibit.
+  'ds-12': { shapes: ['ball'], position: 'forward' },
+  // Rule 30(f): the three balls a vessel under 12 m aground need not exhibit.
+  'ds-13': { shapes: ['ball', 'ball', 'ball'], position: 'forward' },
+  // Rule 30(a)(i): the anchor ball, shown in the fore part.
+  'ds-14': { shapes: ['ball'], position: 'forward' },
+  // Rule 25: under sail alone - a bare mast, no shape at all.
+  'ds-15': { shapes: [], position: 'main' },
+  // Annex I s6: the ball whose minimum dimensions are in question.
+  'ds-16': { shapes: ['ball'], position: 'main' },
 };
 
 // Blast sequences in order, left to right.
@@ -84,6 +120,22 @@ const QUESTION_SOUNDS: Partial<Record<string, BlastMark[]>> = {
   'ss-07': ['short'],
   // Rule 35(g): at anchor - rapid ringing of the bell for about 5 seconds.
   'ss-08': ['bell'],
+  // Rule 34(d): the doubt signal - at least five short and rapid blasts.
+  'ss-09': ['short', 'short', 'short', 'short', 'short'],
+  // Rule 34(e): nearing a bend - one prolonged blast.
+  'ss-10': ['prolonged'],
+  // Rule 34(c)(i): "I intend to overtake you on your starboard side."
+  'ss-11': ['prolonged', 'prolonged', 'short'],
+  // Rule 34(c)(i): "I intend to overtake you on your port side."
+  'ss-12': ['prolonged', 'prolonged', 'short', 'short'],
+  // Rule 34(c)(ii): agreement by the vessel about to be overtaken.
+  'ss-13': ['prolonged', 'short', 'prolonged', 'short'],
+  // Rule 35(g): at anchor, warning an approaching vessel.
+  'ss-14': ['short', 'prolonged', 'short'],
+  // Rule 35(h): aground - the bell signal, with three strokes either side.
+  'ss-15': ['bell'],
+  // Rule 32(c): one prolonged blast shown for reference.
+  'ss-16': ['prolonged'],
 };
 
 // Gap between blasts, in seconds, for signals whose rule states its own
@@ -116,6 +168,16 @@ const QUESTION_SCENARIOS: Partial<Record<string, ScenarioType>> = {
   'vh-08': 'standon-may-act',
   'vh-09': 'fishing-over-sailing',
   'vh-10': 'hierarchy-ladder',
+  'vh-11': 'sail-vs-sail',
+  'vh-12': 'sail-vs-sail',
+  'vh-13': 'being-overtaken',
+  'vh-14': 'narrow-channel',
+  'vh-15': 'narrow-channel',
+  'vh-16': 'narrow-channel',
+  'vh-17': 'priority-nuc',
+  // vh-18 (restricted visibility), vh-19 (seaplanes) and vh-20 (risk of
+  // collision) have no scenario: none of the diagrams depicts them, and
+  // borrowing one would attach a caption that contradicts the question.
 };
 
 function shuffle<T>(arr: T[]): T[] {

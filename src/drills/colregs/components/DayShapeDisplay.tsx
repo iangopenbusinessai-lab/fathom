@@ -109,7 +109,12 @@ export const DayShapeDisplay: React.FC<DayShapeDisplayProps> = ({
       })
     : shapes.map((shape, i) => ({ shape, cx: mast.x, cy: topY + i * SHAPE_SPACING }));
 
-  const mastTopY = Math.min(...placed.map(p => p.cy)) - 14;
+  // ds-15 asks what a vessel under sail alone displays - the answer is nothing,
+  // so it passes no shapes. Math.min of an empty list is Infinity, which would
+  // send the mast off the canvas; fall back to a plain bare mast instead.
+  const mastTopY = placed.length > 0
+    ? Math.min(...placed.map(p => p.cy)) - 14
+    : lowestY - 30;
 
   return (
     <div className="flex flex-col items-center gap-3 select-none">

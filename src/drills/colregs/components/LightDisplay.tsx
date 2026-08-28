@@ -12,6 +12,10 @@ export type LightName =
   | 'allRoundRed2'
   | 'allRoundRed3'
   | 'allRoundWhite'
+  | 'allRoundWhite2'
+  | 'allRoundGreen1'
+  | 'allRoundGreen2'
+  | 'allRoundGreen3'
   | 'allRoundYellow'
   | 'cylinder';
 
@@ -32,6 +36,10 @@ const LIGHT_COLORS: Record<LightName, string> = {
   allRoundRed2:  '#ef4444',
   allRoundRed3:  '#ef4444',
   allRoundWhite: '#ffffff',
+  allRoundWhite2:'#ffffff',
+  allRoundGreen1:'#22c55e',
+  allRoundGreen2:'#22c55e',
+  allRoundGreen3:'#22c55e',
   allRoundYellow:'#eab308',
   cylinder:      '#1e293b',
 };
@@ -48,6 +56,10 @@ const LIGHT_GLOWS: Record<LightName, string> = {
   allRoundRed2:  'rgba(239,68,68,0.9)',
   allRoundRed3:  'rgba(239,68,68,0.9)',
   allRoundWhite: 'rgba(255,255,255,0.9)',
+  allRoundWhite2:'rgba(255,255,255,0.9)',
+  allRoundGreen1:'rgba(34,197,94,0.9)',
+  allRoundGreen2:'rgba(34,197,94,0.9)',
+  allRoundGreen3:'rgba(34,197,94,0.9)',
   allRoundYellow:'rgba(234,179,8,0.9)',
   cylinder:      'rgba(100,116,139,0.5)',
 };
@@ -90,7 +102,11 @@ const LIGHT_POSITIONS: Record<LightName, { cx: number; cy: number; label: string
   allRoundRed2: { cx: 100, cy: 110, label: 'All-Rd Red', arc: { cx: 100, cy: 110, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(239,68,68,0.05)'    } },
   allRoundRed3: { cx: 100, cy: 140, label: 'All-Rd Red', arc: { cx: 100, cy: 140, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(239,68,68,0.04)'    } },
   allRoundWhite:{ cx: 100, cy: 130, label: 'All-Rd Wht', arc: { cx: 100, cy: 130, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(255,255,255,0.05)' } },
-  allRoundYellow:{ cx: 100, cy: 140,label: 'All-Rd Ylw', arc: { cx: 100, cy: 140, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(234,179,8,0.06)'    } },
+  allRoundWhite2:{ cx: 100, cy: 110, label: 'All-Rd Wht', arc: { cx: 100, cy: 110, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(255,255,255,0.05)' } },
+  allRoundGreen1:{ cx: 100, cy: 80,  label: 'All-Rd Grn', arc: { cx: 100, cy: 80,  r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(34,197,94,0.07)'    } },
+  allRoundGreen2:{ cx: 100, cy: 110, label: 'All-Rd Grn', arc: { cx: 100, cy: 110, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(34,197,94,0.05)'    } },
+  allRoundGreen3:{ cx: 100, cy: 140, label: 'All-Rd Grn', arc: { cx: 100, cy: 140, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(34,197,94,0.04)'    } },
+  allRoundYellow:{ cx: 100, cy: 170,label: 'All-Rd Ylw', arc: { cx: 100, cy: 170, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(234,179,8,0.06)'    } },
   cylinder:     { cx: 100, cy: 40,  label: 'Cylinder',   },
 };
 

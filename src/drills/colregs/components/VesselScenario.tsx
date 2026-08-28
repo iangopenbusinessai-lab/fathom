@@ -10,7 +10,9 @@ export type ScenarioType =
   | 'priority-nuc'          // Rule 18 — all vessels keep clear of a NUC vessel
   | 'sail-keeps-clear-ram'  // Rule 18 — sailing vessel keeps clear of a RAM vessel
   | 'fishing-over-sailing'  // Rule 18 — sailing vessel keeps clear of a fishing vessel
-  | 'hierarchy-ladder';     // Rule 18 — the full responsibilities ordering
+  | 'hierarchy-ladder'      // Rule 18 — the full responsibilities ordering
+  | 'sail-vs-sail'          // Rule 12 — two sailing vessels, wind on different sides
+  | 'narrow-channel';       // Rule 9  — keeping to the starboard side of a channel
 
 interface VesselScenarioProps {
   scenario: ScenarioType;
@@ -110,6 +112,20 @@ const SCENARIOS: Record<ScenarioType, { vessels: VesselDef[]; caption: string }>
     vessels: [
       { x: 95,  y: 110, rotation: 90, role: 'stand-on', label: 'Fishing', showArrow: true, arrowDx: 28, arrowDy: 0 },
       { x: 205, y: 190, rotation: 0,  role: 'give-way', label: 'Sailing', showArrow: true, arrowDx: 0,  arrowDy: -28 },
+    ],
+  },
+  'sail-vs-sail': {
+    caption: 'Rule 12 — with the wind on different sides, the vessel with the wind on her port side keeps clear.',
+    vessels: [
+      { x: 95,  y: 105, rotation: 20,  role: 'give-way', label: 'Wind to Port',  showArrow: true, arrowDx: 14, arrowDy: 26 },
+      { x: 205, y: 185, rotation: -20, role: 'stand-on', label: 'Wind to Stbd',  showArrow: true, arrowDx: -14, arrowDy: -26 },
+    ],
+  },
+  'narrow-channel': {
+    caption: 'Rule 9 — keep to the starboard side of the channel; small craft and sailing vessels must not impede a vessel that can navigate only within it.',
+    vessels: [
+      { x: 196, y: 190, rotation: 0,   role: 'stand-on', label: 'Deep Draft', showArrow: true, arrowDx: 0, arrowDy: -30 },
+      { x: 118, y: 120, rotation: 0,   role: 'give-way', label: 'Small Craft', showArrow: true, arrowDx: 0, arrowDy: -26 },
     ],
   },
   'hierarchy-ladder': {

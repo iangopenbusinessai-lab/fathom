@@ -14,7 +14,7 @@ export interface ColregsQuestion {
   explanation: string;
 }
 
-// --- NAVIGATION LIGHTS (10 questions) ---
+// --- NAVIGATION LIGHTS (20 questions) ---
 
 const navigationLightsQuestions: ColregsQuestion[] = [
   {
@@ -132,9 +132,144 @@ const navigationLightsQuestions: ColregsQuestion[] = [
     explanation:
       'Rule 29: A pilot vessel on duty shows an all-round white light over an all-round red light at or near the masthead.',
   },
+  {
+    id: 'nl-11',
+    category: 'navigation-lights',
+    prompt: 'A sailing vessel underway displays which lights?',
+    options: [
+      'Sidelights and a sternlight',
+      'Sidelights, a sternlight and one masthead light',
+      'Two all-round red lights and sidelights',
+      'An all-round white light only',
+    ],
+    correctAnswer: 'Sidelights and a sternlight',
+    explanation:
+      'Rule 25(a): A sailing vessel underway exhibits sidelights and a sternlight. She carries no masthead (steaming) light - that light marks a vessel under power.',
+  },
+  {
+    id: 'nl-12',
+    category: 'navigation-lights',
+    prompt: 'A power-driven vessel of less than 12 metres in length may, instead of the full set, display which lights?',
+    options: [
+      'An all-round white light and sidelights',
+      'An all-round white light alone',
+      'A masthead light and a sternlight only',
+      'Two all-round white lights in a vertical line',
+    ],
+    correctAnswer: 'An all-round white light and sidelights',
+    explanation:
+      'Rule 23(d)(i): A power-driven vessel of less than 12 metres in length may exhibit an all-round white light and sidelights in place of the masthead light, sidelights and sternlight.',
+  },
+  {
+    id: 'nl-13',
+    category: 'navigation-lights',
+    prompt: 'A sailing vessel of less than 20 metres may combine her sidelights and sternlight in what single fitting?',
+    options: [
+      'One tricolour lantern at or near the top of the mast',
+      'One all-round white light at the masthead',
+      'One all-round red light at the masthead',
+      'A single combined lantern at the stemhead',
+    ],
+    correctAnswer: 'One tricolour lantern at or near the top of the mast',
+    explanation:
+      'Rule 25(b): In a sailing vessel of less than 20 metres the sidelights and sternlight may be combined in one lantern carried at or near the top of the mast. An observer still sees the same three sectors - red, green and white.',
+  },
+  {
+    id: 'nl-14',
+    category: 'navigation-lights',
+    prompt: 'A vessel engaged in trawling displays which pair of all-round lights in a vertical line?',
+    options: [
+      'Green over white',
+      'Red over white',
+      'White over red',
+      'Red over green',
+    ],
+    correctAnswer: 'Green over white',
+    explanation:
+      'Rule 26(b)(i): A vessel engaged in trawling shows two all-round lights in a vertical line, the upper green and the lower white, plus sidelights and a sternlight when making way through the water.',
+  },
+  {
+    id: 'nl-15',
+    category: 'navigation-lights',
+    prompt: 'A vessel engaged in fishing OTHER than trawling displays which pair of all-round lights in a vertical line?',
+    options: [
+      'Red over white',
+      'Green over white',
+      'White over red',
+      'Red over red',
+    ],
+    correctAnswer: 'Red over white',
+    explanation:
+      'Rule 26(c)(i): A vessel engaged in fishing other than trawling shows two all-round lights in a vertical line, the upper red and the lower white. Remember it as "red over white, fishing at night".',
+  },
+  {
+    id: 'nl-16',
+    category: 'navigation-lights',
+    prompt: 'A vessel restricted in her ability to manoeuvre displays which three all-round lights in a vertical line?',
+    options: [
+      'Red, white, red',
+      'Red, red, red',
+      'White, red, white',
+      'Green, white, green',
+    ],
+    correctAnswer: 'Red, white, red',
+    explanation:
+      'Rule 27(b)(i): A vessel restricted in her ability to manoeuvre shows three all-round lights in a vertical line - the highest and lowest red, the middle white. Remember it as "red, white, red - restricted ahead".',
+  },
+  {
+    id: 'nl-17',
+    category: 'navigation-lights',
+    prompt: 'What light does a towing vessel show above her sternlight?',
+    options: [
+      'A yellow towing light',
+      'A second white sternlight',
+      'An all-round red light',
+      'A flashing blue light',
+    ],
+    correctAnswer: 'A yellow towing light',
+    explanation:
+      'Rule 24(a)(v): A vessel towing exhibits a yellow towing light in a vertical line above her sternlight. It has the same 135 degree arc as the sternlight it sits above.',
+  },
+  {
+    id: 'nl-18',
+    category: 'navigation-lights',
+    prompt: 'A vessel at anchor of 50 metres or more in length displays how many anchor lights, and where?',
+    options: [
+      'Two - one in the fore part and a lower one at or near the stern',
+      'One - in the fore part only',
+      'Two - both at the masthead in a vertical line',
+      'Three - in a vertical line at the masthead',
+    ],
+    correctAnswer: 'Two - one in the fore part and a lower one at or near the stern',
+    explanation:
+      'Rule 30(a): A vessel at anchor exhibits an all-round white light in the fore part and, if 50 metres or more in length, a second all-round white light at or near the stern and lower than the forward one.',
+  },
+  {
+    id: 'nl-19',
+    category: 'navigation-lights',
+    prompt: 'An air-cushion vessel operating in the non-displacement mode exhibits what additional light?',
+    options: [
+      'An all-round flashing yellow light',
+      'An all-round flashing blue light',
+      'An all-round flashing red light',
+      'A second masthead light',
+    ],
+    correctAnswer: 'An all-round flashing yellow light',
+    explanation:
+      'Rule 23(b): An air-cushion vessel operating in the non-displacement mode exhibits, in addition to the lights of a power-driven vessel, an all-round flashing yellow light.',
+  },
+  {
+    id: 'nl-20',
+    category: 'navigation-lights',
+    prompt: 'Over what arc is each sidelight visible?',
+    options: ['112.5 degrees', '135 degrees', '225 degrees', '360 degrees'],
+    correctAnswer: '112.5 degrees',
+    explanation:
+      'Rule 21(b): Each sidelight shows an unbroken light over an arc of 112.5 degrees, from right ahead to 22.5 degrees abaft the beam on its own side. The two sidelights and the 135 degree sternlight together make up the full 360.',
+  },
 ];
 
-// --- SOUND SIGNALS (8 questions) ---
+// --- SOUND SIGNALS (16 questions) ---
 
 const soundSignalsQuestions: ColregsQuestion[] = [
   {
@@ -224,9 +359,121 @@ const soundSignalsQuestions: ColregsQuestion[] = [
     explanation:
       'Rule 35: A vessel at anchor sounds a rapid ringing of the bell for about 5 seconds at intervals of not more than 1 minute.',
   },
+  {
+    id: 'ss-09',
+    category: 'sound-signals',
+    prompt: 'What does a signal of at least five short and rapid blasts mean?',
+    options: [
+      'I doubt whether you are taking sufficient action to avoid collision',
+      'I am altering course to starboard',
+      'I am aground',
+      'I intend to overtake you',
+    ],
+    correctAnswer: 'I doubt whether you are taking sufficient action to avoid collision',
+    explanation:
+      'Rule 34(d): When vessels in sight of one another fail to understand each other\'s intentions, or one doubts whether sufficient action is being taken to avoid collision, she sounds at least five short and rapid blasts - the doubt or wake-up signal.',
+  },
+  {
+    id: 'ss-10',
+    category: 'sound-signals',
+    prompt: 'A vessel nearing a bend where other vessels may be obscured sounds which signal?',
+    options: [
+      'One prolonged blast',
+      'Two prolonged blasts',
+      'One short blast',
+      'Five short blasts',
+    ],
+    correctAnswer: 'One prolonged blast',
+    explanation:
+      'Rule 34(e): A vessel nearing a bend or an area of a channel where other vessels may be obscured sounds one prolonged blast, to be answered with a prolonged blast by any approaching vessel within hearing.',
+  },
+  {
+    id: 'ss-11',
+    category: 'sound-signals',
+    prompt: 'In a narrow channel, which signal means "I intend to overtake you on your starboard side"?',
+    options: [
+      'Two prolonged blasts followed by one short blast',
+      'Two prolonged blasts followed by two short blasts',
+      'One prolonged blast followed by one short blast',
+      'Three short blasts',
+    ],
+    correctAnswer: 'Two prolonged blasts followed by one short blast',
+    explanation:
+      'Rule 34(c)(i): In a narrow channel or fairway, a vessel intending to overtake sounds two prolonged blasts followed by one short blast to mean "I intend to overtake you on your starboard side".',
+  },
+  {
+    id: 'ss-12',
+    category: 'sound-signals',
+    prompt: 'In a narrow channel, which signal means "I intend to overtake you on your port side"?',
+    options: [
+      'Two prolonged blasts followed by two short blasts',
+      'Two prolonged blasts followed by one short blast',
+      'Two short blasts',
+      'One prolonged and two short blasts',
+    ],
+    correctAnswer: 'Two prolonged blasts followed by two short blasts',
+    explanation:
+      'Rule 34(c)(i): Two prolonged blasts followed by two short blasts means "I intend to overtake you on your port side". One short for starboard, two short for port - the same convention as the Rule 34(a) manoeuvring signals.',
+  },
+  {
+    id: 'ss-13',
+    category: 'sound-signals',
+    prompt: 'How does the vessel about to be overtaken signal her agreement to the overtaking?',
+    options: [
+      'One prolonged, one short, one prolonged and one short blast, in that order',
+      'Two prolonged blasts',
+      'Three short blasts',
+      'Five short and rapid blasts',
+    ],
+    correctAnswer: 'One prolonged, one short, one prolonged and one short blast, in that order',
+    explanation:
+      'Rule 34(c)(ii): The vessel about to be overtaken, if in agreement, sounds one prolonged, one short, one prolonged and one short blast in that order. Anything else - in particular five short blasts - is not agreement.',
+  },
+  {
+    id: 'ss-14',
+    category: 'sound-signals',
+    prompt: 'A vessel at anchor may sound which signal to warn an approaching vessel of her position?',
+    options: [
+      'One short, one prolonged and one short blast',
+      'One prolonged blast',
+      'Two prolonged blasts',
+      'Three short blasts',
+    ],
+    correctAnswer: 'One short, one prolonged and one short blast',
+    explanation:
+      'Rule 35(g): A vessel at anchor may in addition sound three blasts in succession - short, prolonged, short - to give warning of her position and of the possibility of collision to an approaching vessel.',
+  },
+  {
+    id: 'ss-15',
+    category: 'sound-signals',
+    prompt: 'A vessel aground signals her bell how, in restricted visibility?',
+    options: [
+      'Three separate strokes before and after the rapid ringing of the bell',
+      'Rapid ringing of the bell alone, as if at anchor',
+      'Two separate strokes after the rapid ringing only',
+      'Continuous ringing for one minute',
+    ],
+    correctAnswer: 'Three separate strokes before and after the rapid ringing of the bell',
+    explanation:
+      'Rule 35(h): A vessel aground gives the bell signal of a vessel at anchor and in addition three separate and distinct strokes on the bell immediately before and after the rapid ringing.',
+  },
+  {
+    id: 'ss-16',
+    category: 'sound-signals',
+    prompt: 'What is the duration of a "prolonged blast"?',
+    options: [
+      'From four to six seconds',
+      'About one second',
+      'From two to three seconds',
+      'About ten seconds',
+    ],
+    correctAnswer: 'From four to six seconds',
+    explanation:
+      'Rule 32(c): A prolonged blast is a blast of from four to six seconds duration. Rule 32(b) defines a short blast as about one second.',
+  },
 ];
 
-// --- VESSEL HIERARCHY (10 questions) ---
+// --- VESSEL HIERARCHY (20 questions) ---
 
 const vesselHierarchyQuestions: ColregsQuestion[] = [
   {
@@ -359,9 +606,149 @@ const vesselHierarchyQuestions: ColregsQuestion[] = [
     explanation:
       'Rule 18 ("Responsibilities between vessels") defines the full hierarchy: NUC > RAM > CBD > Fishing > Sailing > Power-driven > Seaplanes.',
   },
+  {
+    id: 'vh-11',
+    category: 'vessel-hierarchy',
+    prompt: 'Two sailing vessels are approaching with the wind on different sides. Which one keeps out of the way?',
+    options: [
+      'The vessel which has the wind on her port side',
+      'The vessel which has the wind on her starboard side',
+      'The windward vessel',
+      'The faster vessel',
+    ],
+    correctAnswer: 'The vessel which has the wind on her port side',
+    explanation:
+      'Rule 12(a)(i): When each sailing vessel has the wind on a different side, the one with the wind on her port side keeps out of the way of the other.',
+  },
+  {
+    id: 'vh-12',
+    category: 'vessel-hierarchy',
+    prompt: 'Two sailing vessels have the wind on the same side. Which one keeps out of the way?',
+    options: [
+      'The vessel to windward',
+      'The vessel to leeward',
+      'The vessel on the port tack',
+      'The overtaking vessel only',
+    ],
+    correctAnswer: 'The vessel to windward',
+    explanation:
+      'Rule 12(a)(ii): When both sailing vessels have the wind on the same side, the vessel to windward keeps out of the way of the vessel to leeward.',
+  },
+  {
+    id: 'vh-13',
+    category: 'vessel-hierarchy',
+    prompt: 'What is required of the vessel BEING overtaken?',
+    options: [
+      'Maintain course and speed as the stand-on vessel',
+      'Alter course to starboard to open the range',
+      'Reduce speed to let the other vessel past',
+      'Sound two short blasts and give way',
+    ],
+    correctAnswer: 'Maintain course and speed as the stand-on vessel',
+    explanation:
+      'Rules 13 and 17: The overtaking vessel keeps out of the way; the vessel being overtaken is the stand-on vessel and keeps her course and speed. A subsequent change of bearing does not relieve the overtaking vessel of that duty.',
+  },
+  {
+    id: 'vh-14',
+    category: 'vessel-hierarchy',
+    prompt: 'In a narrow channel, a vessel of less than 20 metres or a sailing vessel must not do what?',
+    options: [
+      'Impede the passage of a vessel that can navigate only within the channel',
+      'Overtake any vessel under any circumstances',
+      'Anchor anywhere within five miles of the channel',
+      'Cross the channel at any time',
+    ],
+    correctAnswer: 'Impede the passage of a vessel that can navigate only within the channel',
+    explanation:
+      'Rule 9(b): A vessel of less than 20 metres in length or a sailing vessel shall not impede the passage of a vessel which can safely navigate only within a narrow channel or fairway.',
+  },
+  {
+    id: 'vh-15',
+    category: 'vessel-hierarchy',
+    prompt: 'A vessel engaged in fishing in a narrow channel must not impede whom?',
+    options: [
+      'Any other vessel navigating within the channel',
+      'Only vessels constrained by their draft',
+      'Only power-driven vessels over 50 metres',
+      'Nobody - fishing vessels have right of way in channels',
+    ],
+    correctAnswer: 'Any other vessel navigating within the channel',
+    explanation:
+      'Rule 9(c): A vessel engaged in fishing shall not impede the passage of any other vessel navigating within a narrow channel or fairway. Her Rule 18 priority does not carry into the channel.',
+  },
+  {
+    id: 'vh-16',
+    category: 'vessel-hierarchy',
+    prompt: 'In a traffic separation scheme, a sailing vessel or a vessel of less than 20 metres must not impede whom?',
+    options: [
+      'A power-driven vessel following a traffic lane',
+      'Any vessel engaged in fishing',
+      'Only vessels not under command',
+      'Nobody - the scheme imposes no such duty',
+    ],
+    correctAnswer: 'A power-driven vessel following a traffic lane',
+    explanation:
+      'Rule 10(j): A vessel of less than 20 metres in length or a sailing vessel shall not impede the safe passage of a power-driven vessel following a traffic lane.',
+  },
+  {
+    id: 'vh-17',
+    category: 'vessel-hierarchy',
+    prompt: 'A power-driven vessel underway must keep out of the way of which of these?',
+    options: [
+      'A vessel not under command, a RAM vessel, a fishing vessel and a sailing vessel',
+      'A sailing vessel only',
+      'A vessel not under command only',
+      'Any vessel larger than herself',
+    ],
+    correctAnswer: 'A vessel not under command, a RAM vessel, a fishing vessel and a sailing vessel',
+    explanation:
+      'Rule 18(a): A power-driven vessel underway keeps out of the way of a vessel not under command, a vessel restricted in her ability to manoeuvre, a vessel engaged in fishing, and a sailing vessel. She sits near the bottom of the order of responsibility.',
+  },
+  {
+    id: 'vh-18',
+    category: 'vessel-hierarchy',
+    prompt: 'Which vessel is the stand-on vessel between two vessels NOT in sight of one another in restricted visibility?',
+    options: [
+      'Neither - Rule 19 applies and there is no stand-on vessel',
+      'The vessel with the other on her port side',
+      'The larger vessel',
+      'The vessel making the slower speed',
+    ],
+    correctAnswer: 'Neither - Rule 19 applies and there is no stand-on vessel',
+    explanation:
+      'Rule 19: The steering and sailing rules for vessels in sight of one another do not apply in restricted visibility. There is no stand-on vessel; every vessel proceeds at a safe speed and takes avoiding action in accordance with Rule 19(d).',
+  },
+  {
+    id: 'vh-19',
+    category: 'vessel-hierarchy',
+    prompt: 'What is required of a seaplane on the water?',
+    options: [
+      'She shall keep well clear of all vessels and avoid impeding their navigation',
+      'She is treated as a vessel not under command',
+      'She has priority over power-driven vessels',
+      'She is treated as a vessel restricted in her ability to manoeuvre',
+    ],
+    correctAnswer: 'She shall keep well clear of all vessels and avoid impeding their navigation',
+    explanation:
+      'Rule 18(e): A seaplane on the water shall in general keep well clear of all vessels and avoid impeding their navigation. She sits at the very bottom of the order of responsibility.',
+  },
+  {
+    id: 'vh-20',
+    category: 'vessel-hierarchy',
+    prompt: 'Risk of collision shall be deemed to exist if which of these is true?',
+    options: [
+      'The compass bearing of an approaching vessel does not appreciably change',
+      'The other vessel is within two miles',
+      'The other vessel is closing at more than ten knots',
+      'The other vessel is fine on the starboard bow',
+    ],
+    correctAnswer: 'The compass bearing of an approaching vessel does not appreciably change',
+    explanation:
+      'Rule 7(d)(i): Risk of collision shall be deemed to exist if the compass bearing of an approaching vessel does not appreciably change. Rule 7(d)(ii) warns that risk may exist even with an appreciable bearing change, as with a very large vessel or a tow at close range.',
+  },
 ];
 
-// --- DAY SHAPES (8 questions) ---
+// --- DAY SHAPES (16 questions) ---
 
 const dayShapesQuestions: ColregsQuestion[] = [
   {
@@ -395,7 +782,7 @@ const dayShapesQuestions: ColregsQuestion[] = [
   {
     id: 'ds-03',
     category: 'day-shapes',
-    prompt: 'A power-driven vessel proceeding under sail only (engine off) must display which day shape when underway?',
+    prompt: 'A sailing vessel proceeding under sail AND being propelled by machinery must display which day shape?',
     options: [
       'One black ball',
       'One black cone, apex downwards',
@@ -470,6 +857,113 @@ const dayShapesQuestions: ColregsQuestion[] = [
     correctAnswer: 'Three',
     explanation:
       'Rule 27: A vessel engaged in minesweeping displays three black balls — one at or near the foremast head and one at each end of the fore yardarm — to indicate that it is dangerous to approach within 1000 metres.',
+  },
+  {
+    id: 'ds-09',
+    category: 'day-shapes',
+    prompt: 'What day shape does a vessel engaged in fishing display?',
+    options: [
+      'Two cones with their apexes together, in a vertical line',
+      'Two black balls in a vertical line',
+      'One black cone, apex downwards',
+      'A ball, a diamond and a ball in a vertical line',
+    ],
+    correctAnswer: 'Two cones with their apexes together, in a vertical line',
+    explanation:
+      'Rule 26(b)(i): A vessel engaged in fishing displays two cones with their apexes together in a vertical line - the daytime equivalent of her green-over-white or red-over-white lights.',
+  },
+  {
+    id: 'ds-10',
+    category: 'day-shapes',
+    prompt: 'A fishing vessel with outlying gear extending more than 150 metres horizontally displays what additional shape?',
+    options: [
+      'A cone, apex upwards, in the direction of the gear',
+      'A second pair of cones, apexes together',
+      'A black diamond on the side of the gear',
+      'Two black balls on the side of the gear',
+    ],
+    correctAnswer: 'A cone, apex upwards, in the direction of the gear',
+    explanation:
+      'Rule 26(c)(ii): A vessel engaged in fishing with outlying gear extending more than 150 metres horizontally displays a cone, apex upwards, in the direction of the gear, so others know which side to avoid.',
+  },
+  {
+    id: 'ds-11',
+    category: 'day-shapes',
+    prompt: 'What day shape is displayed by the vessel BEING TOWED, when the tow exceeds 200 metres?',
+    options: [
+      'One black diamond',
+      'One black ball',
+      'Two black balls in a vertical line',
+      'None - only the towing vessel displays a shape',
+    ],
+    correctAnswer: 'One black diamond',
+    explanation:
+      'Rule 24(e)(i): A vessel being towed displays a diamond shape when the length of the tow exceeds 200 metres. Both ends of the tow carry the diamond - the towing vessel under Rule 24(a)(iv) and the towed vessel under 24(e)(i).',
+  },
+  {
+    id: 'ds-12',
+    category: 'day-shapes',
+    prompt: 'Which vessel at anchor is NOT required to exhibit the anchor ball?',
+    options: [
+      'A vessel of less than 7 metres, not in or near a narrow channel, fairway or anchorage',
+      'Any vessel of less than 20 metres, anywhere',
+      'Any vessel of less than 50 metres, anywhere',
+      'Every vessel at anchor must exhibit it without exception',
+    ],
+    correctAnswer: 'A vessel of less than 7 metres, not in or near a narrow channel, fairway or anchorage',
+    explanation:
+      'Rule 30(g): A vessel of less than 7 metres in length, when at anchor and not in or near a narrow channel, fairway or anchorage, or where other vessels normally navigate, is not required to exhibit the anchor light or shape.',
+  },
+  {
+    id: 'ds-13',
+    category: 'day-shapes',
+    prompt: 'Which vessel aground is NOT required to exhibit the three balls?',
+    options: [
+      'A vessel of less than 12 metres in length',
+      'A vessel of less than 20 metres in length',
+      'A vessel of less than 50 metres in length',
+      'Every vessel aground must exhibit them without exception',
+    ],
+    correctAnswer: 'A vessel of less than 12 metres in length',
+    explanation:
+      'Rule 30(f): A vessel of less than 12 metres in length, when aground, is not required to exhibit the three balls in a vertical line required by Rule 30(d).',
+  },
+  {
+    id: 'ds-14',
+    category: 'day-shapes',
+    prompt: 'Where on the vessel is the anchor ball displayed?',
+    options: [
+      'In the fore part',
+      'At or near the stern',
+      'At the masthead, amidships',
+      'On the side facing the channel',
+    ],
+    correctAnswer: 'In the fore part',
+    explanation:
+      'Rule 30(a)(i): A vessel at anchor exhibits, where it can best be seen, one ball in the fore part - marking the end she is riding to her anchor from.',
+  },
+  {
+    id: 'ds-15',
+    category: 'day-shapes',
+    prompt: 'What day shape does a sailing vessel proceeding under sail alone display?',
+    options: [
+      'None',
+      'One black cone, apex downwards',
+      'One black ball',
+      'Two cones with their apexes together',
+    ],
+    correctAnswer: 'None',
+    explanation:
+      'Rule 25: A sailing vessel proceeding under sail alone carries no day shape. The cone apex downwards of Rule 25(e) is required only when she is under sail AND being propelled by machinery, when she counts as a power-driven vessel.',
+  },
+  {
+    id: 'ds-16',
+    category: 'day-shapes',
+    prompt: 'Under Annex I, what is the minimum diameter of a ball shape on a vessel of 20 metres or more?',
+    options: ['0.6 metres', '0.3 metres', '1.0 metres', '1.5 metres'],
+    correctAnswer: '0.6 metres',
+    explanation:
+      'Annex I, section 6: A ball shall have a diameter of not less than 0.6 metres, and where more than one shape is shown they shall be spaced at least 1.5 metres apart. Vessels of less than 20 metres may use correspondingly smaller shapes.',
   },
 ];
 
