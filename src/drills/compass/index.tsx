@@ -13,7 +13,7 @@ const EXAM_QUESTION_DURATION_MS = 15000; // 15 seconds per question for Exam
 
 // Draw an index in [0, length) that is not the one just used. Falls back to the
 // full range if excluding would leave nothing, so a single-point set still runs.
-function pickIndexExcluding(length: number, exclude: number | null): number {
+export function pickIndexExcluding(length: number, exclude: number | null): number {
   if (length <= 1 || exclude === null) return Math.floor(Math.random() * length);
   const roll = Math.floor(Math.random() * (length - 1));
   return roll >= exclude ? roll + 1 : roll;

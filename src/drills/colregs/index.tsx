@@ -196,7 +196,7 @@ function getPool(filter: CategoryFilter): ColregsQuestion[] {
 // Practice draws with replacement, so without this the same question can come
 // up twice running. Excluding the one just answered fixes that; falling back to
 // the unfiltered pool keeps a one-question category from having nothing to draw.
-function pickExcluding(pool: ColregsQuestion[], excludeId: string | null): ColregsQuestion {
+export function pickExcluding(pool: ColregsQuestion[], excludeId: string | null): ColregsQuestion {
   const candidates = excludeId === null ? pool : pool.filter(q => q.id !== excludeId);
   const from = candidates.length > 0 ? candidates : pool;
   return from[Math.floor(Math.random() * from.length)];
