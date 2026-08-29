@@ -12,7 +12,13 @@ import { COLREGS_QUESTIONS } from '../drills/colregs/constants';
 
 // A citation is: Rule N, Rule N(x), or Rule N(x)(y).
 // x is a single lowercase letter; y is a lowercase roman numeral.
-const WELL_FORMED = /^Rules?\s\d{1,2}(\([a-z]\))?(\((?:i|ii|iii|iv|v|vi|vii|viii|ix|x)\))?$/;
+//
+// The roman group is nested INSIDE the letter group rather than sitting beside
+// it as a second optional group. Side by side, both being optional made the
+// letter skippable, so "Rule 27(ii)" matched on the roman group alone - a
+// citation that has dropped its required letter subparagraph.
+const WELL_FORMED =
+  /^Rules?\s\d{1,2}(\([a-z]\)(\((?:i|ii|iii|iv|v|vi|vii|viii|ix|x)\))?)?$/;
 
 // Grab anything that starts like a citation, including malformed tails, so a
 // bad suffix is captured rather than silently trimmed off.
