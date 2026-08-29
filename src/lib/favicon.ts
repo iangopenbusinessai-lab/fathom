@@ -3,8 +3,8 @@
 //
 // The usual public/favicon.ico convention does not work here. A browser's
 // automatic request goes to the ORIGIN root - github.io/favicon.ico - while
-// this app is served from the /nauticalmaster/ subpath, so anything dropped in
-// public/ is published to /nauticalmaster/favicon.ico and never asked for.
+// this app is served from the /fathom/ subpath, so anything dropped in
+// public/ is published to /fathom/favicon.ico and never asked for.
 // Injecting the link is what makes the file reachable without editing HTML.
 //
 // The href is resolved against document.baseURI rather than hardcoded, so it

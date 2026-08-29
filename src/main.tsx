@@ -2,8 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { installFavicon } from './lib/favicon';
+import { installTitle } from './lib/title';
+import { installManifest } from './lib/manifest';
+import { registerServiceWorker } from './lib/serviceWorker';
 
+installTitle();
 installFavicon();
+installManifest();
+registerServiceWorker();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

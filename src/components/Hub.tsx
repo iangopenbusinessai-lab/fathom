@@ -14,7 +14,7 @@ export const Hub: React.FC<HubProps> = ({ drills, onSelect }) => {
           Islander Training Aid V1.0
         </div>
         <h1 className="text-5xl md:text-6xl font-bold text-white tracking-tighter mb-4 drop-shadow-xl">
-          Nautical<span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">Master</span>
+          Fa<span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">thom</span>
         </h1>
         <p className="text-slate-400 text-sm md:text-base max-w-xs mx-auto leading-relaxed">
           Select a drill to begin training.
