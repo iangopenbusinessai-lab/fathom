@@ -6,8 +6,7 @@ Fathom is a drilling tool for the parts of seamanship that are pure recall:
 the 32-point compass rose, relative bearings, and the COLREGs rules of the
 road. It is aimed at anyone working toward a license or trying to get the
 lights and shapes back after a few years away from them. The material is
-drilled rather than taught — there is no coursework here, just repetition
-against a clock.
+drilled rather than taught.
 
 Live at https://iangopenbusinessai-lab.github.io/fathom/
 
@@ -58,7 +57,7 @@ npm run test:watch # vitest in watch mode
 ```
 
 Note that the service worker only registers in production builds, so `npm run
-dev` will not show install behaviour — use `npm run preview` for that.
+dev` will not show install behavior, so use `npm run preview` for that.
 
 ## Stack and deployment
 
@@ -66,8 +65,7 @@ React 19 and TypeScript on Vite 6, with Tailwind pulled from a CDN and
 lucide-react for icons. Tests run under Vitest.
 
 The app is installable as a PWA. There is a manifest and a service worker, but
-the worker is deliberately minimal — it exists because installability requires
-one, and does no offline caching. Fathom still needs a connection to load.
+the worker is deliberately minimal. Fathom still needs a connection to load.
 
 Deployment is automatic. Pushing to `main` runs `.github/workflows/ci.yml`,
 which installs on Node 22, then runs `npx tsc --noEmit`, `npm run build` and
@@ -79,7 +77,7 @@ nothing ships.
 
 Questions cite the rule they come from, in the form `Rule 27(a)(ii)`. Those
 citations were checked by hand against the USCG Navigation Rules and 33 CFR 83.
-That audit was manual and remains so — the test suite verifies only that
+That audit was manual, so the test suite verifies only that
 citations are well-formed and point at rule numbers that exist, not that a
 given rule is the correct authority for its question. If you find a citation
 that is shaped correctly but attached to the wrong rule, the tests will not
