@@ -1,0 +1,50 @@
+name: CI
+
+# Every push, except the ones this workflow makes itself: the deploy step
+# below pushes to gh-pages, and that branch holds the built site with no
+# package.json, so running the job there would fail on npm ci forever.
+on:
+  push:
+    branches-ignore:
+      - gh-pages
+
+# gh-pages pushes the built site to the gh-pages branch from inside the job,
+# using the token actions/checkout leaves behind in .git/config.
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx tsc --noEmit
+
+      - run: npm run build
+
+      - run: npm test
+
+      # Everything below runs only on main, and only because every step above
+      # passed - a failed check anywhere fails the job and nothing publishes.
+      - name: Configure git for gh-pages
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # Reuses the deploy script from package.json rather than restating the
+      # gh-pages flags here. That script carries a --remove glob that clears
+      # stray dotfiles off the branch; duplicating it inline would be one more
+      # place for that fix to rot. See the Deployment section of claude.md.
+      - name: Deploy to gh-pages
+        if: github.ref == 'refs/heads/main'
+        run: npm run deploy

@@ -51,6 +51,12 @@ npm run build
 npm run deploy
 ```
 
+Pushing to main deploys automatically - see .github/workflows/ci.yml, which
+runs tsc, build and test on every push and then runs this same `deploy` script
+on main only. The workflow calls the npm script rather than restating the
+gh-pages flags, so the --remove fix below lives in exactly one place. Running
+`npm run deploy` by hand still works but is no longer necessary.
+
 `npm run deploy` is `gh-pages -d dist --nojekyll` plus an explicit `--remove`
 glob. gh-pages' default remove pattern (`.`) does not match dotfiles, so any
 dotfile that ever lands on the gh-pages branch survives every later deploy —
