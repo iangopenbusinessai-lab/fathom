@@ -26,7 +26,7 @@ type CategoryFilter = ColregsCategory | 'all';
 
 const EXAM_QUESTION_MS = 15000;
 
-const QUESTION_LIGHTS: Partial<Record<string, LightName[]>> = {
+export const QUESTION_LIGHTS: Partial<Record<string, LightName[]>> = {
   'nl-01': ['starboard'],
   'nl-02': ['port'],
   'nl-03': ['masthead'],
@@ -59,14 +59,14 @@ const QUESTION_LIGHTS: Partial<Record<string, LightName[]>> = {
   'nl-20': ['port', 'starboard'],
 };
 
-interface DayShapeSpec {
+export interface DayShapeSpec {
   shapes: DayShapeName[];
   position: MastPosition;
   arrangement?: ShapeArrangement;
 }
 
 // Shapes listed top-down (first entry is the uppermost shape).
-const QUESTION_SHAPES: Partial<Record<string, DayShapeSpec>> = {
+export const QUESTION_SHAPES: Partial<Record<string, DayShapeSpec>> = {
   // Rule 30(a): at anchor — one ball in the forepart.
   'ds-01': { shapes: ['ball'], position: 'forward' },
   // Rule 27(a): not under command — two balls in a vertical line.
@@ -103,7 +103,7 @@ const QUESTION_SHAPES: Partial<Record<string, DayShapeSpec>> = {
 };
 
 // Blast sequences in order, left to right.
-const QUESTION_SOUNDS: Partial<Record<string, BlastMark[]>> = {
+export const QUESTION_SOUNDS: Partial<Record<string, BlastMark[]>> = {
   // Rule 34(a): "I am altering my course to starboard."
   'ss-01': ['short'],
   // Rule 34(a): "I am altering my course to port."
@@ -140,7 +140,7 @@ const QUESTION_SOUNDS: Partial<Record<string, BlastMark[]>> = {
 
 // Gap between blasts, in seconds, for signals whose rule states its own
 // interval. Anything absent here uses SoundSignalDisplay's default 1s gap.
-const QUESTION_SOUND_GAPS: Partial<Record<string, number>> = {
+export const QUESTION_SOUND_GAPS: Partial<Record<string, number>> = {
   // Rule 35(b): "two prolonged blasts in succession, with an interval of
   // about 2 seconds between them."
   'ss-05': 2,
@@ -148,7 +148,7 @@ const QUESTION_SOUND_GAPS: Partial<Record<string, number>> = {
 
 // Vessel shown for the type-identification questions. No text in the diagram
 // names the type - the day shapes and rig are the whole question.
-const QUESTION_VESSEL_TYPES: Partial<Record<string, VesselTypeName>> = {
+export const QUESTION_VESSEL_TYPES: Partial<Record<string, VesselTypeName>> = {
   'vt-01': 'nuc',
   'vt-02': 'ram',
   'vt-03': 'cbd',
@@ -157,7 +157,7 @@ const QUESTION_VESSEL_TYPES: Partial<Record<string, VesselTypeName>> = {
   'vt-06': 'towing',
 };
 
-const QUESTION_SCENARIOS: Partial<Record<string, ScenarioType>> = {
+export const QUESTION_SCENARIOS: Partial<Record<string, ScenarioType>> = {
   'vh-01': 'priority-nuc',
   'vh-02': 'sail-keeps-clear-ram',
   'vh-03': 'crossing-stbd',

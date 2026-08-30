@@ -4,11 +4,13 @@ import App from './App';
 import { installFavicon } from './lib/favicon';
 import { installTitle } from './lib/title';
 import { installManifest } from './lib/manifest';
+import { installFonts } from './lib/fonts';
 import { registerServiceWorker } from './lib/serviceWorker';
 
 installTitle();
 installFavicon();
 installManifest();
+installFonts();
 registerServiceWorker();
 
 const rootElement = document.getElementById('root');
