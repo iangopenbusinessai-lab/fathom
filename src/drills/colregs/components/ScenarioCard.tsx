@@ -4,12 +4,17 @@ import { ColregsQuestion, CATEGORY_LABELS } from '../constants';
 
 interface ScenarioCardProps {
   question: ColregsQuestion;
+  // The order this draw presents the options in - see presentationOrder in
+  // ../index. Correctness is decided on option TEXT throughout, so this can be
+  // any permutation of question.options without touching the answer logic.
+  options: string[];
   selectedAnswer: string | null;
   onSelect: (answer: string) => void;
 }
 
 export const ScenarioCard: React.FC<ScenarioCardProps> = ({
   question,
+  options,
   selectedAnswer,
   onSelect,
 }) => {
@@ -55,7 +60,7 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
 
       {/* Options */}
       <div className="flex flex-col gap-2">
-        {question.options.map((option) => (
+        {options.map((option) => (
           <button
             key={option}
             onClick={() => !isAnswered && onSelect(option)}

@@ -8,6 +8,7 @@ import {
   ColregsQuestion,
 } from './constants';
 import { bestScoreKey, readBestScore, writeBestScore } from '../../lib/storage';
+import { shuffle } from '../../lib/shuffle';
 import { ScenarioCard } from './components/ScenarioCard';
 import { VesselProfile, VesselTypeName } from './components/VesselProfile';
 import { LightDisplay, LightName } from './components/LightDisplay';
@@ -180,13 +181,15 @@ export const QUESTION_SCENARIOS: Partial<Record<string, ScenarioType>> = {
   // borrowing one would attach a caption that contradicts the question.
 };
 
-function shuffle<T>(arr: T[]): T[] {
-  const out = [...arr];
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
-  }
-  return out;
+// The bank lists the correct answer first in 73% of its 78 questions (option
+// D is correct exactly once in the whole bank), so drilling in source order
+// can be beaten by always pressing the first button. Settling a presentation
+// order per drawn question fixes that without touching the content, and it is
+// settled once per draw rather than per render so the options cannot reorder
+// underneath the pointer. Everything downstream compares option TEXT, never an
+// index, so the reorder cannot desync from the answer.
+export function presentationOrder(question: ColregsQuestion): string[] {
+  return shuffle(question.options);
 }
 
 function getPool(filter: CategoryFilter): ColregsQuestion[] {
@@ -239,6 +242,7 @@ export default function ColregsDrill() {
   const [deck, setDeck] = useState<ColregsQuestion[]>([]);
   const [deckTotal, setDeckTotal] = useState(0);
   const [current, setCurrent] = useState<ColregsQuestion | null>(null);
+  const [options, setOptions] = useState<string[]>([]);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [drillMode, setDrillMode] = useState<DrillMode>('practice');
   const [score, setScore] = useState(0);
@@ -255,6 +259,13 @@ export default function ColregsDrill() {
   const advanceRef = useRef<number | null>(null);
   const timerRef = useRef<number | null>(null);
   const timedOutRef = useRef(false);
+
+  // Every draw goes through here, so a question can never reach the screen
+  // with the previous question's option order still on it.
+  const showQuestion = useCallback((question: ColregsQuestion) => {
+    setCurrent(question);
+    setOptions(presentationOrder(question));
+  }, []);
 
   const clearTimers = useCallback(() => {
     if (advanceRef.current) clearTimeout(advanceRef.current);
@@ -281,12 +292,12 @@ export default function ColregsDrill() {
         return;
       }
       setDeck(next);
-      setCurrent(next[next.length - 1]);
+      showQuestion(next[next.length - 1]);
       setTimeLeft(EXAM_QUESTION_MS);
     } else {
-      setCurrent(pickExcluding(getPool(categoryFilter), currentIdRef.current));
+      showQuestion(pickExcluding(getPool(categoryFilter), currentIdRef.current));
     }
-  }, [categoryFilter]);
+  }, [categoryFilter, showQuestion]);
 
   // --- Answer selection ---
 
@@ -351,11 +362,11 @@ export default function ColregsDrill() {
     if (mode === 'exam') {
       setDeck(pool);
       setDeckTotal(pool.length);
-      setCurrent(pool[pool.length - 1]);
+      showQuestion(pool[pool.length - 1]);
     } else {
       setDeck([]);
       setDeckTotal(0);
-      setCurrent(pool[0]);
+      showQuestion(pool[0]);
     }
     setDrillState('playing');
   };
@@ -365,6 +376,7 @@ export default function ColregsDrill() {
     setDrillState('idle');
     setMenuStep('category');
     setCurrent(null);
+    setOptions([]);
     setSelectedAnswer(null);
   };
 
@@ -597,6 +609,7 @@ export default function ColregsDrill() {
               <ScenarioCard
                 key={current.id}
                 question={current}
+                options={options}
                 selectedAnswer={selectedAnswer}
                 onSelect={handleSelect}
               />
