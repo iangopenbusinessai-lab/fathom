@@ -1,5 +1,5 @@
 import React from 'react';
-import { MONO, STENCIL } from '../theme';
+import { MONO, STENCIL } from '../lib/theme';
 
 export interface SettingRow {
   key: string;

@@ -1,7 +1,7 @@
 import React from 'react';
-import { MONO, STENCIL } from '../theme';
-import { ChartCategory, questionCount } from '../constants';
-import { Progress, lastDrilledLabel, masteryPct } from '../progress';
+import { MONO, STENCIL } from '../../../lib/theme';
+import { ChartCategory, questionCount } from '../../../lib/syllabus';
+import { Progress, lastDrilledLabel, masteryPct } from '../../../lib/progress';
 
 interface CategoryDetailProps {
   category: ChartCategory;

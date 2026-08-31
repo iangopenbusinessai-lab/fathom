@@ -1,4 +1,4 @@
-import { ColregsQuestion } from '../colregs/constants';
+import { ColregsQuestion } from '../drills/colregs/constants';
 
 // The design shows a rule citation beside every verdict and in the results
 // review. The bank does not carry a separate citation field - the citation is

@@ -1,26 +1,22 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChartFrame } from './components/ChartFrame';
+import { ChartFrame } from '../../components/ChartFrame';
 import { CategoryIndex } from './components/CategoryIndex';
 import { CategoryDetail } from './components/CategoryDetail';
 import { AnswerRecord, QuizScreen } from './components/QuizScreen';
 import { ResultsScreen } from './components/ResultsScreen';
-import { SettingGroup, SettingsScreen } from './components/SettingsScreen';
-import { ThemeName } from './theme';
-import {
-  CATEGORIES,
-  DEFAULT_EXAM_LENGTH,
-  LIVE_CATEGORIES,
-  categoryById,
-} from './constants';
+import { SettingGroup, SettingsScreen } from '../../components/SettingsScreen';
+import { ThemeName } from '../../lib/theme';
+import { CATEGORIES, LIVE_CATEGORIES, categoryById } from '../../lib/syllabus';
+import { DEFAULT_EXAM_LENGTH, EXAM_LENGTHS } from '../../lib/prefs';
 import { COLREGS_QUESTIONS_BY_CATEGORY, ColregsQuestion } from '../colregs/constants';
-import { citationOf } from './citation';
+import { citationOf } from '../../lib/citation';
 import {
   Progress,
   clearProgress,
   masteryPct,
   readProgress,
   recordAnswer,
-} from './progress';
+} from '../../lib/progress';
 import { readJSON, writeJSON } from '../../lib/storage';
 
 type Screen = 'hub' | 'category' | 'quiz' | 'results' | 'settings';
@@ -43,7 +39,6 @@ interface QueuedQuestion {
 }
 
 const PREFS_KEY = 'charttable:prefs';
-const EXAM_LENGTHS = [5, 10, 15, 20, 25];
 // Exam mode reveals nothing and moves on by itself; this is the beat the
 // design leaves on the chosen answer before advancing.
 const EXAM_ADVANCE_MS = 420;

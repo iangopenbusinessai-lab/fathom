@@ -1,6 +1,6 @@
 import React from 'react';
-import { MONO, STENCIL } from '../theme';
-import { PASS_MARK } from '../constants';
+import { MONO, STENCIL } from '../../../lib/theme';
+import { PASS_MARK } from '../../../lib/syllabus';
 import { AnswerRecord } from './QuizScreen';
 
 interface ResultsScreenProps {

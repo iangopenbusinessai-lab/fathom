@@ -1,10 +1,18 @@
 import type { ComponentType } from 'react';
 
+// What the hub hands a drill when a category card launches it: the id of the
+// syllabus category the user picked, so the drill can open on that category
+// rather than on its own top-level menu. Undefined means "opened cold" - the
+// drill shows its own menu from the start.
+export interface DrillProps {
+  focus?: string;
+}
+
 export interface DrillConfig {
   id: string;
   title: string;
   description: string;
-  component: ComponentType;
+  component: ComponentType<DrillProps>;
 }
 
 export interface CompassPoint {

@@ -1,8 +1,10 @@
 import { DrillConfig } from '../types';
 import CompassDrill from './compass';
 import ColregsDrill from './colregs';
-import ChartTableDrill from './charttable';
 
+// The hub is the syllabus index in src/lib/syllabus.ts, not this list. A drill
+// here is the engine a syllabus category is routed to (see drillTargetFor),
+// which is why there are fewer entries here than cards on the hub.
 export const DRILLS: DrillConfig[] = [
   {
     id: 'compass',
@@ -15,11 +17,5 @@ export const DRILLS: DrillConfig[] = [
     title: 'COLREGS',
     description: 'Navigation lights, sound signals, vessel hierarchy, and day shapes.',
     component: ColregsDrill,
-  },
-  {
-    id: 'charttable',
-    title: 'Chart Table',
-    description: 'Browse the syllabus by category, then drill or sit an exam against the rule.',
-    component: ChartTableDrill,
   },
 ];

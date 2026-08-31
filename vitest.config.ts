@@ -5,8 +5,10 @@ import { defineConfig } from 'vitest/config';
 // entirely alone.
 export default defineConfig({
   test: {
-    // Data-only suite: no DOM, no component rendering. See src/__tests__.
+    // Still no DOM: the one component test renders through
+    // react-dom/server rather than mounting, so the node environment is
+    // enough. See src/__tests__.
     environment: 'node',
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
   },
 });

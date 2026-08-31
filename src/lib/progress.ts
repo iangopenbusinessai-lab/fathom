@@ -1,4 +1,4 @@
-import { readJSON, writeJSON } from '../../lib/storage';
+import { readJSON, writeJSON } from './storage';
 
 // Per-category progress for the chart table.
 //

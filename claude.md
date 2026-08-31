@@ -5,44 +5,101 @@ https://iangopenbusinessai-lab.github.io/fathom/
 
 ## Stack
 - Vite 6, React 19, TypeScript 5.8
-- Tailwind CSS (CDN in index.html)
-- lucide-react for icons
+- The chart-table design system: CSS custom properties + a stylesheet in
+  ChartFrame. See "Design system" below.
+- Tailwind CSS (CDN in index.html) — now only inside the drill *diagrams*
+  (CompassRose, LightDisplay and friends), which were never restyled.
 - gh-pages for deployment
 
 ## File Structure
 ```
 src/
   main.tsx              ← entry point
-  App.tsx               ← routes between Hub and active drill
-  types.ts              ← shared types including DrillConfig
+  App.tsx               ← the shell: ChartFrame + routes between Hub, a drill, settings
+  types.ts              ← DrillConfig, DrillProps, compass types
+  lib/
+    theme.ts            ← light/dark palettes as CSS custom properties, font stacks
+    syllabus.ts         ← CATEGORIES: the four-section syllabus the Hub renders
+    prefs.ts            ← app-wide display prefs + PrefsProvider / usePrefs
+    progress.ts         ← per-category mastery ledger (localStorage)
+    citation.ts         ← reads "Rule 27(a)" back out of an explanation
+    shuffle.ts          ← Fisher-Yates, used for option order and deck order
+    fonts.ts            ← runtime <link> injection for the webfonts
+  components/
+    ChartFrame.tsx      ← the chart ground, masthead, soundings, and the ct-* stylesheet
+    Hub.tsx             ← the syllabus index, four sections of category cards
+    VisualPanel.tsx     ← the dark instrument panel, drawing the colregs diagrams
+    SettingsScreen.tsx  ← generic settings list, rows supplied by App
   drills/
     index.ts            ← DRILLS registry array
     compass/            ← compass & relative bearing drill
       index.tsx
       constants.ts
-      CompassRose.tsx
-      ControlPanel.tsx
+      CompassRose.tsx   ← the rose itself, unchanged, drawn on a dark instrument panel
+      ControlPanel.tsx  ← the drill's menu / readout / result screens
     colregs/            ← COLREGS rules of the road drill
-      index.tsx
-      constants.ts      ← 36 questions across 4 categories
+      index.tsx         ← state machine + the question-to-diagram maps
+      constants.ts      ← 78 questions across 5 categories
       components/
-        ScenarioCard.tsx
-        LightDisplay.tsx
-        VesselScenario.tsx
-  components/
-    Hub.tsx             ← main menu, renders drill cards
+        ScenarioCard.tsx  ← the answer options and the verdict
+        LightDisplay.tsx  ← and the other diagrams, all Tailwind, all unchanged
+    charttable/         ← RETIRED, not in the DRILLS registry. See "Chart Table" below.
+  __tests__/            ← data-shape tests plus one server-render smoke test
 ```
 
 ## Architecture
-- App.tsx holds `activeDrill: DrillConfig | null` — null = Hub, non-null = active drill
-- DrillConfig: { id, title, description, component }
-- Each drill is fully self-contained in its own folder
-- Adding a drill = new folder + register in src/drills/index.ts
+- App.tsx is the shell. It wraps everything in PrefsProvider and ChartFrame, so
+  the masthead, the ruled ground and the theme are continuous across every
+  screen. A `Route` picks between the Hub, one drill, and settings.
+- The **Hub is the syllabus**, not the drill list: `src/lib/syllabus.ts`
+  describes every category under one of four sections — Navigation, Rules of
+  the road, Signals and communication, Aids to navigation — and
+  `drillTargetFor()` says which drill answers it. There are more hub cards than
+  drills, on purpose.
+- A card hands the drill a `focus` (DrillProps), the syllabus category the user
+  picked, and the drill opens on it instead of on its own top-level menu.
+- Drills write to the shared progress ledger as they go; App re-reads it on the
+  way back to the hub, which is what fills the mastery bars.
+- Adding a drill = new folder + register in src/drills/index.ts + point a
+  syllabus category at it in drillTargetFor().
+
+## Design system
+The chart table: parchment and navy ink by day, brass on navy at the night helm.
+
+- `src/lib/theme.ts` holds both palettes as CSS custom properties (`--ct-bg`,
+  `--ct-ink`, `--ct-brass`, `--ct-stbd`, `--ct-port`, `--ct-line`, …). They are
+  custom properties rather than Tailwind classes because the palette is not in
+  the Tailwind config, and index.html — where a CDN Tailwind config would have
+  to live — is finalized.
+- `ChartFrame` puts those properties on its root and ships the one stylesheet
+  everything draws from: `.ct-solid` / `.ct-ghost` / `.ct-link` buttons,
+  `.ct-card`, `.ct-option`, `.ct-rule` (the dashed rope divider), `.ct-quizbody`
+  and `.ct-rosebody` layouts, and `.ct-instrument`. Hover states live there as
+  real CSS because inline styles cannot express `:hover`.
+- The soundings row along the top edge is chart texture, declared in
+  ChartFrame.
+- `.ct-instrument` is the dark panel the diagrams sit on. The rose and the
+  lights are drawn in white and signal colours and would vanish on the
+  parchment, so that panel stays navy in both themes and reads as a lit
+  instrument standing on the chart table.
+- Fonts (Big Shoulders Stencil, IBM Plex Sans, IBM Plex Mono) are injected at
+  runtime by `src/lib/fonts.ts`; every consumer declares a full fallback stack.
+
+## Chart Table
+`src/drills/charttable/` was a standalone drill that carried this design. The
+design is now the site's, so the drill is retired: it is not in the DRILLS
+registry and nothing renders it. What remains there — `index.tsx`,
+`CategoryIndex`, `CategoryDetail`, `QuizScreen`, `ResultsScreen` — still
+compiles and is kept only pending a decision on what to keep. Its theme,
+frame, visual panel, settings screen, syllabus, progress ledger and citation
+reader have already moved to `src/lib` and `src/components`.
 
 ## Drill Pattern
 Every drill follows this structure:
 - Practice / Exam modes
 - Question prompt + visual aid + multiple choice answers
+- Multiple-choice options are shuffled per draw, never rendered in bank order,
+  and correctness is decided on option **text**, never on an index
 - Shared scoring and timer logic pattern from compass drill
 
 ## Deployment

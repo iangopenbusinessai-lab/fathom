@@ -1,8 +1,8 @@
 import React from 'react';
-import { MONO } from '../theme';
+import { MONO } from '../../../lib/theme';
 import { ColregsQuestion } from '../../colregs/constants';
-import { citationOf } from '../citation';
-import { VisualPanel, hasVisual } from './VisualPanel';
+import { citationOf } from '../../../lib/citation';
+import { VisualPanel, hasVisual } from '../../../components/VisualPanel';
 
 export interface AnswerRecord {
   questionId: string;

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ArrowLeft, Play, Timer, Medal, XCircle, BookOpen } from 'lucide-react';
 import {
   COLREGS_QUESTIONS,
   COLREGS_QUESTIONS_BY_CATEGORY,
@@ -10,16 +9,19 @@ import {
 import { bestScoreKey, readBestScore, writeBestScore } from '../../lib/storage';
 import { shuffle } from '../../lib/shuffle';
 import { ScenarioCard } from './components/ScenarioCard';
-import { VesselProfile, VesselTypeName } from './components/VesselProfile';
-import { LightDisplay, LightName } from './components/LightDisplay';
-import { VesselScenario, ScenarioType } from './components/VesselScenario';
-import { SoundSignalDisplay, BlastMark } from './components/SoundSignalDisplay';
-import {
-  DayShapeDisplay,
-  DayShapeName,
-  MastPosition,
-  ShapeArrangement,
-} from './components/DayShapeDisplay';
+import { VisualPanel, hasVisual } from '../../components/VisualPanel';
+import { MONO, STENCIL } from '../../lib/theme';
+import { usePrefs } from '../../lib/prefs';
+import { recordAnswer } from '../../lib/progress';
+import { PASS_MARK, categoryBySource } from '../../lib/syllabus';
+import { DrillProps } from '../../types';
+// Only the types are needed here: the visuals themselves are drawn by the
+// shared VisualPanel, which reads the same question-to-diagram maps below.
+import { VesselTypeName } from './components/VesselProfile';
+import { LightName } from './components/LightDisplay';
+import { ScenarioType } from './components/VesselScenario';
+import { BlastMark } from './components/SoundSignalDisplay';
+import { DayShapeName, MastPosition, ShapeArrangement } from './components/DayShapeDisplay';
 
 type DrillState = 'idle' | 'playing' | 'finished';
 type DrillMode = 'practice' | 'exam';
@@ -216,28 +218,47 @@ const CATEGORY_ORDER: CategoryFilter[] = [
 
 // `sub` is the descriptor only - the question count is prepended at render
 // time from the pool itself, so adding questions cannot leave a stale number.
-const CATEGORY_META: Record<CategoryFilter, { label: string; sub: string; accent: string }> = {
-  'all':               { label: 'All COLREGS',        sub: 'across all topics',        accent: 'cyan'   },
-  'navigation-lights': { label: 'Navigation Lights',  sub: 'lights & arcs',            accent: 'amber'  },
-  'sound-signals':     { label: 'Sound Signals',      sub: 'blasts & fog signals',     accent: 'green'  },
-  'vessel-hierarchy':  { label: 'Vessel Hierarchy',   sub: 'give-way rules',           accent: 'indigo' },
-  'day-shapes':        { label: 'Day Shapes',         sub: 'shapes & marks',           accent: 'rose'   },
-  'vessel-types':      { label: 'Vessel Types',       sub: 'identify by shape & rig',  accent: 'violet' },
+const CATEGORY_META: Record<CategoryFilter, { label: string; sub: string }> = {
+  'all':               { label: 'All rules of the road', sub: 'across every topic'       },
+  'navigation-lights': { label: 'Navigation lights',     sub: 'lights and arcs'          },
+  'sound-signals':     { label: 'Sound signals',         sub: 'blasts and fog signals'   },
+  'vessel-hierarchy':  { label: 'Vessel hierarchy',      sub: 'give-way rules'           },
+  'day-shapes':        { label: 'Day shapes',            sub: 'shapes and marks'         },
+  'vessel-types':      { label: 'Vessel types',          sub: 'identify by shape and rig' },
 };
 
-const ACCENT_CLASSES: Record<string, { border: string; bg: string; text: string; hover: string }> = {
-  cyan:   { border: 'border-cyan-900/40',   bg: 'from-cyan-500/15 to-cyan-900/15',   text: 'text-cyan-400',   hover: 'hover:border-cyan-500/50'   },
-  amber:  { border: 'border-amber-900/40',  bg: 'from-amber-500/15 to-amber-900/15', text: 'text-amber-400',  hover: 'hover:border-amber-500/50'  },
-  green:  { border: 'border-green-900/40',  bg: 'from-green-500/15 to-green-900/15', text: 'text-green-400',  hover: 'hover:border-green-500/50'  },
-  indigo: { border: 'border-indigo-900/40', bg: 'from-indigo-500/15 to-indigo-900/15',text: 'text-indigo-400',hover: 'hover:border-indigo-500/50' },
-  rose:   { border: 'border-rose-900/40',   bg: 'from-rose-500/15 to-rose-900/15',   text: 'text-rose-400',   hover: 'hover:border-rose-500/50'   },
-  violet: { border: 'border-violet-900/40', bg: 'from-violet-500/15 to-violet-900/15',text: 'text-violet-400',hover: 'hover:border-violet-500/50' },
+// The syllabus card a run belongs to, so its answers land on the right mastery
+// bar on the hub. A mixed run has no single card and records nothing.
+function progressIdFor(filter: CategoryFilter): string | null {
+  if (filter === 'all') return null;
+  return categoryBySource(filter)?.id ?? null;
+}
+
+const metaRow: React.CSSProperties = {
+  fontFamily: MONO,
+  fontSize: 10.5,
+  letterSpacing: '0.14em',
+  textTransform: 'uppercase',
+  color: 'var(--ct-muted)',
 };
 
-export default function ColregsDrill() {
+function isCategoryFilter(value: string | undefined): value is CategoryFilter {
+  return value !== undefined && (CATEGORY_ORDER as string[]).includes(value);
+}
+
+export default function ColregsDrill({ focus }: DrillProps) {
+  const { prefs } = usePrefs();
+
+  // A hub card names the category it is for, so the drill opens on that
+  // category's mode picker. Opened without one, it starts at its own category
+  // list exactly as before.
+  const focused = isCategoryFilter(focus) ? focus : null;
+
   const [drillState, setDrillState] = useState<DrillState>('idle');
-  const [menuStep, setMenuStep] = useState<'category' | 'mode'>('category');
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
+  const [menuStep, setMenuStep] = useState<'category' | 'mode'>(
+    focused ? 'mode' : 'category'
+  );
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>(focused ?? 'all');
 
   const [deck, setDeck] = useState<ColregsQuestion[]>([]);
   const [deckTotal, setDeckTotal] = useState(0);
@@ -309,12 +330,26 @@ export default function ColregsDrill() {
     setAnswered(prev => prev + 1);
     if (isCorrect) setScore(prev => prev + 1);
 
+    // Recorded against the syllabus card this run belongs to, which is what
+    // fills the mastery bars on the hub. Storage is best-effort, so a failure
+    // here cannot interrupt the run.
+    const progressId = progressIdFor(categoryFilter);
+    if (progressId) recordAnswer(progressId, isCorrect);
+
+    if (!isCorrect && prefs.haptics && typeof navigator !== 'undefined' && navigator.vibrate) {
+      try {
+        navigator.vibrate(60);
+      } catch {
+        // Vibration is a nicety and is refused outright on some platforms.
+      }
+    }
+
     clearTimers();
 
     advanceRef.current = window.setTimeout(() => {
       advance(deck, drillMode);
     }, isCorrect ? 1200 : 2000);
-  }, [selectedAnswer, current, deck, drillMode, advance, clearTimers]);
+  }, [selectedAnswer, current, deck, drillMode, advance, clearTimers, categoryFilter, prefs.haptics]);
 
   // --- Exam timer ---
 
@@ -374,7 +409,7 @@ export default function ColregsDrill() {
   const resetToMenu = () => {
     clearTimers();
     setDrillState('idle');
-    setMenuStep('category');
+    setMenuStep(focused ? 'mode' : 'category');
     setCurrent(null);
     setOptions([]);
     setSelectedAnswer(null);
@@ -408,252 +443,342 @@ export default function ColregsDrill() {
     }
   }, [drillState, score]);
 
-  // --- Visual aids ---
+  // --- Visual aid ---
 
-  const activeLights = current ? (QUESTION_LIGHTS[current.id] ?? null) : null;
-  const activeScenario = current ? (QUESTION_SCENARIOS[current.id] ?? null) : null;
-  const activeShapes = current ? (QUESTION_SHAPES[current.id] ?? null) : null;
-  const activeSounds = current ? (QUESTION_SOUNDS[current.id] ?? null) : null;
-  const activeVesselType = current ? (QUESTION_VESSEL_TYPES[current.id] ?? null) : null;
-  const hasVisual =
-    activeLights !== null ||
-    activeScenario !== null ||
-    activeShapes !== null ||
-    activeSounds !== null ||
-    activeVesselType !== null;
+  // The diagram itself is drawn by the shared VisualPanel, off the same maps
+  // declared above; this only asks whether there is one.
+  const showPanel = current ? hasVisual(current.id) : false;
 
   const timerSeconds = Math.ceil(timeLeft / 1000);
   const timerWarning = timerSeconds <= 5;
+  const pool = getPool(categoryFilter);
 
   // ── RENDER ──
 
-  return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 overflow-hidden relative selection:bg-cyan-500/30 font-sans">
+  if (drillState === 'idle' && menuStep === 'category') {
+    return (
+      <section className="ct-fade" style={{ padding: '30px 0 0' }}>
+        <div style={metaRow}>Rules of the road</div>
+        <h1
+          style={{
+            margin: '14px 0 0',
+            fontFamily: STENCIL,
+            fontWeight: 700,
+            fontSize: 46,
+            lineHeight: 0.98,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: 'var(--ct-ink)',
+          }}
+        >
+          Collision regulations
+        </h1>
+        <p
+          style={{
+            maxWidth: '52ch',
+            margin: '18px 0 0',
+            fontSize: 16,
+            lineHeight: 1.6,
+            color: 'var(--ct-ink)',
+          }}
+        >
+          Choose a topic to study, or test across all of them.
+        </p>
 
-      {/* Background ambience */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-cyan-900/10 blur-[120px] rounded-full animate-pulse" style={{ animationDuration: '10s' }} />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-indigo-900/10 blur-[120px] rounded-full animate-pulse" style={{ animationDuration: '12s' }} />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20" />
-      </div>
+        <div className="ct-rule" style={{ margin: '26px 0 16px' }} />
 
-      {/* ── IDLE ── */}
-      {drillState === 'idle' && (
-        <div className="z-10 w-full max-w-lg flex flex-col items-center gap-8 animate-in fade-in zoom-in-95 duration-500">
-
-          {menuStep === 'category' && (
-            <>
-              <div className="text-center">
-                <div className="inline-block px-3 py-1 bg-cyan-950/50 border border-cyan-800 rounded-full text-[10px] uppercase tracking-[0.2em] text-cyan-400 mb-4">
-                  COLREGS Drill
-                </div>
-                <h2 className="text-4xl font-bold text-white tracking-tighter mb-2">
-                  Collision Regulations
-                </h2>
-                <p className="text-slate-400 text-sm max-w-xs mx-auto leading-relaxed">
-                  Choose a category to study, or test across all topics.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-3 w-full">
-                {CATEGORY_ORDER.map((cat) => {
-                  const meta = CATEGORY_META[cat];
-                  const ac = ACCENT_CLASSES[meta.accent];
-                  return (
-                    <button
-                      key={cat}
-                      onClick={() => { setCategoryFilter(cat); setMenuStep('mode'); }}
-                      className={`group flex items-center gap-4 px-5 py-4 rounded-2xl border ${ac.border} bg-slate-800/40 hover:bg-slate-800/80 ${ac.hover} transition-all text-left backdrop-blur-sm`}
-                    >
-                      <div className={`bg-gradient-to-br ${ac.bg} p-3 rounded-xl ${ac.text} border ${ac.border} group-hover:scale-105 transition-transform`}>
-                        <BookOpen size={22} />
-                      </div>
-                      <div>
-                        <span className={`block font-bold text-base text-white group-hover:${ac.text} transition-colors`}>{meta.label}</span>
-                        <span className="text-xs text-slate-500">
-                          {getPool(cat).length} questions — {meta.sub}
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </>
-          )}
-
-          {menuStep === 'mode' && (
-            <>
-              <div className="relative w-full flex items-center justify-center">
-                <button
-                  onClick={() => setMenuStep('category')}
-                  className="absolute left-0 p-2 text-slate-500 hover:text-white transition-colors hover:bg-slate-800 rounded-full"
-                >
-                  <ArrowLeft size={20} />
-                </button>
-                <h2 className={`text-2xl font-bold tracking-tight ${ACCENT_CLASSES[CATEGORY_META[categoryFilter].accent].text}`}>
-                  {CATEGORY_META[categoryFilter].label}
-                </h2>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 w-full max-w-xs mx-auto">
-                <button
-                  onClick={() => startDrill('practice')}
-                  className="group flex flex-col items-center gap-2 px-6 py-5 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 hover:border-cyan-500/50 transition-all"
-                >
-                  <span className="font-bold text-lg text-white group-hover:text-cyan-400">Practice Mode</span>
-                  <span className="text-xs text-slate-500">Unlimited questions. No timer.</span>
-                </button>
-
-                <button
-                  onClick={() => startDrill('exam')}
-                  className="group flex items-center gap-4 px-6 py-5 rounded-xl border border-yellow-900/30 bg-slate-800/80 hover:bg-yellow-950/30 hover:border-yellow-500/40 transition-all"
-                >
-                  <div className="bg-yellow-500/10 p-3 rounded-lg text-yellow-500 group-hover:bg-yellow-500 group-hover:text-white transition-colors shrink-0">
-                    <Medal size={22} />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-bold text-white group-hover:text-yellow-400">Exam Mode</div>
-                    <div className="text-xs text-slate-400">All questions. 15s each. One pass.</div>
-                  </div>
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      )}
-
-      {/* ── PLAYING ── */}
-      {drillState === 'playing' && current && (
-        <div className="z-10 w-full max-w-5xl animate-in fade-in slide-in-from-right-8 duration-500">
-
-          {/* Stats bar */}
-          <div className="flex justify-between items-end text-slate-400 font-mono border-b border-slate-800 pb-3 mb-6 relative">
-            <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-widest opacity-60">Score</span>
-              <span className="text-3xl font-bold text-cyan-400 leading-none">{score}</span>
-            </div>
-
-            {drillMode === 'exam' && (
-              <div className="absolute left-1/2 -translate-x-1/2 bottom-3 flex flex-col items-center">
-                <Timer className="w-4 h-4 mb-1 opacity-50" />
-                <span className={`text-3xl font-bold leading-none transition-colors ${timerWarning ? 'text-red-500 animate-pulse' : 'text-yellow-400'}`}>
-                  {timerSeconds}s
-                </span>
-              </div>
-            )}
-
-            <div className="flex items-center gap-4">
-              {drillMode === 'exam' && (
-                <div className="flex flex-col items-end">
-                  <span className="text-[10px] uppercase tracking-widest opacity-60">Progress</span>
-                  <span className="text-xl font-bold text-slate-300 leading-none">
-                    {deckTotal - deck.length + 1}/{deckTotal}
-                  </span>
-                </div>
-              )}
-              {drillMode === 'practice' && (
-                <div className="flex flex-col items-end">
-                  <span className="text-[10px] uppercase tracking-widest opacity-60">Answered</span>
-                  <span className="text-xl font-bold text-slate-300 leading-none">{answered}</span>
-                </div>
-              )}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))',
+            gap: 12,
+          }}
+        >
+          {CATEGORY_ORDER.map((cat) => {
+            const meta = CATEGORY_META[cat];
+            return (
               <button
-                onClick={handleFinish}
-                className="flex items-center gap-1 text-[10px] uppercase tracking-wider text-red-500 hover:text-red-400 opacity-60 hover:opacity-100 transition-all"
+                key={cat}
+                className="ct-card"
+                onClick={() => {
+                  setCategoryFilter(cat);
+                  setMenuStep('mode');
+                }}
               >
-                <XCircle size={14} /> Quit
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 10,
+                  }}
+                >
+                  <span style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.25 }}>
+                    {meta.label}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: MONO,
+                      fontSize: 10,
+                      letterSpacing: '0.1em',
+                      whiteSpace: 'nowrap',
+                      color: 'var(--ct-brass)',
+                    }}
+                  >
+                    {getPool(cat).length} Q
+                  </span>
+                </span>
+                <span
+                  style={{
+                    fontFamily: MONO,
+                    fontSize: 10.5,
+                    color: 'var(--ct-muted)',
+                    letterSpacing: '0.06em',
+                  }}
+                >
+                  {meta.sub}
+                </span>
               </button>
-            </div>
-          </div>
-
-          {/* Question area */}
-          <div className={`flex flex-col ${hasVisual ? 'md:flex-row' : ''} items-start gap-8`}>
-
-            {/* Visual aid */}
-            {hasVisual && (
-              <div className="w-full md:w-64 shrink-0 flex items-center justify-center">
-                {activeVesselType && (
-                  <VesselProfile type={activeVesselType} label="Vessel" />
-                )}
-                {activeLights && !activeVesselType && (
-                  <LightDisplay active={activeLights} label="Vessel Lights" />
-                )}
-                {activeSounds && !activeLights && !activeVesselType && (
-                  <SoundSignalDisplay
-                    key={current.id}
-                    sequence={activeSounds}
-                    gapS={QUESTION_SOUND_GAPS[current.id]}
-                    label="Blast Sequence"
-                  />
-                )}
-                {activeShapes && !activeLights && !activeSounds && !activeVesselType && (
-                  <DayShapeDisplay
-                    shapes={activeShapes.shapes}
-                    position={activeShapes.position}
-                    arrangement={activeShapes.arrangement}
-                    label="Day Shapes"
-                  />
-                )}
-                {activeScenario && !activeLights && !activeShapes && !activeSounds && !activeVesselType && (
-                  <VesselScenario
-                    scenario={activeScenario}
-                    label="Scenario"
-                    revealed={selectedAnswer !== null}
-                  />
-                )}
-              </div>
-            )}
-
-            {/* Card */}
-            <div className={`flex-1 w-full ${!hasVisual ? 'max-w-lg mx-auto' : ''}`}>
-              <ScenarioCard
-                key={current.id}
-                question={current}
-                options={options}
-                selectedAnswer={selectedAnswer}
-                onSelect={handleSelect}
-              />
-            </div>
-          </div>
+            );
+          })}
         </div>
-      )}
+      </section>
+    );
+  }
 
-      {/* ── FINISHED ── */}
-      {drillState === 'finished' && (
-        <div className="z-10 w-full max-w-sm animate-in fade-in zoom-in-95 duration-500">
-          <div className="bg-slate-900/80 p-8 rounded-2xl border border-slate-800 backdrop-blur-xl text-center space-y-6">
-            <div>
-              <div className="text-slate-400 text-sm uppercase tracking-widest mb-1">
-                {drillMode === 'exam' ? 'Exam Complete' : 'Session Ended'}
-              </div>
-              <div className="text-6xl font-bold text-white mb-1">{score}</div>
-              <div className="text-cyan-400 text-sm">
-                {drillMode === 'exam' ? `Correct out of ${deckTotal}` : `of ${answered} answered`}
-              </div>
-              {bestScore > 0 && (
-                <div className="text-slate-500 text-xs mt-2">Best: {bestScore}</div>
-              )}
-            </div>
+  if (drillState === 'idle') {
+    return (
+      <section className="ct-fade" style={{ padding: '28px 0 0' }}>
+        {/* Focused from a hub card, there is no in-drill category list to go
+            back to - the hub itself is the way back, and the masthead already
+            offers it. */}
+        {!focused && (
+          <button className="ct-link" onClick={() => setMenuStep('category')}>
+            &larr; All topics
+          </button>
+        )}
 
-            <div className="h-px w-full bg-slate-800" />
+        <h1
+          style={{
+            margin: focused ? 0 : '16px 0 0',
+            fontFamily: STENCIL,
+            fontWeight: 700,
+            fontSize: 46,
+            lineHeight: 0.98,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: 'var(--ct-ink)',
+          }}
+        >
+          {CATEGORY_META[categoryFilter].label}
+        </h1>
 
-            <button
-              onClick={() => startDrill(drillMode)}
-              className="w-full py-3 bg-white text-slate-900 hover:bg-cyan-50 font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
-            >
-              <Play size={18} />
-              Try Again
-            </button>
-
-            <button
-              onClick={resetToMenu}
-              className="text-xs text-slate-500 hover:text-slate-300 underline block w-full py-2"
-            >
-              Back to Menu
-            </button>
-          </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 18, marginTop: 12, ...metaRow }}>
+          <span>{CATEGORY_META[categoryFilter].sub}</span>
+          <span>{pool.length} questions</span>
+          {bestScore > 0 && <span>Best {bestScore}</span>}
         </div>
-      )}
-    </div>
-  );
+
+        <div className="ct-rule" style={{ margin: '26px 0 22px' }} />
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+          <button className="ct-solid" onClick={() => startDrill('practice')}>
+            Practice · untimed
+          </button>
+          <button className="ct-ghost" onClick={() => startDrill('exam')}>
+            Exam · {pool.length} Q · 15s each
+          </button>
+        </div>
+
+        <p
+          style={{
+            maxWidth: '56ch',
+            marginTop: 26,
+            fontSize: 14,
+            lineHeight: 1.6,
+            color: 'var(--ct-muted)',
+          }}
+        >
+          Practice draws without end and shows the rule behind every answer. The exam is one
+          pass through the whole topic, fifteen seconds a question, with the explanations
+          held back.
+        </p>
+      </section>
+    );
+  }
+
+  if (drillState === 'playing' && current) {
+    // Practice draws with replacement and never ends, so the run of pips is
+    // the exam's progress bar only.
+    const asked = deckTotal - deck.length;
+    const pips =
+      drillMode === 'exam'
+        ? Array.from({ length: deckTotal }, (_, i) =>
+            i === asked ? 'var(--ct-brass)' : 'var(--ct-line)'
+          )
+        : null;
+
+    return (
+      <section style={{ padding: '24px 0 0' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 16,
+            ...metaRow,
+          }}
+        >
+          <button className="ct-link ct-link-danger" onClick={handleFinish}>
+            &larr; Abandon
+          </button>
+          <span>{drillMode === 'practice' ? 'Practice · untimed' : 'Exam · timed'}</span>
+          <span
+            style={{
+              color:
+                drillMode === 'exam' && timerWarning ? 'var(--ct-port)' : 'var(--ct-muted)',
+            }}
+          >
+            {drillMode === 'exam' ? `${timerSeconds}s` : `${answered} answered`}
+          </span>
+        </div>
+
+        {pips && (
+          <div style={{ display: 'flex', gap: 4, margin: '14px 0 0' }} aria-hidden="true">
+            {pips.map((color, i) => (
+              <span key={i} style={{ flex: 1, height: 3, background: color }} />
+            ))}
+          </div>
+        )}
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 14,
+            marginTop: 26,
+            ...metaRow,
+            fontSize: 11,
+          }}
+        >
+          {drillMode === 'exam' ? (
+            <span>
+              Q {asked + 1} / {deckTotal}
+            </span>
+          ) : (
+            <span>Score {score}</span>
+          )}
+          <span>{CATEGORY_LABELS[current.category]}</span>
+        </div>
+
+        <h2
+          style={{
+            margin: '12px 0 0',
+            fontSize: 26,
+            lineHeight: 1.32,
+            fontWeight: 600,
+            maxWidth: '44ch',
+            color: 'var(--ct-ink)',
+          }}
+        >
+          {current.prompt}
+        </h2>
+
+        <div className={`ct-quizbody${showPanel ? ' ct-has-visual' : ''}`}>
+          {showPanel && (
+            <VisualPanel
+              key={current.id}
+              questionId={current.id}
+              revealed={selectedAnswer !== null}
+            />
+          )}
+
+          <ScenarioCard
+            key={current.id}
+            question={current}
+            options={options}
+            selectedAnswer={selectedAnswer}
+            // Practice reveals the verdict in place; the exam advances by
+            // itself and holds it back. Unchanged from before the reskin -
+            // only where it is expressed has moved.
+            reveal={selectedAnswer !== null && drillMode === 'practice'}
+            colorblind={prefs.colorblind}
+            showCitations={prefs.showCitations}
+            onSelect={handleSelect}
+          />
+        </div>
+      </section>
+    );
+  }
+
+  if (drillState === 'finished') {
+    const total = drillMode === 'exam' ? deckTotal : answered;
+    const pass = total > 0 && score / total >= PASS_MARK;
+
+    return (
+      <section className="ct-fade" style={{ padding: '28px 0 0' }}>
+        <div style={metaRow}>
+          {drillMode === 'exam' ? 'Exam result' : 'Practice result'} ·{' '}
+          {CATEGORY_META[categoryFilter].label}
+        </div>
+
+        <h1
+          style={{
+            margin: '14px 0 0',
+            fontFamily: STENCIL,
+            fontWeight: 700,
+            fontSize: 66,
+            lineHeight: 0.9,
+            letterSpacing: '0.05em',
+            textTransform: 'uppercase',
+            color: pass ? 'var(--ct-stbd)' : 'var(--ct-port)',
+          }}
+        >
+          {pass ? 'Pass' : 'Not yet'}
+        </h1>
+
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 30,
+            marginTop: 18,
+            ...metaRow,
+            fontSize: 12,
+          }}
+        >
+          <span>
+            Score{' '}
+            <strong style={{ color: 'var(--ct-ink)', fontSize: 15 }}>
+              {score}/{total}
+            </strong>
+          </span>
+          <span>
+            Pass mark{' '}
+            <strong style={{ color: 'var(--ct-ink)', fontSize: 15 }}>
+              {Math.round(PASS_MARK * 100)}%
+            </strong>
+          </span>
+          {bestScore > 0 && (
+            <span>
+              Best <strong style={{ color: 'var(--ct-ink)', fontSize: 15 }}>{bestScore}</strong>
+            </span>
+          )}
+        </div>
+
+        <div className="ct-rule" style={{ margin: '26px 0 22px' }} />
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+          <button className="ct-solid" onClick={() => startDrill(drillMode)}>
+            Drill it again
+          </button>
+          <button className="ct-ghost" onClick={resetToMenu}>
+            {focused ? 'Back to the topic' : 'All topics'}
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  return null;
 }

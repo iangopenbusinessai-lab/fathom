@@ -6,25 +6,21 @@ import {
   QUESTION_SOUNDS,
   QUESTION_SOUND_GAPS,
   QUESTION_VESSEL_TYPES,
-} from '../../colregs';
-import { LightDisplay } from '../../colregs/components/LightDisplay';
-import { DayShapeDisplay } from '../../colregs/components/DayShapeDisplay';
-import { VesselProfile } from '../../colregs/components/VesselProfile';
-import { VesselScenario } from '../../colregs/components/VesselScenario';
-import { SoundSignalDisplay } from '../../colregs/components/SoundSignalDisplay';
-import { MONO } from '../theme';
+} from '../drills/colregs';
+import { LightDisplay } from '../drills/colregs/components/LightDisplay';
+import { DayShapeDisplay } from '../drills/colregs/components/DayShapeDisplay';
+import { VesselProfile } from '../drills/colregs/components/VesselProfile';
+import { VesselScenario } from '../drills/colregs/components/VesselScenario';
+import { SoundSignalDisplay } from '../drills/colregs/components/SoundSignalDisplay';
 
 // 75 of the 78 bank questions are answered from a picture rather than from the
 // prompt text - "identify this vessel from what she is showing". The canvas
 // design had no visual slot because its placeholder bank was all text, so this
 // panel is an addition to it. Without one those questions are unanswerable.
 //
-// The visuals are the colregs drill's own components, reused unchanged. They
-// draw white masthead lights, so they need a dark ground and would vanish on
-// the parchment. The panel is therefore always dark in both themes, read as a
-// lit instrument sitting on the chart table.
-
-const PANEL_BG = '#0a1929';
+// The visuals are the colregs drill's own components, reused unchanged. The
+// dark ground they need comes from the shared .ct-instrument class in
+// ChartFrame, which the compass drill's rose sits on too.
 
 interface VisualPanelProps {
   questionId: string;
@@ -83,29 +79,8 @@ export const VisualPanel: React.FC<VisualPanelProps> = ({ questionId, revealed }
   if (!inner) return null;
 
   return (
-    <div
-      style={{
-        background: PANEL_BG,
-        border: '1px solid var(--ct-line)',
-        padding: '18px 14px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 10,
-      }}
-    >
-      <div
-        style={{
-          fontFamily: MONO,
-          fontSize: 9,
-          letterSpacing: '0.22em',
-          textTransform: 'uppercase',
-          color: 'rgba(212,169,74,0.65)',
-          alignSelf: 'flex-start',
-        }}
-      >
-        Observed
-      </div>
+    <div className="ct-instrument">
+      <div className="ct-instrument-label">Observed</div>
       <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>{inner}</div>
     </div>
   );

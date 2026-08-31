@@ -1,12 +1,12 @@
 import React from 'react';
-import { MONO, STENCIL } from '../theme';
+import { MONO, STENCIL } from '../../../lib/theme';
 import {
   CATEGORIES,
   ChartCategory,
   SECTION_ORDER,
   questionCount,
-} from '../constants';
-import { Progress, masteryPct, overallPct, streakDays, totalAnswered } from '../progress';
+} from '../../../lib/syllabus';
+import { Progress, masteryPct, overallPct, streakDays, totalAnswered } from '../../../lib/progress';
 
 interface CategoryIndexProps {
   progress: Progress;

@@ -1,14 +1,42 @@
 import React from 'react';
-import { MONO, SANS, STENCIL, THEMES, ThemeName, themeLabel } from '../theme';
-import { SOUNDINGS } from '../constants';
+import { MONO, SANS, STENCIL, THEMES, ThemeName, themeLabel } from '../lib/theme';
 
 // The chart itself: the ruled ground, the soundings along the top edge, the
 // masthead, and the stylesheet every screen inside it draws from.
+//
+// This is the site's frame, not one drill's. Everything - the hub, the compass
+// drill, the colregs drill, settings - renders inside it, which is what makes
+// the masthead, the theme toggle and the ruled ground continuous from screen
+// to screen.
 //
 // The design expressed hover states as a `style-hover` attribute, which the
 // canvas runtime does not implement - it is an authoring annotation. Inline
 // styles cannot express :hover at all, so those states live in the stylesheet
 // below as real CSS, keyed off the same custom properties as everything else.
+
+// The depth soundings printed along the top edge. Decorative - they are the
+// chart's own texture, not data. The subscript digits are the fractional
+// fathom marks a real chart carries.
+export const SOUNDINGS: string[] = [
+  '4₂',
+  '7',
+  '11₅',
+  '6',
+  '3₈',
+  '9',
+  '14',
+  '5₄',
+  '8',
+  '12',
+  '4',
+  '17₂',
+  '6₆',
+  '10',
+  '21',
+  '3₅',
+  '7₈',
+  '13',
+];
 
 const CSS = `
 .ct-root {
@@ -81,6 +109,23 @@ const CSS = `
 .ct-card[disabled] { cursor: default; opacity: 0.62; }
 .ct-card[disabled]:hover { border-color: var(--ct-line); }
 
+/* Instrument panel ---------------------------------------------------- */
+/* The lit-instrument ground the drill visuals sit on. Those diagrams draw
+   white masthead lights and grey compass points, so they need a dark field and
+   would vanish on the parchment - the panel stays dark in both themes and
+   reads as an instrument standing on the chart table. */
+.ct-instrument {
+  background: #0a1929;
+  border: 1px solid var(--ct-line);
+  padding: 18px 14px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.ct-instrument-label {
+  align-self: flex-start;
+  font-family: ${MONO}; font-size: 9px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: rgba(212,169,74,0.65);
+}
+
 /* Answer options ------------------------------------------------------ */
 .ct-option {
   display: flex; align-items: flex-start; gap: 14px; text-align: left;
@@ -97,6 +142,16 @@ const CSS = `
 }
 @media (min-width: 720px) {
   .ct-quizbody.ct-has-visual { grid-template-columns: 260px minmax(0, 1fr); }
+}
+
+/* Compass body: the rose needs far more room than a lights diagram - there are
+   32 targets on it - so it leads and takes the wider column. */
+.ct-rosebody {
+  display: grid; grid-template-columns: 1fr; gap: 26px;
+  align-items: start;
+}
+@media (min-width: 720px) {
+  .ct-rosebody { grid-template-columns: minmax(0, 1fr) minmax(0, 290px); }
 }
 
 .ct-fade { animation: ctFade 260ms ease-out; }
@@ -133,10 +188,6 @@ export const ChartFrame: React.FC<ChartFrameProps> = ({
       <style>{CSS}</style>
       <div className="ct-root">
         <div className="ct-sheet">
-          {/* App.tsx floats a fixed "Hub" button at top-left over every drill.
-              This clears it so the masthead does not sit underneath. */}
-          <div style={{ height: 34 }} />
-
           <div
             className="ct-mono"
             style={{
@@ -168,6 +219,8 @@ export const ChartFrame: React.FC<ChartFrameProps> = ({
           >
             <button
               onClick={onGoHub}
+              title="Back to the chart table"
+              aria-label="Back to the chart table"
               style={{
                 display: 'flex',
                 alignItems: 'center',

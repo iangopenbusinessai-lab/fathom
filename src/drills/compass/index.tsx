@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Anchor } from 'lucide-react';
 import { CompassRose } from './CompassRose';
 import { ControlPanel } from './ControlPanel';
 import { COMPASS_POINTS, RELATIVE_POINTS } from './constants';
-import { CompassPoint, GameState, GameStats, GameMode, GameType } from '../../types';
+import { CompassPoint, DrillProps, GameState, GameStats, GameMode, GameType } from '../../types';
 import { bestScoreKey, readBestScore, writeBestScore } from '../../lib/storage';
+import { recordAnswer } from '../../lib/progress';
 
 // Standalone Application - No External Services
 
@@ -19,10 +19,14 @@ export function pickIndexExcluding(length: number, exclude: number | null): numb
   return roll >= exclude ? roll + 1 : roll;
 }
 
-export default function CompassDrill() {
+export default function CompassDrill({ focus }: DrillProps) {
   const [gameState, setGameState] = useState<GameState>('idle');
   const [gameMode, setGameMode] = useState<GameMode>('practice');
-  const [gameType, setGameType] = useState<GameType>('compass');
+  // The hub's Navigation cards are 'compass' and 'relative', which are exactly
+  // this drill's two game types, so a card opens straight onto its own rose.
+  const [gameType, setGameType] = useState<GameType>(
+    focus === 'relative' ? 'relative' : 'compass'
+  );
   const [rotation, setRotation] = useState(0);
 
   // Game Data
@@ -249,6 +253,11 @@ export default function CompassDrill() {
         setStats(prev => ({ ...prev, score: prev.score + 1 }));
     }
 
+    // Recorded against the syllabus card this rose belongs to, which is what
+    // fills its mastery bar on the hub. Storage is best-effort, so a failure
+    // here cannot interrupt the run.
+    recordAnswer(gameType, isCorrect);
+
     const delay = gameMode === 'exam' ? 1000 : (isCorrect ? 500 : 1000);
 
     timeoutRef.current = window.setTimeout(() => {
@@ -264,80 +273,75 @@ export default function CompassDrill() {
       };
   }, []);
 
+  // ── RENDER ──
+  //
+  // The rose keeps its own dark ground in both themes - it is drawn in white,
+  // grey and signal colours and would disappear on the parchment - so it sits
+  // in the shared .ct-instrument panel, the same treatment the colregs
+  // diagrams get.
+
+  if (gameState === 'idle') {
+    return (
+      <ControlPanel
+        gameState={gameState}
+        targetPoint={targetPoint}
+        stats={stats}
+        timeLeft={timeLeft}
+        gameMode={gameMode}
+        gameType={gameType}
+        onStart={startGame}
+        onQuit={resetToMenu}
+      />
+    );
+  }
+
+  if (gameState === 'finished') {
+    return (
+      <ControlPanel
+        gameState={gameState}
+        targetPoint={targetPoint}
+        stats={stats}
+        timeLeft={timeLeft}
+        gameMode={gameMode}
+        gameType={gameType}
+        onStart={startGame}
+        onQuit={resetToMenu}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 overflow-hidden relative selection:bg-cyan-500/30 font-sans">
+    <section style={{ padding: '24px 0 0' }}>
+      <div className="ct-rosebody">
+        <div className="ct-instrument">
+          <div className="ct-instrument-label">
+            {gameType === 'compass' ? 'Rose' : 'Own ship'}
+          </div>
+          <CompassRose
+            targetPoint={targetPoint}
+            gameState={gameState}
+            onPointClick={handlePointClick}
+            clickedIndex={clickedIndex}
+            rotation={rotation}
+            gameMode={gameMode}
+            gameType={gameType}
+          />
+        </div>
 
-      {/* Background Ambience */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-cyan-900/10 blur-[120px] rounded-full animate-pulse duration-[10s]"></div>
-        <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-indigo-900/10 blur-[120px] rounded-full animate-pulse duration-[12s]"></div>
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20"></div>
+        <ControlPanel
+          gameState={gameState}
+          targetPoint={targetPoint}
+          stats={stats}
+          timeLeft={timeLeft}
+          gameMode={gameMode}
+          gameType={gameType}
+          onStart={startGame}
+          onQuit={resetToMenu}
+          examProgress={
+            gameMode === 'exam' ? { current: 32 - examDeck.length, total: 32 } : undefined
+          }
+        />
       </div>
-
-      {gameState === 'idle' ? (
-        // --- TITLE SCREEN LAYOUT ---
-        <div className="z-10 w-full max-w-lg flex flex-col items-center justify-center min-h-[60vh] relative animate-in fade-in zoom-in-95 duration-700">
-
-           {/* Decorative Background Icon for Title */}
-           <div className="absolute -z-10 opacity-5 scale-150 animate-[spin_60s_linear_infinite]">
-              <Anchor size={400} />
-           </div>
-
-           <ControlPanel
-              gameState={gameState}
-              targetPoint={targetPoint}
-              stats={stats}
-              timeLeft={timeLeft}
-              gameMode={gameMode}
-              gameType={gameType}
-              onStart={startGame}
-              onQuit={resetToMenu}
-              isTitleScreen={true}
-           />
-
-           {/* Footer Credits */}
-           <div className="absolute bottom-[-10vh] text-slate-600 text-xs tracking-widest uppercase opacity-50">
-              By Ian Gopen
-           </div>
-        </div>
-      ) : (
-        // --- GAME LAYOUT ---
-        <div className="z-10 w-full max-w-6xl flex flex-col md:flex-row items-center gap-8 md:gap-16 animate-in fade-in slide-in-from-right-8 duration-500">
-
-          {/* Left: Compass Visual */}
-          <div className="flex-1 w-full max-w-[600px] aspect-square flex items-center justify-center">
-            <CompassRose
-              targetPoint={targetPoint}
-              gameState={gameState}
-              onPointClick={handlePointClick}
-              clickedIndex={clickedIndex}
-              rotation={rotation}
-              gameMode={gameMode}
-              gameType={gameType}
-            />
-          </div>
-
-          {/* Right: Controls */}
-          <div className="flex-1 w-full max-w-md">
-             <ControlPanel
-                gameState={gameState}
-                targetPoint={targetPoint}
-                stats={stats}
-                timeLeft={timeLeft}
-                gameMode={gameMode}
-                gameType={gameType}
-                onStart={startGame}
-                onQuit={resetToMenu}
-                examProgress={gameMode === 'exam' ? {
-                    current: (32 - examDeck.length),
-                    total: 32
-                } : undefined}
-                isTitleScreen={false}
-             />
-          </div>
-        </div>
-      )}
-
-    </div>
+    </section>
   );
 }

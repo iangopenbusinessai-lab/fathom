@@ -1,4 +1,4 @@
-import { ColregsCategory, COLREGS_QUESTIONS_BY_CATEGORY } from '../colregs/constants';
+import { ColregsCategory, COLREGS_QUESTIONS_BY_CATEGORY } from '../drills/colregs/constants';
 
 // The chart table indexes the syllabus, not just the question bank, so a
 // category can appear here before it has any questions behind it. `status`
@@ -208,29 +208,30 @@ export const LIVE_CATEGORIES: ChartCategory[] = CATEGORIES.filter(
   (c) => c.status === 'live'
 );
 
-// The depth soundings printed along the top edge. Decorative - they are the
-// chart's own texture, not data. The subscript digits are the fractional
-// fathom marks a real chart carries.
-export const SOUNDINGS: string[] = [
-  '4₂',
-  '7',
-  '11₅',
-  '6',
-  '3₈',
-  '9',
-  '14',
-  '5₄',
-  '8',
-  '12',
-  '4',
-  '17₂',
-  '6₆',
-  '10',
-  '21',
-  '3₅',
-  '7₈',
-  '13',
-];
-
+// The share of a run that has to be right for it to read as a pass.
 export const PASS_MARK = 0.7;
-export const DEFAULT_EXAM_LENGTH = 10;
+
+// Where a card on the hub leads. The syllabus is the site's index now, so this
+// is the one place that knows which drill answers which category - the hub
+// just follows it, and a category that has no drill behind it yet says so by
+// returning null rather than by the hub special-casing its status.
+export interface DrillTarget {
+  drillId: string;
+  focus: string;
+}
+
+export function drillTargetFor(cat: ChartCategory): DrillTarget | null {
+  // Bearings are generated from the 32-point tables rather than being written
+  // multiple-choice, so they are drilled by the compass rose. The card id is
+  // 'compass' or 'relative', which is exactly the game type that drill takes.
+  if (cat.status === 'compass') return { drillId: 'compass', focus: cat.id };
+  if (cat.status === 'live' && cat.source) return { drillId: 'colregs', focus: cat.source };
+  return null;
+}
+
+// The reverse of `source`: which syllabus card a bank category belongs to.
+// The drills record progress against syllabus ids, so this is what lets a
+// colregs run land on the right card's mastery bar.
+export function categoryBySource(source: ColregsCategory): ChartCategory | undefined {
+  return CATEGORIES.find((c) => c.source === source);
+}
