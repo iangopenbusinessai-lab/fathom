@@ -1,4 +1,5 @@
 import { ColregsCategory, COLREGS_QUESTIONS_BY_CATEGORY } from '../drills/colregs/constants';
+import { COMPASS_POINTS, RELATIVE_POINTS } from '../drills/compass/constants';
 
 // The chart table indexes the syllabus, not just the question bank, so a
 // category can appear here before it has any questions behind it. `status`
@@ -234,4 +235,39 @@ export function drillTargetFor(cat: ChartCategory): DrillTarget | null {
 // colregs run land on the right card's mastery bar.
 export function categoryBySource(source: ColregsCategory): ChartCategory | undefined {
   return CATEGORIES.find((c) => c.source === source);
+}
+
+// ── The drillable items behind a card ────────────────────────────────────
+//
+// One entry per thing that can be asked, with a label short enough to list.
+// The weak-spot report reads this to turn ledger ids back into something a
+// person recognises, and the queue builder reads it to know what "the whole
+// pool" is. A category with no bank behind it yet returns nothing, which is
+// what makes every consumer degrade quietly rather than special-case 'soon'.
+
+export interface SyllabusItem {
+  id: string;
+  label: string;
+}
+
+// Compass points are not questions and have no ids of their own, so the ledger
+// key is built from the rose they belong to and the point's abbreviation -
+// 'compass:NxE', 'relative:Stbd Bow'. Both roses have 32 points with the same
+// indices, so the rose has to be part of the key or they would collide.
+export function itemIdForPoint(gameType: string, abbr: string): string {
+  return `${gameType}:${abbr}`;
+}
+
+export function itemsForCategory(cat: ChartCategory): SyllabusItem[] {
+  if (cat.status === 'live' && cat.source) {
+    return COLREGS_QUESTIONS_BY_CATEGORY[cat.source].map((q) => ({
+      id: q.id,
+      label: q.prompt,
+    }));
+  }
+  if (cat.status === 'compass') {
+    const points = cat.id === 'relative' ? RELATIVE_POINTS : COMPASS_POINTS;
+    return points.map((pt) => ({ id: itemIdForPoint(cat.id, pt.abbr), label: pt.full }));
+  }
+  return [];
 }

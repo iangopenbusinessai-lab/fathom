@@ -21,6 +21,9 @@ interface ControlPanelProps {
   onStart: (mode: GameMode, type: GameType) => void;
   onQuit: () => void;
   examProgress?: { current: number; total: number };
+  // How many bearings the exam just asked. A planned run can be shorter than
+  // the full rose, so the result cannot say "out of 32" and be right.
+  examTotal?: number;
 }
 
 const metaRow: React.CSSProperties = {
@@ -67,6 +70,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   onStart,
   onQuit,
   examProgress,
+  examTotal,
 }) => {
   const seconds = Math.ceil(timeLeft / 1000);
   const warning = seconds <= 5;
@@ -223,7 +227,9 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       <div
         style={{ display: 'flex', flexWrap: 'wrap', gap: 30, marginTop: 18, ...metaRow, fontSize: 12 }}
       >
-        <span>{gameMode === 'exam' ? 'Correct out of 32' : 'Points found'}</span>
+        <span>
+          {gameMode === 'exam' ? `Correct out of ${examTotal ?? 32}` : 'Points found'}
+        </span>
         {stats.bestScore > 0 && (
           <span>
             Best <strong style={{ color: 'var(--ct-ink)', fontSize: 15 }}>{stats.bestScore}</strong>

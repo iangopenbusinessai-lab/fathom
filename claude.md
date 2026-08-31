@@ -21,13 +21,15 @@ src/
     theme.ts            ← light/dark palettes as CSS custom properties, font stacks
     syllabus.ts         ← CATEGORIES: the four-section syllabus the Hub renders
     prefs.ts            ← app-wide display prefs + PrefsProvider / usePrefs
-    progress.ts         ← per-category mastery ledger (localStorage)
+    progress.ts         ← the answer ledger: per-category mastery + per-item tallies
+    session.ts          ← SessionPlan and planQueue: how a run's questions are chosen
     citation.ts         ← reads "Rule 27(a)" back out of an explanation
     shuffle.ts          ← Fisher-Yates, used for option order and deck order
     fonts.ts            ← runtime <link> injection for the webfonts
   components/
     ChartFrame.tsx      ← the chart ground, masthead, soundings, and the ct-* stylesheet
     Hub.tsx             ← the syllabus index, four sections of category cards
+    CategoryDetail.tsx  ← one category: weak spots, exercise controls, start buttons
     VisualPanel.tsx     ← the dark instrument panel, drawing the colregs diagrams
     SettingsScreen.tsx  ← generic settings list, rows supplied by App
   drills/
@@ -56,12 +58,42 @@ src/
   the road, Signals and communication, Aids to navigation — and
   `drillTargetFor()` says which drill answers it. There are more hub cards than
   drills, on purpose.
-- A card hands the drill a `focus` (DrillProps), the syllabus category the user
-  picked, and the drill opens on it instead of on its own top-level menu.
+- A card opens `CategoryDetail`, which is where a run is set up and started.
+  It hands the drill a `focus` (which category) and a `start` (which of the
+  drill's own modes, and a `SessionPlan`), and the drill goes straight into
+  that run. The two shortcut buttons at the top of the hub skip the category
+  screen and open a drill's own menu instead, unplanned.
 - Drills write to the shared progress ledger as they go; App re-reads it on the
   way back to the hub, which is what fills the mastery bars.
 - Adding a drill = new folder + register in src/drills/index.ts + point a
   syllabus category at it in drillTargetFor().
+
+## Sessions, plans and the ledger
+- `src/lib/progress.ts` is the one ledger. It keeps a per-category tally
+  (mastery, drilled total, last drilled) **and** a per-item tally keyed by
+  question id, or by `'<gameType>:<abbr>'` for compass points. Category
+  mastery cannot say *which* questions are costing it; the per-item grain is
+  what the weak-spot list reads.
+- A ledger written before the per-item grain existed reads back with an empty
+  `items` and its category figures intact - `coerce()` handles it, and
+  `src/__tests__/ledger.test.ts` pins that.
+- `weakSpots()` is the report: lowest accuracy first, an item needs
+  `WEAK_MIN_ATTEMPTS` answers before it can appear, and anything answered right
+  every time is never listed. `isWeakItem()` is the stricter queue filter -
+  missed more often than got right - used by "focus on weak spots".
+- `src/lib/session.ts` holds `SessionPlan` (count / per-question timer / weak
+  spots) and `planQueue()`, the single place a run's questions are chosen.
+  **`DEFAULT_PLAN` must always mean "behave exactly as before":** with it,
+  `planQueue` is a plain shuffle of the whole pool, no clock is set, and an
+  unplanned colregs practice run still draws without end. `isDefaultPlan()` is
+  what the drills check, and `src/__tests__/session.test.ts` pins the contract.
+- Widening is deliberate: a weak-spots run puts the weak questions first and
+  tops the queue up from the rest of the pool, so asking for 20 when only 6 are
+  weak still gives 20.
+- Exam mode's 15s per question is fixed and a plan does not override it; the
+  plan's timer sets up a *timed practice* run instead. On the compass, a count
+  applies to the exam only - practice and timed attack are sixty-second runs,
+  not decks.
 
 ## Design system
 The chart table: parchment and navy ink by day, brass on navy at the night helm.

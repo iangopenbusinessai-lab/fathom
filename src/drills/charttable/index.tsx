@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChartFrame } from '../../components/ChartFrame';
 import { CategoryIndex } from './components/CategoryIndex';
-import { CategoryDetail } from './components/CategoryDetail';
+import { CategoryDetail } from '../../components/CategoryDetail';
 import { AnswerRecord, QuizScreen } from './components/QuizScreen';
 import { ResultsScreen } from './components/ResultsScreen';
 import { SettingGroup, SettingsScreen } from '../../components/SettingsScreen';
@@ -353,12 +353,17 @@ export default function ChartTableDrill() {
         category={activeCategory}
         progress={progress}
         onBack={goHub}
-        onPractice={() => begin([activeCategory.id], 'practice', null, activeCategory.id)}
-        onExam={() =>
+        // The shared CategoryDetail hands back a mode and a plan now. The
+        // retired drill maps the one field it can honour - the count - onto
+        // its own begin().
+        onStart={(mode, plan) =>
           begin(
             [activeCategory.id],
-            'exam',
-            Math.min(poolFor([activeCategory.id]).length, prefs.examLength),
+            mode === 'exam' ? 'exam' : 'practice',
+            plan.count ??
+              (mode === 'exam'
+                ? Math.min(poolFor([activeCategory.id]).length, prefs.examLength)
+                : null),
             activeCategory.id
           )
         }

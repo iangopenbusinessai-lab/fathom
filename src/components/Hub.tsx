@@ -11,6 +11,9 @@ import { Progress, masteryPct, overallPct, streakDays, totalAnswered } from '../
 
 interface HubProps {
   progress: Progress;
+  // A card opens the category screen, where the run is set up. The two
+  // shortcuts at the top skip that and go straight into a drill's own menu.
+  onOpenCategory: (categoryId: string) => void;
   onOpenDrill: (drillId: string, focus: string) => void;
 }
 
@@ -41,7 +44,7 @@ const statLabel: React.CSSProperties = {
 
 const statValue: React.CSSProperties = { color: 'var(--ct-brass)', fontWeight: 600 };
 
-export const Hub: React.FC<HubProps> = ({ progress, onOpenDrill }) => (
+export const Hub: React.FC<HubProps> = ({ progress, onOpenCategory, onOpenDrill }) => (
   <>
     <section style={{ padding: '30px 0 8px' }}>
       <p
@@ -140,7 +143,7 @@ export const Hub: React.FC<HubProps> = ({ progress, onOpenDrill }) => (
                   key={cat.id}
                   className="ct-card"
                   disabled={target === null}
-                  onClick={target ? () => onOpenDrill(target.drillId, target.focus) : undefined}
+                  onClick={target ? () => onOpenCategory(cat.id) : undefined}
                 >
                   <span
                     style={{

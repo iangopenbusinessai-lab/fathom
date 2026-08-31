@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import {
   COLREGS_QUESTIONS,
   COLREGS_QUESTIONS_BY_CATEGORY,
@@ -12,8 +12,15 @@ import { ScenarioCard } from './components/ScenarioCard';
 import { VisualPanel, hasVisual } from '../../components/VisualPanel';
 import { MONO, STENCIL } from '../../lib/theme';
 import { usePrefs } from '../../lib/prefs';
-import { recordAnswer } from '../../lib/progress';
+import { readProgress, recordAnswer } from '../../lib/progress';
 import { PASS_MARK, categoryBySource } from '../../lib/syllabus';
+import {
+  DEFAULT_PLAN,
+  SessionPlan,
+  isDefaultPlan,
+  planQueue,
+  timerLabel,
+} from '../../lib/session';
 import { DrillProps } from '../../types';
 // Only the types are needed here: the visuals themselves are drawn by the
 // shared VisualPanel, which reads the same question-to-diagram maps below.
@@ -27,6 +34,9 @@ type DrillState = 'idle' | 'playing' | 'finished';
 type DrillMode = 'practice' | 'exam';
 type CategoryFilter = ColregsCategory | 'all';
 
+// Exam mode's own clock, unchanged and not overridable: a plan's timer sets up
+// a timed practice run instead, which is a different thing from sitting the
+// exam.
 const EXAM_QUESTION_MS = 15000;
 
 export const QUESTION_LIGHTS: Partial<Record<string, LightName[]>> = {
@@ -198,6 +208,13 @@ function getPool(filter: CategoryFilter): ColregsQuestion[] {
   return filter === 'all' ? COLREGS_QUESTIONS : COLREGS_QUESTIONS_BY_CATEGORY[filter];
 }
 
+// The one place a run's questions are chosen. With the default plan this is
+// just `shuffle(pool)` - which is exactly what startDrill did before plans
+// existed - so an unplanned run draws from the same deck it always did.
+function buildQueue(filter: CategoryFilter, plan: SessionPlan): ColregsQuestion[] {
+  return planQueue(getPool(filter), (q) => q.id, plan, readProgress());
+}
+
 // Practice draws with replacement, so without this the same question can come
 // up twice running. Excluding the one just answered fixes that; falling back to
 // the unfiltered pool keeps a one-question category from having nothing to draw.
@@ -227,11 +244,11 @@ const CATEGORY_META: Record<CategoryFilter, { label: string; sub: string }> = {
   'vessel-types':      { label: 'Vessel types',          sub: 'identify by shape and rig' },
 };
 
-// The syllabus card a run belongs to, so its answers land on the right mastery
-// bar on the hub. A mixed run has no single card and records nothing.
-function progressIdFor(filter: CategoryFilter): string | null {
-  if (filter === 'all') return null;
-  return categoryBySource(filter)?.id ?? null;
+// The syllabus card a question belongs to, so its answer lands on the right
+// mastery bar. Read from the question rather than from the run's filter, so a
+// mixed run credits each card it actually drew from.
+function progressIdFor(question: ColregsQuestion): string | null {
+  return categoryBySource(question.category)?.id ?? null;
 }
 
 const metaRow: React.CSSProperties = {
@@ -246,7 +263,7 @@ function isCategoryFilter(value: string | undefined): value is CategoryFilter {
   return value !== undefined && (CATEGORY_ORDER as string[]).includes(value);
 }
 
-export default function ColregsDrill({ focus }: DrillProps) {
+export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
   const { prefs } = usePrefs();
 
   // A hub card names the category it is for, so the drill opens on that
@@ -259,6 +276,17 @@ export default function ColregsDrill({ focus }: DrillProps) {
     focused ? 'mode' : 'category'
   );
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>(focused ?? 'all');
+
+  // The plan the current run was built from. Kept so "Drill it again" repeats
+  // the same exercise rather than quietly reverting to the standard one.
+  const [plan, setPlan] = useState<SessionPlan>(start?.plan ?? DEFAULT_PLAN);
+  // A deck run walks a fixed queue and ends; the alternative is practice's
+  // endless draw. An exam is always a deck; a practice run becomes one as soon
+  // as a plan shapes it.
+  const [deckRun, setDeckRun] = useState(false);
+  // Per-question clock for this run, or null for untimed. Exam mode always
+  // sets EXAM_QUESTION_MS here; a planned practice run sets its own.
+  const [questionMs, setQuestionMs] = useState<number | null>(null);
 
   const [deck, setDeck] = useState<ColregsQuestion[]>([]);
   const [deckTotal, setDeckTotal] = useState(0);
@@ -276,6 +304,10 @@ export default function ColregsDrill({ focus }: DrillProps) {
   const [bestScore, setBestScore] = useState(() => readBestScore(bestKey));
 
   const [timeLeft, setTimeLeft] = useState(EXAM_QUESTION_MS);
+
+  // advance() runs from a timeout and needs the run's clock without taking a
+  // dependency that would re-create it mid-question.
+  const questionMsRef = useRef<number | null>(null);
 
   const advanceRef = useRef<number | null>(null);
   const timerRef = useRef<number | null>(null);
@@ -300,11 +332,11 @@ export default function ColregsDrill({ focus }: DrillProps) {
 
   // --- Advance to next question ---
 
-  const advance = useCallback((currentDeck: ColregsQuestion[], mode: DrillMode) => {
+  const advance = useCallback((currentDeck: ColregsQuestion[], usesDeck: boolean) => {
     timedOutRef.current = false;
     setSelectedAnswer(null);
 
-    if (mode === 'exam') {
+    if (usesDeck) {
       const next = [...currentDeck];
       next.pop();
       if (next.length === 0) {
@@ -314,10 +346,11 @@ export default function ColregsDrill({ focus }: DrillProps) {
       }
       setDeck(next);
       showQuestion(next[next.length - 1]);
-      setTimeLeft(EXAM_QUESTION_MS);
     } else {
       showQuestion(pickExcluding(getPool(categoryFilter), currentIdRef.current));
     }
+
+    if (questionMsRef.current !== null) setTimeLeft(questionMsRef.current);
   }, [categoryFilter, showQuestion]);
 
   // --- Answer selection ---
@@ -333,8 +366,8 @@ export default function ColregsDrill({ focus }: DrillProps) {
     // Recorded against the syllabus card this run belongs to, which is what
     // fills the mastery bars on the hub. Storage is best-effort, so a failure
     // here cannot interrupt the run.
-    const progressId = progressIdFor(categoryFilter);
-    if (progressId) recordAnswer(progressId, isCorrect);
+    const progressId = current ? progressIdFor(current) : null;
+    if (progressId && current) recordAnswer(progressId, isCorrect, current.id);
 
     if (!isCorrect && prefs.haptics && typeof navigator !== 'undefined' && navigator.vibrate) {
       try {
@@ -347,14 +380,16 @@ export default function ColregsDrill({ focus }: DrillProps) {
     clearTimers();
 
     advanceRef.current = window.setTimeout(() => {
-      advance(deck, drillMode);
+      advance(deck, deckRun);
     }, isCorrect ? 1200 : 2000);
-  }, [selectedAnswer, current, deck, drillMode, advance, clearTimers, categoryFilter, prefs.haptics]);
+  }, [selectedAnswer, current, deck, deckRun, advance, clearTimers, prefs.haptics]);
 
   // --- Exam timer ---
 
   useEffect(() => {
-    if (drillState !== 'playing' || drillMode !== 'exam') return;
+    // Untimed runs never start the loop at all, which is what an unplanned
+    // practice run is.
+    if (drillState !== 'playing' || questionMs === null) return;
 
     let last = performance.now();
     const loop = (now: number) => {
@@ -366,7 +401,7 @@ export default function ColregsDrill({ focus }: DrillProps) {
           timedOutRef.current = true;
           setAnswered(a => a + 1);
           advanceRef.current = window.setTimeout(() => {
-            advance(deck, drillMode);
+            advance(deck, deckRun);
           }, 1200);
           return 0;
         }
@@ -377,37 +412,67 @@ export default function ColregsDrill({ focus }: DrillProps) {
     timerRef.current = requestAnimationFrame(loop);
     return () => { if (timerRef.current) cancelAnimationFrame(timerRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [drillState, drillMode, current?.id]);
+  }, [drillState, questionMs, current?.id]);
 
   // Cleanup
   useEffect(() => () => clearTimers(), [clearTimers]);
 
   // --- Start ---
 
-  const startDrill = (mode: DrillMode) => {
+  const startDrill = (mode: DrillMode, runPlan: SessionPlan = plan) => {
     clearTimers();
-    const pool = shuffle(getPool(categoryFilter));
+    const queue = buildQueue(categoryFilter, runPlan);
+    if (queue.length === 0) return;
+
+    // Exam mode keeps its own fixed clock; only a practice run takes the
+    // plan's. An exam is always a deck, and a practice run becomes one the
+    // moment the plan shapes it - untouched, it draws without end as before.
+    const perQuestion = mode === 'exam' ? EXAM_QUESTION_MS : runPlan.perQuestionMs;
+    const usesDeck = mode === 'exam' || !isDefaultPlan(runPlan);
+
+    setPlan(runPlan);
     setDrillMode(mode);
+    setDeckRun(usesDeck);
+    setQuestionMs(perQuestion);
+    questionMsRef.current = perQuestion;
     setScore(0);
     setAnswered(0);
     setSelectedAnswer(null);
-    setTimeLeft(EXAM_QUESTION_MS);
+    setTimeLeft(perQuestion ?? EXAM_QUESTION_MS);
     timedOutRef.current = false;
 
-    if (mode === 'exam') {
-      setDeck(pool);
-      setDeckTotal(pool.length);
-      showQuestion(pool[pool.length - 1]);
+    if (usesDeck) {
+      setDeck(queue);
+      setDeckTotal(queue.length);
+      showQuestion(queue[queue.length - 1]);
     } else {
       setDeck([]);
       setDeckTotal(0);
-      showQuestion(pool[0]);
+      showQuestion(queue[0]);
     }
     setDrillState('playing');
   };
 
+  // Launched from a category screen: go straight into the run it configured.
+  // A layout effect rather than a plain one, so the drill's own menu never
+  // paints for a frame first.
+  const plannedStartRef = useRef(false);
+  useLayoutEffect(() => {
+    if (!start || plannedStartRef.current) return;
+    plannedStartRef.current = true;
+    startDrill(start.mode === 'exam' ? 'exam' : 'practice', start.plan);
+  // startDrill is re-created every render; the ref is what makes this run once.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [start]);
+
   const resetToMenu = () => {
     clearTimers();
+    // Launched from a category screen, that screen is the way back - it is
+    // where the exercise was set up.
+    if (onExit) {
+      onExit();
+      return;
+    }
     setDrillState('idle');
     setMenuStep(focused ? 'mode' : 'category');
     setCurrent(null);
@@ -608,15 +673,14 @@ export default function ColregsDrill({ focus }: DrillProps) {
   }
 
   if (drillState === 'playing' && current) {
-    // Practice draws with replacement and never ends, so the run of pips is
-    // the exam's progress bar only.
+    // An endless practice draw has no end to show progress towards, so the
+    // run of pips belongs to deck runs only.
     const asked = deckTotal - deck.length;
-    const pips =
-      drillMode === 'exam'
-        ? Array.from({ length: deckTotal }, (_, i) =>
-            i === asked ? 'var(--ct-brass)' : 'var(--ct-line)'
-          )
-        : null;
+    const pips = deckRun
+      ? Array.from({ length: deckTotal }, (_, i) =>
+          i === asked ? 'var(--ct-brass)' : 'var(--ct-line)'
+        )
+      : null;
 
     return (
       <section style={{ padding: '24px 0 0' }}>
@@ -632,14 +696,19 @@ export default function ColregsDrill({ focus }: DrillProps) {
           <button className="ct-link ct-link-danger" onClick={handleFinish}>
             &larr; Abandon
           </button>
-          <span>{drillMode === 'practice' ? 'Practice · untimed' : 'Exam · timed'}</span>
+          <span>
+            {drillMode === 'exam'
+              ? 'Exam · timed'
+              : questionMs === null
+                ? 'Practice · untimed'
+                : `Practice · ${timerLabel(questionMs)} each`}
+          </span>
           <span
             style={{
-              color:
-                drillMode === 'exam' && timerWarning ? 'var(--ct-port)' : 'var(--ct-muted)',
+              color: questionMs !== null && timerWarning ? 'var(--ct-port)' : 'var(--ct-muted)',
             }}
           >
-            {drillMode === 'exam' ? `${timerSeconds}s` : `${answered} answered`}
+            {questionMs !== null ? `${timerSeconds}s` : `${answered} answered`}
           </span>
         </div>
 
@@ -661,7 +730,7 @@ export default function ColregsDrill({ focus }: DrillProps) {
             fontSize: 11,
           }}
         >
-          {drillMode === 'exam' ? (
+          {deckRun ? (
             <span>
               Q {asked + 1} / {deckTotal}
             </span>
@@ -712,7 +781,7 @@ export default function ColregsDrill({ focus }: DrillProps) {
   }
 
   if (drillState === 'finished') {
-    const total = drillMode === 'exam' ? deckTotal : answered;
+    const total = deckRun ? deckTotal : answered;
     const pass = total > 0 && score / total >= PASS_MARK;
 
     return (

@@ -6,6 +6,8 @@ import { Hub } from '../components/Hub';
 import { ChartFrame } from '../components/ChartFrame';
 import { SECTION_ORDER } from '../lib/syllabus';
 import { readProgress } from '../lib/progress';
+import { CategoryDetail } from '../components/CategoryDetail';
+import { categoryById } from '../lib/syllabus';
 import ColregsDrill from '../drills/colregs';
 import CompassDrill from '../drills/compass';
 
@@ -33,7 +35,11 @@ describe('app shell renders', () => {
         onGoHub={() => undefined}
         onGoSettings={() => undefined}
       >
-        <Hub progress={readProgress()} onOpenDrill={() => undefined} />
+        <Hub
+          progress={readProgress()}
+          onOpenCategory={() => undefined}
+          onOpenDrill={() => undefined}
+        />
       </ChartFrame>
     );
     // The dark palette's tokens must reach the root, or every screen inside
@@ -67,5 +73,50 @@ describe('drills open on the category the hub sent them to', () => {
     expect(renderToStaticMarkup(<CompassDrill focus="compass" />)).toContain(
       'Compass bearings'
     );
+  });
+});
+
+describe('the category screen', () => {
+  const lights = categoryById('lights')!;
+  const blank = readProgress();
+
+  function detail(progress = blank) {
+    return renderToStaticMarkup(
+      <CategoryDetail
+        category={lights}
+        progress={progress}
+        onBack={() => undefined}
+        onStart={() => undefined}
+      />
+    );
+  }
+
+  it('says so plainly rather than showing an empty weak-spot list', () => {
+    const html = detail();
+    expect(html).toContain('Not enough answers here yet');
+  });
+
+  it('lists the worst questions once there is history', () => {
+    const html = detail({
+      cats: {},
+      items: {
+        // The prompt for nl-01 is the starboard sidelight question.
+        'nl-01': { answered: 4, correct: 0 },
+        'nl-02': { answered: 4, correct: 3 },
+      },
+      days: [],
+    });
+    expect(html).toContain('starboard sidelight');
+    expect(html).toContain('0% · 0/4');
+    expect(html).not.toContain('Not enough answers here yet');
+  });
+
+  it('offers the three exercise controls and the standard runs', () => {
+    const html = detail();
+    expect(html).toContain('Questions');
+    expect(html).toContain('Timer');
+    expect(html).toContain('Focus on weak spots');
+    expect(html).toContain('Practice · untimed');
+    expect(html).toContain('Exam · 15s each');
   });
 });

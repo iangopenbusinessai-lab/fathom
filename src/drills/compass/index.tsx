@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import { CompassRose } from './CompassRose';
 import { ControlPanel } from './ControlPanel';
 import { COMPASS_POINTS, RELATIVE_POINTS } from './constants';
 import { CompassPoint, DrillProps, GameState, GameStats, GameMode, GameType } from '../../types';
 import { bestScoreKey, readBestScore, writeBestScore } from '../../lib/storage';
-import { recordAnswer } from '../../lib/progress';
+import { readProgress, recordAnswer } from '../../lib/progress';
+import { itemIdForPoint } from '../../lib/syllabus';
+import { DEFAULT_PLAN, SessionPlan, planQueue } from '../../lib/session';
 
 // Standalone Application - No External Services
 
@@ -19,7 +21,7 @@ export function pickIndexExcluding(length: number, exclude: number | null): numb
   return roll >= exclude ? roll + 1 : roll;
 }
 
-export default function CompassDrill({ focus }: DrillProps) {
+export default function CompassDrill({ focus, start, onExit }: DrillProps) {
   const [gameState, setGameState] = useState<GameState>('idle');
   const [gameMode, setGameMode] = useState<GameMode>('practice');
   // The hub's Navigation cards are 'compass' and 'relative', which are exactly
@@ -27,6 +29,12 @@ export default function CompassDrill({ focus }: DrillProps) {
   const [gameType, setGameType] = useState<GameType>(
     focus === 'relative' ? 'relative' : 'compass'
   );
+  // How the run was set up on the category screen, if it was. Practice and
+  // timed attack run for sixty seconds rather than walking a deck, so the
+  // count shapes the exam only; the weak-spot filter narrows the points every
+  // mode draws from, and the timer sets the exam's per-question clock.
+  const [plan, setPlan] = useState<SessionPlan>(start?.plan ?? DEFAULT_PLAN);
+  const [examQuestionMs, setExamQuestionMs] = useState(EXAM_QUESTION_DURATION_MS);
   const [rotation, setRotation] = useState(0);
 
   // Game Data
@@ -66,13 +74,36 @@ export default function CompassDrill({ focus }: DrillProps) {
       return gameType === 'compass' ? COMPASS_POINTS : RELATIVE_POINTS;
   }, [gameType]);
 
-  const shuffleDeck = useCallback(() => {
-    const deck = [...Array(32).keys()];
+  // The points the run in progress may draw from. Held in a ref because
+  // startGame settles it before its own state updates have landed, and
+  // generateRound has to read the same set startGame chose.
+  const runPointsRef = useRef<CompassPoint[]>(COMPASS_POINTS);
+
+  // The rose a run draws from. With the default plan that is all 32 points in
+  // their own order - exactly what every draw used before plans existed. With
+  // "focus on weak spots" it is the points the ledger says are missed more
+  // often than not, widened from the rest of the rose when too few qualify.
+  const pointsFor = useCallback((type: GameType, runPlan: SessionPlan) => {
+    const all = type === 'compass' ? COMPASS_POINTS : RELATIVE_POINTS;
+    if (!runPlan.weakSpotsOnly) return all;
+    const queued = planQueue(
+      all,
+      (pt) => itemIdForPoint(type, pt.abbr),
+      { ...runPlan, count: null },
+      readProgress()
+    );
+    return queued.length > 0 ? queued : all;
+  }, []);
+
+  // Indices into `points`, shuffled, cut to the plan's count. Unplanned this
+  // is the same full 32-index shuffle the exam always used.
+  const buildDeck = useCallback((points: CompassPoint[], runPlan: SessionPlan) => {
+    const deck = [...points.keys()];
     for (let i = deck.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [deck[i], deck[j]] = [deck[j], deck[i]];
     }
-    return deck;
+    return runPlan.count === null ? deck : deck.slice(0, runPlan.count);
   }, []);
 
   // --- Game Logic ---
@@ -106,6 +137,14 @@ export default function CompassDrill({ focus }: DrillProps) {
   }, [gameState, stats.bestScore, bestKey]);
 
   const resetToMenu = () => {
+    // Launched from a category screen, that screen is the way back - it is
+    // where the exercise was set up.
+    if (timerRef.current) cancelAnimationFrame(timerRef.current);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (onExit) {
+      onExit();
+      return;
+    }
     setGameState('idle');
     setClickedIndex(null);
     setTargetPoint(null);
@@ -116,7 +155,7 @@ export default function CompassDrill({ focus }: DrillProps) {
 
   const generateRound = useCallback(() => {
     setClickedIndex(null);
-    const activePoints = getActivePoints();
+    const activePoints = runPointsRef.current;
 
     // 1. Determine Target
     let nextTargetIndex = 0;
@@ -131,7 +170,7 @@ export default function CompassDrill({ focus }: DrillProps) {
         setExamDeck(nextDeck);
 
         // Reset timer for the new question
-        setTimeLeft(EXAM_QUESTION_DURATION_MS);
+        setTimeLeft(examQuestionMs);
     } else {
         // Practice/Timed: random with replacement, minus the point just asked,
         // which could otherwise be drawn twice in a row.
@@ -149,22 +188,30 @@ export default function CompassDrill({ focus }: DrillProps) {
         setRotation(0);
     }
 
-  }, [gameMode, gameType, examDeck, endGame, getActivePoints]);
+  }, [gameMode, examDeck, endGame, examQuestionMs]);
 
-  const startGame = (mode: GameMode, type: GameType) => {
+  const startGame = (mode: GameMode, type: GameType, runPlan: SessionPlan = plan) => {
     setGameMode(mode);
     setGameType(type);
+    setPlan(runPlan);
     setStats(prev => ({ ...prev, score: 0, totalAttempts: 0 }));
 
     // We need to access points immediately, but state update for gameType might be async in next render.
     // So we use local var or the new type passed in.
-    const activePoints = type === 'compass' ? COMPASS_POINTS : RELATIVE_POINTS;
+    const activePoints = pointsFor(type, runPlan);
+    runPointsRef.current = activePoints;
+
+    // The plan's timer is the exam's per-question clock. Practice and timed
+    // attack are sixty-second runs rather than per-question ones, so they take
+    // no clock from the plan.
+    const perQuestion = runPlan.perQuestionMs ?? EXAM_QUESTION_DURATION_MS;
+    setExamQuestionMs(perQuestion);
 
     if (mode === 'exam') {
-        const deck = shuffleDeck();
+        const deck = buildDeck(activePoints, runPlan);
         setExamDeck(deck);
-        setQuestionsTotal(32);
-        setTimeLeft(EXAM_QUESTION_DURATION_MS);
+        setQuestionsTotal(deck.length);
+        setTimeLeft(perQuestion);
 
         // Manual first round init
         const firstDeck = [...deck];
@@ -187,6 +234,18 @@ export default function CompassDrill({ focus }: DrillProps) {
         setRotation((mode !== 'practice') ? Math.floor(Math.random() * 360) : 0);
     }
   };
+
+  // Launched from a category screen: go straight into the run it configured.
+  // A layout effect rather than a plain one, so the drill's own menu never
+  // paints for a frame first.
+  const plannedStartRef = useRef(false);
+  useLayoutEffect(() => {
+    if (!start || plannedStartRef.current) return;
+    plannedStartRef.current = true;
+    startGame(start.mode, focus === 'relative' ? 'relative' : 'compass', start.plan);
+  // startGame is re-created every render; the ref is what makes this run once.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [start]);
 
   // --- Timer ---
   useEffect(() => {
@@ -256,7 +315,11 @@ export default function CompassDrill({ focus }: DrillProps) {
     // Recorded against the syllabus card this rose belongs to, which is what
     // fills its mastery bar on the hub. Storage is best-effort, so a failure
     // here cannot interrupt the run.
-    recordAnswer(gameType, isCorrect);
+    recordAnswer(
+      gameType,
+      isCorrect,
+      targetPoint ? itemIdForPoint(gameType, targetPoint.abbr) : null
+    );
 
     const delay = gameMode === 'exam' ? 1000 : (isCorrect ? 500 : 1000);
 
@@ -306,6 +369,7 @@ export default function CompassDrill({ focus }: DrillProps) {
         gameType={gameType}
         onStart={startGame}
         onQuit={resetToMenu}
+        examTotal={questionsTotal}
       />
     );
   }
@@ -338,7 +402,9 @@ export default function CompassDrill({ focus }: DrillProps) {
           onStart={startGame}
           onQuit={resetToMenu}
           examProgress={
-            gameMode === 'exam' ? { current: 32 - examDeck.length, total: 32 } : undefined
+            gameMode === 'exam'
+              ? { current: questionsTotal - examDeck.length, total: questionsTotal }
+              : undefined
           }
         />
       </div>
