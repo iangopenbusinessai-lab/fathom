@@ -1,13 +1,13 @@
 import React from 'react';
-import { MONO, SANS, STENCIL, THEMES, ThemeName, themeLabel } from '../lib/theme';
+import { MONO, SANS, STENCIL, THEMES, ThemeName } from '../lib/theme';
 
 // The chart itself: the ruled ground, the soundings along the top edge, the
 // masthead, and the stylesheet every screen inside it draws from.
 //
 // This is the site's frame, not one drill's. Everything - the hub, the compass
 // drill, the colregs drill, settings - renders inside it, which is what makes
-// the masthead, the theme toggle and the ruled ground continuous from screen
-// to screen.
+// the masthead, the trail and the ruled ground continuous from screen to
+// screen.
 //
 // The design expressed hover states as a `style-hover` attribute, which the
 // canvas runtime does not implement - it is an authoring annotation. Inline
@@ -70,15 +70,6 @@ const CSS = `
 .ct-solid:hover { background: var(--ct-brass); }
 .ct-ghost { background: transparent; color: var(--ct-ink); border: 1px solid var(--ct-line); }
 .ct-ghost:hover { border-color: var(--ct-brass); color: var(--ct-brass); }
-
-.ct-chip {
-  display: flex; align-items: center; gap: 7px;
-  background: transparent; border: 1px solid var(--ct-line);
-  color: var(--ct-muted); font-family: ${MONO}; font-size: 10px;
-  letter-spacing: 0.14em; padding: 8px 11px; text-transform: uppercase;
-  cursor: pointer; transition: border-color 140ms ease, color 140ms ease;
-}
-.ct-chip:hover { border-color: var(--ct-brass); color: var(--ct-brass); }
 
 .ct-icon {
   display: flex; align-items: center; justify-content: center;
@@ -154,6 +145,26 @@ const CSS = `
   .ct-rosebody { grid-template-columns: minmax(0, 1fr) minmax(0, 290px); }
 }
 
+/* The trail: where you are, and the labelled way back ----------------- */
+/* The wordmark still goes home, but "click the logo" is a convention, not a
+   signpost. The trail states the current location and puts a named Chart
+   table button in front of it on every screen that is not the hub. */
+.ct-trail {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  padding: 11px 0 0;
+  font-family: ${MONO}; font-size: 10.5px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+}
+.ct-crumb {
+  background: transparent; border: none; padding: 0;
+  font: inherit; letter-spacing: inherit; text-transform: inherit;
+  color: var(--ct-muted); cursor: pointer;
+  transition: color 140ms ease;
+}
+.ct-crumb:hover { color: var(--ct-brass); }
+.ct-crumb-sep { color: var(--ct-line); }
+.ct-crumb-here { color: var(--ct-ink); }
+
 .ct-fade { animation: ctFade 260ms ease-out; }
 @keyframes ctFade {
   from { opacity: 0; transform: translateY(6px); }
@@ -164,24 +175,40 @@ const CSS = `
 }
 `;
 
+// One step of the trail. A step with an `onClick` is somewhere you can go
+// back to; the last step is where you are, and never carries one.
+export interface TrailStep {
+  label: string;
+  onClick?: () => void;
+}
+
 interface ChartFrameProps {
   theme: ThemeName;
-  onToggleTheme: () => void;
   onGoHub: () => void;
   onGoSettings: () => void;
+  // Everything below the hub. Empty means the hub itself, which shows as the
+  // current location rather than as a button back to where you already are.
+  trail?: TrailStep[];
   children: React.ReactNode;
 }
 
 export const ChartFrame: React.FC<ChartFrameProps> = ({
   theme,
-  onToggleTheme,
   onGoHub,
   onGoSettings,
+  trail = [],
   children,
 }) => {
   // The theme tokens ride on the root as inline custom properties, which is
   // what lets the stylesheet above stay theme-agnostic.
   const vars = THEMES[theme] as React.CSSProperties;
+
+  // The hub is always the first step. On the hub itself it is the current
+  // location; anywhere else it is the named way back.
+  const steps: TrailStep[] = [
+    { label: 'Chart table', onClick: trail.length > 0 ? onGoHub : undefined },
+    ...trail,
+  ];
 
   return (
     <div style={{ ...vars, fontFamily: SANS }}>
@@ -274,9 +301,6 @@ export const ChartFrame: React.FC<ChartFrameProps> = ({
             </button>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <button className="ct-chip" onClick={onToggleTheme}>
-                {themeLabel(theme)}
-              </button>
               <button className="ct-icon" onClick={onGoSettings} title="Settings" aria-label="Settings">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
                   <circle cx="12" cy="12" r="3.2" />
@@ -287,6 +311,28 @@ export const ChartFrame: React.FC<ChartFrameProps> = ({
           </header>
 
           <div className="ct-rule" />
+
+          <nav className="ct-trail" aria-label="Breadcrumb">
+            {steps.map((step, i) => (
+              <React.Fragment key={`${step.label}-${i}`}>
+                {i > 0 && (
+                  <span className="ct-crumb-sep" aria-hidden="true">
+                    /
+                  </span>
+                )}
+                {step.onClick ? (
+                  <button className="ct-crumb" onClick={step.onClick}>
+                    {i === 0 ? `← ${step.label}` : step.label}
+                  </button>
+                ) : (
+                  <span className="ct-crumb-here" aria-current="page">
+                    {step.label}
+                  </span>
+                )}
+              </React.Fragment>
+            ))}
+          </nav>
+
           {children}
         </div>
       </div>

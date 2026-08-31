@@ -28,7 +28,10 @@ import { GameMode } from '../types';
 interface CategoryDetailProps {
   category: ChartCategory;
   progress: Progress;
-  onBack: () => void;
+  // Optional for the same reason as on the settings screen: the frame's trail
+  // is the way back, so the shell leaves this off and only the retired chart
+  // table drill still supplies it.
+  onBack?: () => void;
   // The drill's own mode, plus the plan the controls below built. A plan left
   // at its defaults is the same run the drill has always started.
   onStart: (mode: GameMode, plan: SessionPlan) => void;
@@ -152,9 +155,11 @@ export const CategoryDetail: React.FC<CategoryDetailProps> = ({
 
   return (
     <section className="ct-fade" style={{ padding: '28px 0 0' }}>
-      <button className="ct-link" onClick={onBack}>
-        &larr; All categories
-      </button>
+      {onBack && (
+        <button className="ct-link" onClick={onBack}>
+          &larr; All categories
+        </button>
+      )}
 
       <h1
         style={{

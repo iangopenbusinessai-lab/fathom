@@ -34,10 +34,11 @@ export const THEMES: Record<ThemeName, ThemeVars> = {
   },
 };
 
-// The label names the state you would switch TO, which is what the design's
-// toggle button reads.
-export function themeLabel(theme: ThemeName): string {
-  return theme === 'dark' ? 'Chart table' : 'Night helm';
+// The name of the lighting you are IN. The masthead toggle that named the
+// state you would switch to is gone; the control lives in Settings now, and a
+// settings row reads as its current value.
+export function themeName(theme: ThemeName): string {
+  return theme === 'dark' ? 'Night helm' : 'Chart table';
 }
 
 export const SANS = "'IBM Plex Sans', system-ui, -apple-system, sans-serif";

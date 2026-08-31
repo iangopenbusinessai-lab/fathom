@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { ChartFrame } from './components/ChartFrame';
+import { ChartFrame, TrailStep } from './components/ChartFrame';
 import { CategoryDetail } from './components/CategoryDetail';
 import { Hub } from './components/Hub';
 import { SettingGroup, SettingsScreen } from './components/SettingsScreen';
@@ -8,6 +8,7 @@ import { CATEGORIES, categoryById, drillTargetFor } from './lib/syllabus';
 import { SessionPlan } from './lib/session';
 import { DrillStart, GameMode } from './types';
 import { PrefsProvider, usePrefs } from './lib/prefs';
+import { themeName } from './lib/theme';
 import { Progress, clearProgress, masteryPct, readProgress } from './lib/progress';
 
 // One route at a time, and the drill route carries the syllabus category the
@@ -109,10 +110,13 @@ function Shell() {
         name: 'Display',
         rows: [
           {
+            // The only theme control now that the masthead chip is gone. It
+            // cycles like the other controls, and reads as the lighting you
+            // are in rather than as an on/off.
             key: 'theme',
-            label: 'Night helm',
-            help: 'Warm brass instrument lighting on navy, to preserve night vision at the wheel.',
-            ctrlLabel: prefs.theme === 'dark' ? 'On' : 'Off',
+            label: 'Lighting',
+            help: 'Night helm is warm brass on navy, to preserve night vision at the wheel. Chart table is the daylight parchment.',
+            ctrlLabel: themeName(prefs.theme),
             tone: (prefs.theme === 'dark' ? 'on' : 'off') as 'on' | 'off',
             onActivate: () =>
               savePrefs({ ...prefs, theme: prefs.theme === 'dark' ? 'light' : 'dark' }),
@@ -175,17 +179,22 @@ function Shell() {
   // each one its own key.
   const runKey = route.screen === 'drill' && route.start ? runNonce : 0;
 
+  // Where you are, said out loud. The hub step is added by the frame; this is
+  // everything below it, and any step that is not the last one is somewhere
+  // you can click back to.
+  let trail: TrailStep[] = [];
   let body: React.ReactNode;
 
   if (route.screen === 'settings') {
-    body = <SettingsScreen groups={settingGroups} onBack={goHub} />;
+    trail = [{ label: 'Settings' }];
+    body = <SettingsScreen groups={settingGroups} />;
   } else if (route.screen === 'category') {
     const cat = categoryById(route.categoryId);
+    if (cat) trail = [{ label: cat.section }, { label: cat.name }];
     body = cat ? (
       <CategoryDetail
         category={cat}
         progress={progress}
-        onBack={goHub}
         onStart={(mode, plan) => startPlanned(cat.id, mode, plan)}
       />
     ) : (
@@ -195,6 +204,14 @@ function Shell() {
     const drill = DRILLS.find((d) => d.id === route.drillId);
     if (drill) {
       const DrillComponent = drill.component;
+      const cat = route.from ? categoryById(route.from) : null;
+      trail = cat
+        ? [
+            { label: cat.section },
+            { label: cat.name, onClick: () => openCategory(cat.id) },
+            { label: drill.title },
+          ]
+        : [{ label: drill.title }];
       // Keyed on the focus as well as the drill, so picking a different
       // category from the hub restarts the drill on it rather than leaving the
       // previous run's state in place.
@@ -220,11 +237,9 @@ function Shell() {
   return (
     <ChartFrame
       theme={prefs.theme}
-      onToggleTheme={() =>
-        savePrefs({ ...prefs, theme: prefs.theme === 'dark' ? 'light' : 'dark' })
-      }
       onGoHub={goHub}
       onGoSettings={() => setRoute({ screen: 'settings' })}
+      trail={trail}
     >
       {body}
     </ChartFrame>

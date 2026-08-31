@@ -441,9 +441,6 @@ export default function ChartTableDrill() {
   return (
     <ChartFrame
       theme={prefs.theme}
-      onToggleTheme={() =>
-        savePrefs({ ...prefs, theme: prefs.theme === 'dark' ? 'light' : 'dark' })
-      }
       onGoHub={goHub}
       onGoSettings={() => setScreen('settings')}
     >

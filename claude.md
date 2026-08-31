@@ -63,6 +63,17 @@ src/
   drill's own modes, and a `SessionPlan`), and the drill goes straight into
   that run. The two shortcut buttons at the top of the hub skip the category
   screen and open a drill's own menu instead, unplanned.
+- **The trail** is the navigation signpost: ChartFrame draws a breadcrumb
+  under the masthead rule from a `trail: TrailStep[]` App computes per route.
+  The hub is always the first step - the current location on the hub itself, a
+  labelled "← Chart table" button everywhere else. It replaces the implicit
+  "click the wordmark" convention (the wordmark still works), so CategoryDetail
+  and SettingsScreen take `onBack` as optional and the shell no longer passes
+  one; only the retired chart table drill, which has no trail, still does.
+- Theme is set in Settings ("Display → Lighting"), not from the masthead - the
+  old `.ct-chip` toggle there is gone. `DEFAULT_PREFS.theme` is `dark`: night
+  helm is the first-run default, and `readPrefs` only overrides it for a theme
+  that was stored explicitly. `src/__tests__/prefs.test.ts` pins that.
 - Drills write to the shared progress ledger as they go; App re-reads it on the
   way back to the hub, which is what fills the mastery bars.
 - Adding a drill = new folder + register in src/drills/index.ts + point a

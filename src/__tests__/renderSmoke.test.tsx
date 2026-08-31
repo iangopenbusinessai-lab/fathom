@@ -31,7 +31,6 @@ describe('app shell renders', () => {
     const html = renderToStaticMarkup(
       <ChartFrame
         theme="dark"
-        onToggleTheme={() => undefined}
         onGoHub={() => undefined}
         onGoSettings={() => undefined}
       >
@@ -47,6 +46,46 @@ describe('app shell renders', () => {
     expect(html).toContain('--ct-bg:#0a1929');
     expect(html).toContain('Buoyage / IALA marks');
     expect(html).toContain('Navigation lights');
+  });
+});
+
+describe('the frame says where you are', () => {
+  it('names the hub as the current location, with no way back to itself', () => {
+    const html = renderToStaticMarkup(
+      <ChartFrame theme="dark" onGoHub={() => undefined} onGoSettings={() => undefined}>
+        <div />
+      </ChartFrame>
+    );
+    expect(html).toContain('ct-crumb-here');
+    expect(html).toContain('Chart table');
+    expect(html).not.toContain('ct-crumb"');
+  });
+
+  it('puts a labelled way home in front of the current screen', () => {
+    const html = renderToStaticMarkup(
+      <ChartFrame
+        theme="dark"
+        onGoHub={() => undefined}
+        onGoSettings={() => undefined}
+        trail={[{ label: 'Rules of the road' }, { label: 'Navigation lights' }]}
+      >
+        <div />
+      </ChartFrame>
+    );
+    expect(html).toContain('ct-crumb"');
+    expect(html).toContain('Chart table');
+    expect(html).toContain('Navigation lights');
+  });
+
+  // The masthead toggle is gone; the theme control lives in Settings.
+  it('no longer carries a theme chip', () => {
+    const html = renderToStaticMarkup(
+      <ChartFrame theme="light" onGoHub={() => undefined} onGoSettings={() => undefined}>
+        <div />
+      </ChartFrame>
+    );
+    expect(html).not.toContain('ct-chip');
+    expect(html).not.toContain('Night helm');
   });
 });
 

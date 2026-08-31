@@ -19,7 +19,11 @@ export interface SettingGroup {
 
 interface SettingsScreenProps {
   groups: SettingGroup[];
-  onBack: () => void;
+  // Optional: the app frame carries a trail with a named way back, so the
+  // shell does not pass one and the screen does not draw a second back arrow
+  // directly under the first. The retired chart table drill, which has no
+  // trail of its own, still does.
+  onBack?: () => void;
 }
 
 const groupLabel: React.CSSProperties = {
@@ -67,9 +71,11 @@ function controlStyle(tone: SettingRow['tone']): React.CSSProperties {
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({ groups, onBack }) => (
   <section className="ct-fade" style={{ padding: '28px 0 0' }}>
-    <button className="ct-link" onClick={onBack}>
-      &larr; Back
-    </button>
+    {onBack && (
+      <button className="ct-link" onClick={onBack}>
+        &larr; Back
+      </button>
+    )}
 
     <h1
       style={{

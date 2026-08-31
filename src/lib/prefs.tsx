@@ -22,8 +22,12 @@ export interface Prefs {
   examLength: number;
 }
 
+// Night helm is the default lighting. A chart table is read at the wheel more
+// often than at a desk, so the app opens dark unless someone has said
+// otherwise - see readPrefs, which only falls back to this for a preference
+// that was never expressed.
 export const DEFAULT_PREFS: Prefs = {
-  theme: 'light',
+  theme: 'dark',
   colorblind: false,
   haptics: false,
   showCitations: true,
@@ -37,7 +41,10 @@ export function readPrefs(): Prefs {
   if (typeof raw !== 'object' || raw === null) return DEFAULT_PREFS;
   const r = raw as Record<string, unknown>;
   return {
-    theme: r.theme === 'dark' ? 'dark' : 'light',
+    // Only an explicitly stored theme wins over the default. Anything else -
+    // no key at all, or a value from a shape we no longer write - is "never
+    // chosen", and gets the default rather than being pinned to light.
+    theme: r.theme === 'light' || r.theme === 'dark' ? r.theme : DEFAULT_PREFS.theme,
     colorblind: r.colorblind === true,
     haptics: r.haptics === true,
     showCitations: r.showCitations !== false,
