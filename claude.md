@@ -45,7 +45,6 @@ src/
       components/
         ScenarioCard.tsx  ← the answer options and the verdict
         LightDisplay.tsx  ← and the other diagrams, all Tailwind, all unchanged
-    charttable/         ← RETIRED, not in the DRILLS registry. See "Chart Table" below.
   __tests__/            ← data-shape tests plus one server-render smoke test
 ```
 
@@ -130,12 +129,14 @@ The chart table: parchment and navy ink by day, brass on navy at the night helm.
 
 ## Chart Table
 `src/drills/charttable/` was a standalone drill that carried this design. The
-design is now the site's, so the drill is retired: it is not in the DRILLS
-registry and nothing renders it. What remains there — `index.tsx`,
-`CategoryIndex`, `CategoryDetail`, `QuizScreen`, `ResultsScreen` — still
-compiles and is kept only pending a decision on what to keep. Its theme,
-frame, visual panel, settings screen, syllabus, progress ledger and citation
-reader have already moved to `src/lib` and `src/components`.
+design is now the site's, so the drill was retired and then deleted — its
+`index.tsx`, `CategoryIndex`, `QuizScreen` and `ResultsScreen` are gone, and
+the folder with them; see git history for the originals. Everything worth
+keeping had already moved out: the theme, frame, visual panel, settings
+screen, syllabus, progress ledger, citation reader and `CategoryDetail` now
+live in `src/lib` and `src/components`. The `charttable:` localStorage key
+prefixes in `prefs.tsx` and `progress.ts` stay as they are, for the same
+reason the `nauticalmaster` namespace does.
 
 ## Drill Pattern
 Every drill follows this structure:
