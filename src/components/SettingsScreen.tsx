@@ -39,6 +39,7 @@ function controlStyle(tone: SettingRow['tone']): React.CSSProperties {
     flex: 'none',
     minWidth: 86,
     padding: '9px 12px',
+    borderRadius: 10,
     fontFamily: MONO,
     fontSize: 10.5,
     letterSpacing: '0.14em',

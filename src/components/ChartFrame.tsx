@@ -1,8 +1,9 @@
 import React from 'react';
+import { Settings } from 'lucide-react';
 import { MONO, SANS, STENCIL, THEMES, ThemeName } from '../lib/theme';
 
-// The chart itself: the ruled ground, the soundings along the top edge, the
-// masthead, and the stylesheet every screen inside it draws from.
+// The chart itself: the ruled ground, the masthead, and the stylesheet every
+// screen inside it draws from.
 //
 // This is the site's frame, not one drill's. Everything - the hub, the compass
 // drill, the colregs drill, settings - renders inside it, which is what makes
@@ -13,30 +14,6 @@ import { MONO, SANS, STENCIL, THEMES, ThemeName } from '../lib/theme';
 // canvas runtime does not implement - it is an authoring annotation. Inline
 // styles cannot express :hover at all, so those states live in the stylesheet
 // below as real CSS, keyed off the same custom properties as everything else.
-
-// The depth soundings printed along the top edge. Decorative - they are the
-// chart's own texture, not data. The subscript digits are the fractional
-// fathom marks a real chart carries.
-export const SOUNDINGS: string[] = [
-  '4₂',
-  '7',
-  '11₅',
-  '6',
-  '3₈',
-  '9',
-  '14',
-  '5₄',
-  '8',
-  '12',
-  '4',
-  '17₂',
-  '6₆',
-  '10',
-  '21',
-  '3₅',
-  '7₈',
-  '13',
-];
 
 const CSS = `
 .ct-root {
@@ -63,6 +40,7 @@ const CSS = `
   letter-spacing: 0.16em;
   text-transform: uppercase;
   padding: 14px 22px;
+  border-radius: 11px;
   cursor: pointer;
   transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
 }
@@ -71,10 +49,15 @@ const CSS = `
 .ct-ghost { background: transparent; color: var(--ct-ink); border: 1px solid var(--ct-line); }
 .ct-ghost:hover { border-color: var(--ct-brass); color: var(--ct-brass); }
 
+/* The settings control. A bare glyph in the masthead read as decoration, so it
+   is a real bordered button with a toothed gear and its own word beside it -
+   nothing here should need a click to find out what it does. */
 .ct-icon {
-  display: flex; align-items: center; justify-content: center;
-  width: 36px; height: 34px; background: transparent;
-  border: 1px solid var(--ct-line); color: var(--ct-muted);
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 36px; padding: 0 12px; background: transparent;
+  border: 1px solid var(--ct-line); border-radius: 10px;
+  color: var(--ct-muted); font-family: ${MONO}; font-size: 10px;
+  letter-spacing: 0.16em; text-transform: uppercase;
   cursor: pointer; transition: border-color 140ms ease, color 140ms ease;
 }
 .ct-icon:hover { border-color: var(--ct-brass); color: var(--ct-brass); }
@@ -91,7 +74,8 @@ const CSS = `
 /* Category cards ------------------------------------------------------ */
 .ct-card {
   text-align: left; background: var(--ct-panel);
-  border: 1px solid var(--ct-line); padding: 16px 16px 14px;
+  border: 1px solid var(--ct-line); border-radius: 12px;
+  padding: 16px 16px 14px;
   display: flex; flex-direction: column; gap: 10px; color: inherit;
   cursor: pointer; transition: border-color 140ms ease;
   font-family: inherit;
@@ -108,6 +92,7 @@ const CSS = `
 .ct-instrument {
   background: #0a1929;
   border: 1px solid var(--ct-line);
+  border-radius: 14px;
   padding: 18px 14px;
   display: flex; flex-direction: column; align-items: center; gap: 10px;
 }
@@ -121,7 +106,7 @@ const CSS = `
 .ct-option {
   display: flex; align-items: flex-start; gap: 14px; text-align: left;
   padding: 15px 16px; font-size: 15.5px; line-height: 1.45;
-  font-family: inherit; cursor: pointer;
+  border-radius: 12px; font-family: inherit; cursor: pointer;
   transition: border-color 140ms ease, background-color 140ms ease;
 }
 .ct-option[disabled] { cursor: default; }
@@ -215,33 +200,13 @@ export const ChartFrame: React.FC<ChartFrameProps> = ({
       <style>{CSS}</style>
       <div className="ct-root">
         <div className="ct-sheet">
-          <div
-            className="ct-mono"
-            style={{
-              display: 'flex',
-              gap: 14,
-              padding: '10px 2px 0',
-              fontSize: 10,
-              letterSpacing: '0.08em',
-              color: 'var(--ct-muted)',
-              opacity: 0.65,
-              overflow: 'hidden',
-              whiteSpace: 'nowrap',
-            }}
-            aria-hidden="true"
-          >
-            {SOUNDINGS.map((s, i) => (
-              <span key={`${s}-${i}`}>{s}</span>
-            ))}
-          </div>
-
           <header
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               gap: 16,
-              padding: '18px 0 16px',
+              padding: '26px 0 16px',
             }}
           >
             <button
@@ -301,11 +266,9 @@ export const ChartFrame: React.FC<ChartFrameProps> = ({
             </button>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <button className="ct-icon" onClick={onGoSettings} title="Settings" aria-label="Settings">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
-                  <circle cx="12" cy="12" r="3.2" />
-                  <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1" />
-                </svg>
+              <button className="ct-icon" onClick={onGoSettings} title="Settings">
+                <Settings size={15} strokeWidth={1.7} aria-hidden="true" />
+                <span>Settings</span>
               </button>
             </div>
           </header>

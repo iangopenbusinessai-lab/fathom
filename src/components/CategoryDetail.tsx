@@ -39,6 +39,7 @@ interface CategoryDetailProps {
 
 const panel: React.CSSProperties = {
   border: '1px solid var(--ct-line)',
+  borderRadius: 12,
   background: 'var(--ct-panel)',
   padding: 16,
 };
@@ -96,6 +97,7 @@ function Cycle<T>({
         style={{
           minWidth: 74,
           padding: '8px 12px',
+          borderRadius: 10,
           fontFamily: MONO,
           fontSize: 10.5,
           letterSpacing: '0.14em',
