@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { COLREGS_QUESTIONS } from '../drills/colregs/constants';
+import { citationOf } from '../lib/citation';
+import {
+  COLREGS_QUESTIONS,
+  SEAMANSHIP_LABELS,
+  isColregsGoverned,
+} from '../drills/colregs/constants';
 
 // SCOPE NOTE - this file checks the SHAPE of citation strings only.
 //
@@ -9,6 +14,16 @@ import { COLREGS_QUESTIONS } from '../drills/colregs/constants';
 // and 33 CFR 83, and it stays manual. What is automated here is that no
 // citation drifts into a malformed shape - "Rule 27(a)(iv)(b)", "Rule 27(A)",
 // "Rule 27(a)(1)" - which is the kind of typo a later edit can introduce.
+//
+// SCOPE NOTE 2 - not every category in the bank is governed by the COLREGS.
+// Anchor types are seamanship: no rule number applies, so demanding "Rule N"
+// of them would be demanding a citation that does not exist. Rather than let
+// those questions break the suite, or exempt them by listing their ids here,
+// the rule-citation checks below run over isColregsGoverned() questions only,
+// and a second describe block holds the non-COLREGS ones to the equivalent
+// standard for their own form: a topic label from the closed SEAMANSHIP_LABELS
+// set. Both lists come from constants, so adding the next seamanship category
+// needs no edit in this file.
 
 // A citation is: Rule N, Rule N(x), or Rule N(x)(y).
 // x is a single lowercase letter; y is a lowercase roman numeral.
@@ -31,15 +46,22 @@ function citationsIn(text: string): string[] {
   return text.match(CITATION_TOKEN) ?? [];
 }
 
-const ALL_TEXT = COLREGS_QUESTIONS.map((q) => ({
+const GOVERNED = COLREGS_QUESTIONS.filter(isColregsGoverned);
+const SEAMANSHIP = COLREGS_QUESTIONS.filter((q) => !isColregsGoverned(q));
+
+const ALL_TEXT = GOVERNED.map((q) => ({
   id: q.id,
   text: `${q.prompt} ${q.options.join(' ')} ${q.explanation}`,
 }));
 
+// A non-COLREGS explanation opens with its topic label, the way a rule
+// citation opens a governed one: "Ground tackle: The fluke anchor ...".
+const SEAMANSHIP_OPENER = new RegExp(`^(?:${SEAMANSHIP_LABELS.join('|')}): \\S`);
+
 describe('citation format', () => {
   it('finds citations to check (guards against a dead regex)', () => {
     const total = ALL_TEXT.reduce((n, q) => n + citationsIn(q.text).length, 0);
-    expect(total).toBeGreaterThan(COLREGS_QUESTIONS.length);
+    expect(total).toBeGreaterThan(GOVERNED.length);
   });
 
   it.each(ALL_TEXT.map((q) => [q.id, q.text] as const))(
@@ -69,7 +91,7 @@ describe('citation format', () => {
   });
 
   it('puts a citation in every explanation, not just the prompt', () => {
-    const uncited = COLREGS_QUESTIONS.filter(
+    const uncited = GOVERNED.filter(
       (q) => citationsIn(q.explanation).length === 0 && !ANNEX_TOKEN.test(q.explanation)
     );
     expect(uncited.map((q) => q.id)).toEqual([]);
@@ -90,4 +112,34 @@ describe('citation format: the regex itself', () => {
     'Rule 100',          // not a rule number shape
     'Rule 27(ii)',       // roman in the letter slot
   ])('rejects %s', (c) => expect(WELL_FORMED.test(c)).toBe(false));
+});
+
+describe('non-COLREGS categories are labelled, not cited', () => {
+  it('has some to check (guards against the filter going empty)', () => {
+    expect(SEAMANSHIP.length).toBeGreaterThan(0);
+  });
+
+  it.each(SEAMANSHIP.map((q) => [q.id, q] as const))(
+    '%s opens its explanation with a known topic label',
+    (_id, q) => {
+      expect(q.explanation).toMatch(SEAMANSHIP_OPENER);
+    }
+  );
+
+  it.each(SEAMANSHIP.map((q) => [q.id, q] as const))(
+    '%s cites no rule number, which would not exist for it',
+    (_id, q) => {
+      const text = `${q.prompt} ${q.options.join(' ')} ${q.explanation}`;
+      expect(citationsIn(text)).toEqual([]);
+      expect(ANNEX_TOKEN.test(text)).toBe(false);
+    }
+  );
+
+  it('reads the label back as the badge the verdict shows', () => {
+    // citationOf is what ScenarioCard renders beside the verdict. If it
+    // returned '' here the answer screen would lose its source line entirely.
+    for (const q of SEAMANSHIP) {
+      expect(SEAMANSHIP_LABELS).toContain(citationOf(q) as (typeof SEAMANSHIP_LABELS)[number]);
+    }
+  });
 });

@@ -163,6 +163,24 @@ export const CATEGORIES: ChartCategory[] = [
     topics: ['Channel 16 and DSC', 'Mayday / Pan-pan / Securite', 'Standard phrases'],
   },
   {
+    id: 'anchors',
+    name: 'Anchor types',
+    section: 'Seamanship',
+    rule: 'Ground tackle',
+    status: 'live',
+    source: 'anchor-types',
+    blurb:
+      'The five anchors a candidate is expected to know on sight, and which bottom each one is for: fluke, plow, claw, grapnel and mushroom.',
+    topics: [
+      'Fluke (Danforth)',
+      'Plow (CQR / Delta)',
+      'Claw (Bruce)',
+      'Grapnel',
+      'Mushroom and permanent moorings',
+      'Matching anchor to bottom',
+    ],
+  },
+  {
     id: 'buoyage',
     name: 'Buoyage / IALA marks',
     section: 'Aids to navigation',
@@ -187,11 +205,19 @@ export const CATEGORIES: ChartCategory[] = [
   },
 ];
 
+// Seamanship sits last because it is the section that is going to grow: it is
+// the home for the knowledge a candidate is examined on that no rule, annex or
+// buoyage system governs - anchors first, with PFD types and fire safety
+// earmarked behind them. The four sections above it are each anchored to a
+// published source (the COLREGS, its annexes, IALA, Chart 5011); this one is
+// defined by the absence of one, which is why it could not be folded into any
+// of them. See NON_COLREGS_CATEGORIES in ../drills/colregs/constants.
 export const SECTION_ORDER: string[] = [
   'Navigation',
   'Rules of the road',
   'Signals and communication',
   'Aids to navigation',
+  'Seamanship',
 ];
 
 export function categoryById(id: string): ChartCategory | undefined {

@@ -3,7 +3,8 @@ export type ColregsCategory =
   | 'sound-signals'
   | 'vessel-hierarchy'
   | 'day-shapes'
-  | 'vessel-types';
+  | 'vessel-types'
+  | 'anchor-types';
 
 export interface ColregsQuestion {
   id: string;
@@ -13,6 +14,26 @@ export interface ColregsQuestion {
   correctAnswer: string;
   explanation: string;
 }
+
+// Not everything in this bank is governed by the COLREGS. Anchor types are
+// seamanship knowledge: there is no rule number to cite, so those explanations
+// carry a topic label instead ("Ground tackle:", "Holding ground:") and the
+// citation format test holds them to that shape rather than to "Rule N(x)".
+//
+// This list is the single place that says which categories are outside the
+// rules, so the next seamanship topic - PFD types, fire safety - is added here
+// and every consumer follows. See src/lib/citation.ts and
+// src/__tests__/citationFormat.test.ts.
+export const NON_COLREGS_CATEGORIES: ColregsCategory[] = ['anchor-types'];
+
+export function isColregsGoverned(question: ColregsQuestion): boolean {
+  return !NON_COLREGS_CATEGORIES.includes(question.category);
+}
+
+// The topic labels a non-COLREGS explanation may open with. Closed set for the
+// same reason the rule citation is a fixed shape: so a later edit cannot
+// quietly invent a sixth label that renders as a badge nobody recognises.
+export const SEAMANSHIP_LABELS = ['Ground tackle', 'Holding ground'] as const;
 
 // --- NAVIGATION LIGHTS (20 questions) ---
 
@@ -1061,6 +1082,158 @@ const vesselTypesQuestions: ColregsQuestion[] = [
   },
 ];
 
+// --- ANCHOR TYPES (13 questions) ---
+//
+// Seamanship, not COLREGS: no rule governs which anchor you carry, so these
+// explanations open with a topic label from SEAMANSHIP_LABELS instead of a
+// rule citation. See the note beside NON_COLREGS_CATEGORIES above.
+//
+// Every type here has a generic name and a trademarked one in real use, and
+// both are heard on a dock. The generic term is always the correct answer -
+// grading on "Danforth" would mark a candidate wrong for the more formal word -
+// and the explanation names the trade name so neither reads as an error.
+
+const anchorTypesQuestions: ColregsQuestion[] = [
+  {
+    id: 'an-01',
+    category: 'anchor-types',
+    prompt:
+      'This anchor has two broad flat plates hinged at the crown, with a stock laid across it. What type is it?',
+    options: ['Fluke anchor', 'Plow anchor', 'Claw anchor', 'Mushroom anchor'],
+    correctAnswer: 'Fluke anchor',
+    explanation:
+      'Ground tackle: The fluke anchor - sold most widely as the Danforth - is built from two broad flat plates hinged at the crown, with a stock across the crown to roll those plates down into the bottom. The large plate area is what gives it its holding power.',
+  },
+  {
+    id: 'an-02',
+    category: 'anchor-types',
+    prompt:
+      'This anchor carries a single plowshare on the end of its shank, two wings rising to either side of one point. What type is it?',
+    options: ['Plow anchor', 'Fluke anchor', 'Grapnel', 'Claw anchor'],
+    correctAnswer: 'Plow anchor',
+    explanation:
+      'Ground tackle: The plow anchor is named for the plowshare on the end of the shank, which cuts in and buries the way a plough turns soil. The two long-running patterns are the CQR and the Delta; both are plows, and both are known by their trade names as often as by the generic one.',
+  },
+  {
+    id: 'an-03',
+    category: 'anchor-types',
+    prompt:
+      'This anchor is a single casting with three heavy curved tines off one crown, a short shank and no stock. What type is it?',
+    options: ['Claw anchor', 'Fluke anchor', 'Plow anchor', 'Mushroom anchor'],
+    correctAnswer: 'Claw anchor',
+    explanation:
+      'Ground tackle: The claw anchor - usually called a Bruce, after the original maker - is cast in one piece with three curved tines, no stock and no hinge. It sets quickly and at almost any angle of approach, which is what earned it its place as a bower.',
+  },
+  {
+    id: 'an-04',
+    category: 'anchor-types',
+    prompt:
+      'This anchor has several thin hooked tines spaced around a long bare shaft. What type is it?',
+    options: ['Grapnel', 'Claw anchor', 'Fluke anchor', 'Plow anchor'],
+    correctAnswer: 'Grapnel',
+    explanation:
+      'Ground tackle: The grapnel carries multiple curved tines around a central shaft and holds by hooking onto something rather than by burying itself. It is small-craft gear - dinghies, tenders and kayaks - and folding patterns are made to stow flat.',
+  },
+  {
+    id: 'an-05',
+    category: 'anchor-types',
+    prompt:
+      'This anchor is an inverted bowl on a plain shank, with no fluke, point or tine anywhere on it. What type is it?',
+    options: ['Mushroom anchor', 'Claw anchor', 'Plow anchor', 'Grapnel'],
+    correctAnswer: 'Mushroom anchor',
+    explanation:
+      'Ground tackle: The mushroom anchor has nothing on it that can dig in. It holds by its own weight and by silting gradually into a soft bottom over weeks and months, which is why it is laid for permanent moorings rather than carried as working gear.',
+  },
+  {
+    id: 'an-06',
+    category: 'anchor-types',
+    prompt:
+      'You are anchoring on a firm sand bottom and want the most holding power you can get for the weight of gear you are able to handle. Which type is the strongest choice?',
+    options: ['Fluke anchor', 'Grapnel', 'Mushroom anchor', 'Claw anchor'],
+    correctAnswer: 'Fluke anchor',
+    explanation:
+      'Holding ground: The fluke anchor (Danforth) gives the highest holding power for its weight of the common types in sand and mud, because once buried its two wide plates present a large area against the pull. That advantage belongs to bottoms it can dig into and nowhere else.',
+  },
+  {
+    id: 'an-07',
+    category: 'anchor-types',
+    prompt: 'A fluke anchor is at its best in sand and mud. On which bottom is it least reliable?',
+    options: ['Rock', 'Soft mud', 'Firm sand', 'Silt'],
+    correctAnswer: 'Rock',
+    explanation:
+      'Holding ground: A fluke anchor holds by burying its plates, and on rock there is nothing to bury them in - it skates across, or jams by luck and then has to be broken out. A bottom like that wants an anchor that hooks instead of one that digs.',
+  },
+  {
+    id: 'an-08',
+    category: 'anchor-types',
+    prompt:
+      'You are lying to one anchor overnight and expect wind and tide to swing the boat right around. Which type is best known for resetting itself when the pull comes from a new direction?',
+    options: ['Plow anchor', 'Grapnel', 'Mushroom anchor', 'Fluke anchor'],
+    correctAnswer: 'Plow anchor',
+    explanation:
+      'Holding ground: The plow (CQR or Delta) is the type most trusted to reset through a shift: as the pull comes round, the share is dragged out and ploughs straight back in on the new heading. That behaviour, with good holding on most bottoms, is what makes it an all-round bower.',
+  },
+  {
+    id: 'an-09',
+    category: 'anchor-types',
+    prompt: 'A plow anchor holds well on most bottoms. Which one is its known weak point?',
+    options: ['Thick grass', 'Firm sand', 'Soft mud', 'Gravel'],
+    correctAnswer: 'Thick grass',
+    explanation:
+      'Holding ground: Thick grass and weed are where the plow struggles - the share skids over the mat of vegetation instead of cutting through to the holding ground underneath. The claw has the same difficulty in heavy grass.',
+  },
+  {
+    id: 'an-10',
+    category: 'anchor-types',
+    prompt: 'The CQR and the Delta are both plow anchors. What distinguishes one from the other?',
+    options: [
+      'The CQR has a hinged shank; the Delta\'s shank is fixed',
+      'The CQR has two plowshares; the Delta has one',
+      'The CQR is a stocked anchor; the Delta is stockless',
+      'The CQR is cast in one piece; the Delta is hinged at the crown',
+    ],
+    correctAnswer: 'The CQR has a hinged shank; the Delta\'s shank is fixed',
+    explanation:
+      'Ground tackle: Both are plows and both are trade names. The CQR pivots on a hinge where the shank meets the share, which lets the share stay where it is as the boat swings above it; the Delta carries the same kind of share on a fixed shank. Calling either one a plow anchor is correct.',
+  },
+  {
+    id: 'an-11',
+    category: 'anchor-types',
+    prompt:
+      'Which type sets quickly at almost any angle of approach and is a dependable choice on rock and on mixed bottoms?',
+    options: ['Claw anchor', 'Fluke anchor', 'Mushroom anchor', 'Plow anchor'],
+    correctAnswer: 'Claw anchor',
+    explanation:
+      'Holding ground: The claw (Bruce) sets fast and handles rock and mixed bottoms well, its tines finding purchase where a burying anchor has nothing to bury into. Its weakness is the plow\'s weakness too: thick grass, which it slides over.',
+  },
+  {
+    id: 'an-12',
+    category: 'anchor-types',
+    prompt:
+      'A dinghy needs to anchor over a rocky, debris-strewn bottom where the anchor has to catch in a crevice rather than bury itself. Which type is made for that?',
+    options: ['Grapnel', 'Fluke anchor', 'Mushroom anchor', 'Plow anchor'],
+    correctAnswer: 'Grapnel',
+    explanation:
+      'Holding ground: The grapnel is the hooking anchor - its tines catch on rock, coral and debris, and it is sized for small craft. In sand or mud it is a poor choice: there is nothing to hook, and thin tines have no area to hold with. A claw also works on rock, but on a larger boat and by burying as well as catching.',
+  },
+  {
+    id: 'an-13',
+    category: 'anchor-types',
+    prompt:
+      'Why is a mushroom anchor unsuitable as the working anchor for an overnight stop?',
+    options: [
+      'It holds by weight and by silting in slowly, so it has little grip on the night it is dropped',
+      'It sets so hard that it cannot be broken out again',
+      'It can only be used on rock and coral bottoms',
+      'It holds well but is too light to carry enough chain',
+    ],
+    correctAnswer:
+      'It holds by weight and by silting in slowly, so it has little grip on the night it is dropped',
+    explanation:
+      'Ground tackle: A mushroom develops its hold as it settles and silts into a soft bottom, a process measured in weeks. Dropped fresh it is doing nothing but lying on the bottom under its own weight, so it belongs on a permanent mooring and not in the anchor locker.',
+  },
+];
+
 // --- COMBINED EXPORT ---
 
 export const COLREGS_QUESTIONS: ColregsQuestion[] = [
@@ -1069,6 +1242,7 @@ export const COLREGS_QUESTIONS: ColregsQuestion[] = [
   ...vesselHierarchyQuestions,
   ...dayShapesQuestions,
   ...vesselTypesQuestions,
+  ...anchorTypesQuestions,
 ];
 
 export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuestion[]> = {
@@ -1077,6 +1251,7 @@ export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuest
   'vessel-hierarchy': vesselHierarchyQuestions,
   'day-shapes': dayShapesQuestions,
   'vessel-types': vesselTypesQuestions,
+  'anchor-types': anchorTypesQuestions,
 };
 
 export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
@@ -1085,4 +1260,5 @@ export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
   'vessel-hierarchy': 'Vessel Hierarchy',
   'day-shapes': 'Day Shapes',
   'vessel-types': 'Vessel Types',
+  'anchor-types': 'Anchor Types',
 };

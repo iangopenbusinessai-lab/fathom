@@ -29,6 +29,7 @@ import { LightName } from './components/LightDisplay';
 import { ScenarioType } from './components/VesselScenario';
 import { BlastMark } from './components/SoundSignalDisplay';
 import { DayShapeName, MastPosition, ShapeArrangement } from './components/DayShapeDisplay';
+import { AnchorTypeName } from './components/AnchorDisplay';
 
 type DrillState = 'idle' | 'playing' | 'finished';
 type DrillMode = 'practice' | 'exam';
@@ -170,6 +171,21 @@ export const QUESTION_VESSEL_TYPES: Partial<Record<string, VesselTypeName>> = {
   'vt-06': 'towing',
 };
 
+// Anchor shown for the five identification questions. Same contract as the
+// vessel profiles: the silhouette is the whole question, so nothing in the
+// diagram names the type.
+//
+// The bottom-matching questions (an-06 onward) deliberately have no diagram.
+// They ask which anchor suits a given bottom, and drawing one anchor beside
+// that prompt would either give the answer away or illustrate a wrong one.
+export const QUESTION_ANCHORS: Partial<Record<string, AnchorTypeName>> = {
+  'an-01': 'fluke',
+  'an-02': 'plow',
+  'an-03': 'claw',
+  'an-04': 'grapnel',
+  'an-05': 'mushroom',
+};
+
 export const QUESTION_SCENARIOS: Partial<Record<string, ScenarioType>> = {
   'vh-01': 'priority-nuc',
   'vh-02': 'sail-keeps-clear-ram',
@@ -231,6 +247,7 @@ const CATEGORY_ORDER: CategoryFilter[] = [
   'vessel-hierarchy',
   'day-shapes',
   'vessel-types',
+  'anchor-types',
 ];
 
 // `sub` is the descriptor only - the question count is prepended at render
@@ -242,6 +259,7 @@ const CATEGORY_META: Record<CategoryFilter, { label: string; sub: string }> = {
   'vessel-hierarchy':  { label: 'Vessel hierarchy',      sub: 'give-way rules'           },
   'day-shapes':        { label: 'Day shapes',            sub: 'shapes and marks'         },
   'vessel-types':      { label: 'Vessel types',          sub: 'identify by shape and rig' },
+  'anchor-types':      { label: 'Anchor types',          sub: 'ground tackle and holding' },
 };
 
 // The syllabus card a question belongs to, so its answer lands on the right

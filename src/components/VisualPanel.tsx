@@ -6,12 +6,14 @@ import {
   QUESTION_SOUNDS,
   QUESTION_SOUND_GAPS,
   QUESTION_VESSEL_TYPES,
+  QUESTION_ANCHORS,
 } from '../drills/colregs';
 import { LightDisplay } from '../drills/colregs/components/LightDisplay';
 import { DayShapeDisplay } from '../drills/colregs/components/DayShapeDisplay';
 import { VesselProfile } from '../drills/colregs/components/VesselProfile';
 import { VesselScenario } from '../drills/colregs/components/VesselScenario';
 import { SoundSignalDisplay } from '../drills/colregs/components/SoundSignalDisplay';
+import { AnchorDisplay } from '../drills/colregs/components/AnchorDisplay';
 
 // 75 of the 78 bank questions are answered from a picture rather than from the
 // prompt text - "identify this vessel from what she is showing". The canvas
@@ -38,7 +40,8 @@ export function hasVisual(questionId: string): boolean {
     QUESTION_LIGHTS[questionId] !== undefined ||
     QUESTION_SOUNDS[questionId] !== undefined ||
     QUESTION_SHAPES[questionId] !== undefined ||
-    QUESTION_SCENARIOS[questionId] !== undefined
+    QUESTION_SCENARIOS[questionId] !== undefined ||
+    QUESTION_ANCHORS[questionId] !== undefined
   );
 }
 
@@ -48,6 +51,7 @@ export const VisualPanel: React.FC<VisualPanelProps> = ({ questionId, revealed }
   const sounds = QUESTION_SOUNDS[questionId];
   const shapes = QUESTION_SHAPES[questionId];
   const scenario = QUESTION_SCENARIOS[questionId];
+  const anchor = QUESTION_ANCHORS[questionId];
 
   let inner: React.ReactNode = null;
   if (vesselType) {
@@ -74,6 +78,8 @@ export const VisualPanel: React.FC<VisualPanelProps> = ({ questionId, revealed }
     );
   } else if (scenario) {
     inner = <VesselScenario scenario={scenario} label="Scenario" revealed={revealed} />;
+  } else if (anchor) {
+    inner = <AnchorDisplay type={anchor} label="Anchor" />;
   }
 
   if (!inner) return null;
