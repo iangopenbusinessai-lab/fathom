@@ -1,6 +1,7 @@
 import React from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { GameState, GameStats, CompassPoint, GameMode, GameType } from '../../types';
-import { MONO, STENCIL } from '../../lib/theme';
+import { DISPLAY, MONO } from '../../lib/theme';
 
 // The compass drill's screens, in the chart-table idiom. The rose itself is
 // unchanged and is drawn by ../CompassRose; this is the paper around it - the
@@ -36,12 +37,11 @@ const metaRow: React.CSSProperties = {
 
 const heading: React.CSSProperties = {
   margin: 0,
-  fontFamily: STENCIL,
-  fontWeight: 700,
-  fontSize: 46,
-  lineHeight: 0.98,
-  letterSpacing: '0.06em',
-  textTransform: 'uppercase',
+  fontFamily: DISPLAY,
+  fontWeight: 600,
+  fontSize: 42,
+  lineHeight: 1.05,
+  letterSpacing: '0.005em',
   color: 'var(--ct-ink)',
 };
 
@@ -142,7 +142,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           }}
         >
           <button className="ct-link ct-link-danger" onClick={onQuit}>
-            &larr; Abandon
+            <ArrowLeft size={12} strokeWidth={2} aria-hidden="true" style={{ verticalAlign: '-2px', marginRight: 5 }} />Abandon
           </button>
           <span style={{ color: warning ? 'var(--ct-port)' : 'var(--ct-muted)' }}>
             {seconds}s
@@ -176,8 +176,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             <div style={metaRow}>{gameMode === 'exam' ? 'Target' : 'Find'}</div>
             <div
               style={{
-                fontFamily: STENCIL,
-                fontWeight: 700,
+                fontFamily: DISPLAY,
+                fontWeight: 600,
                 fontSize: 54,
                 lineHeight: 1,
                 letterSpacing: '0.05em',

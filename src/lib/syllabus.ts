@@ -224,6 +224,30 @@ export function categoryById(id: string): ChartCategory | undefined {
   return CATEGORIES.find((c) => c.id === id);
 }
 
+// ── Sections ─────────────────────────────────────────────────────────────
+//
+// The hub is a welcome screen that lists SECTIONS, and a section card opens
+// that section's own category list. Both read this rather than counting
+// sections themselves, so adding a sixth section to SECTION_ORDER puts a sixth
+// card on the hub with no other edit. A section declared in SECTION_ORDER with
+// no categories behind it is dropped rather than drawn empty.
+
+export interface SyllabusSection {
+  name: string;
+  categories: ChartCategory[];
+}
+
+export function sections(): SyllabusSection[] {
+  return SECTION_ORDER.map((name) => ({
+    name,
+    categories: CATEGORIES.filter((c) => c.section === name),
+  })).filter((s) => s.categories.length > 0);
+}
+
+export function sectionByName(name: string): SyllabusSection | undefined {
+  return sections().find((s) => s.name === name);
+}
+
 // Question count for a card, read from the bank rather than stored, so adding
 // a question to ../colregs/constants updates the chart table for free.
 export function questionCount(cat: ChartCategory): number {

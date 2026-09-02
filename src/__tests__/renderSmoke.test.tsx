@@ -7,7 +7,9 @@ import { ChartFrame } from '../components/ChartFrame';
 import { SECTION_ORDER } from '../lib/syllabus';
 import { readProgress } from '../lib/progress';
 import { CategoryDetail } from '../components/CategoryDetail';
-import { categoryById } from '../lib/syllabus';
+import { AboutScreen } from '../components/AboutScreen';
+import { SectionScreen } from '../components/SectionScreen';
+import { categoryById, sectionByName, sections } from '../lib/syllabus';
 import ColregsDrill from '../drills/colregs';
 import CompassDrill from '../drills/compass';
 
@@ -27,7 +29,7 @@ describe('app shell renders', () => {
     }
   });
 
-  it('draws a card for every syllabus category', () => {
+  it('draws a card for every syllabus SECTION, not every category', () => {
     const html = renderToStaticMarkup(
       <ChartFrame
         theme="dark"
@@ -36,7 +38,7 @@ describe('app shell renders', () => {
       >
         <Hub
           progress={readProgress()}
-          onOpenCategory={() => undefined}
+          onOpenSection={() => undefined}
           onOpenDrill={() => undefined}
         />
       </ChartFrame>
@@ -44,8 +46,79 @@ describe('app shell renders', () => {
     // The dark palette's tokens must reach the root, or every screen inside
     // renders on an unstyled ground.
     expect(html).toContain('--ct-bg:#0a1929');
-    expect(html).toContain('Buoyage / IALA marks');
-    expect(html).toContain('Navigation lights');
+
+    // The hub is a welcome screen now: one card per section, and the count
+    // read from the syllabus rather than written into the page.
+    expect(html).toContain('The syllabus');
+    expect(html).toContain(`${sections().length} sections`);
+    for (const section of SECTION_ORDER) {
+      expect(html).toContain(section);
+    }
+
+    // Category names appear only inside a section card's summary line, never
+    // as cards of their own - the mastery bar is what a card carries, so
+    // counting those is how we tell one kind of card from the other.
+    const bars = html.match(/aria-label="Mastery /g) ?? [];
+    expect(bars).toHaveLength(sections().length);
+  });
+
+  it('keeps the wordmark on the stencil face after the Fraunces swap', () => {
+    const html = renderToStaticMarkup(
+      <ChartFrame theme="dark" onGoHub={() => undefined} onGoSettings={() => undefined}>
+        <div />
+      </ChartFrame>
+    );
+    // FATHOM is the one thing still set in Big Shoulders Stencil. Everything
+    // else that used to be - section headers, screen titles, card titles - is
+    // ct-display now.
+    expect(html).toContain('ct-stencil');
+    expect(html).toContain('Big Shoulders Stencil');
+    expect(html).toContain('Fraunces');
+    expect(html).toMatch(/class="ct-stencil"[^>]*>[^<]*FATHOM/);
+  });
+});
+
+describe('a section screen lists that section and only that section', () => {
+  const rules = sectionByName('Rules of the road')!;
+
+  it('draws a card for every category in the section', () => {
+    const html = renderToStaticMarkup(
+      <SectionScreen
+        section={rules}
+        progress={readProgress()}
+        onOpenCategory={() => undefined}
+      />
+    );
+    for (const cat of rules.categories) {
+      expect(html).toContain(cat.name);
+    }
+    // And nothing from a different section.
+    expect(html).not.toContain('Buoyage / IALA marks');
+  });
+
+  it('names the section and says how much of it is drillable', () => {
+    const html = renderToStaticMarkup(
+      <SectionScreen
+        section={rules}
+        progress={readProgress()}
+        onOpenCategory={() => undefined}
+      />
+    );
+    expect(html).toContain('Rules of the road');
+    expect(html).toContain('topics');
+    expect(html).toContain('drillable');
+  });
+});
+
+describe('the about screen', () => {
+  it('lists the syllabus sections rather than a written-out copy of them', () => {
+    const html = renderToStaticMarkup(<AboutScreen />);
+    expect(html).toContain('About Fathom');
+    expect(html).toContain(`${sections().length} sections`);
+    for (const section of SECTION_ORDER) {
+      expect(html).toContain(section);
+    }
+    expect(html).toContain('33 CFR');
   });
 });
 
@@ -59,6 +132,28 @@ describe('the frame says where you are', () => {
     expect(html).toContain('ct-crumb-here');
     expect(html).toContain('Chart table');
     expect(html).not.toContain('ct-crumb"');
+  });
+
+  it('carries a section step between the hub and a category', () => {
+    const html = renderToStaticMarkup(
+      <ChartFrame
+        theme="dark"
+        onGoHub={() => undefined}
+        onGoSettings={() => undefined}
+        trail={[
+          { label: 'Rules of the road', onClick: () => undefined },
+          { label: 'Navigation lights', onClick: () => undefined },
+          { label: 'Rules of the Road' },
+        ]}
+      >
+        <div />
+      </ChartFrame>
+    );
+    // Chart table / Section / Category / Drill - three separators. Matched on
+    // the attribute, not the bare class name, which also appears in the
+    // stylesheet the frame ships inline.
+    expect(html.match(/class="ct-crumb-sep"/g) ?? []).toHaveLength(3);
+    expect(html).toContain('ct-crumb-here');
   });
 
   it('puts a labelled way home in front of the current screen', () => {

@@ -1,5 +1,6 @@
 import React from 'react';
-import { MONO, STENCIL } from '../lib/theme';
+import { ArrowLeft } from 'lucide-react';
+import { DISPLAY, MONO } from '../lib/theme';
 
 export interface SettingRow {
   key: string;
@@ -74,19 +75,18 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ groups, onBack }
   <section className="ct-fade" style={{ padding: '28px 0 0' }}>
     {onBack && (
       <button className="ct-link" onClick={onBack}>
-        &larr; Back
+        <ArrowLeft size={12} strokeWidth={2} aria-hidden="true" style={{ verticalAlign: '-2px', marginRight: 5 }} />Back
       </button>
     )}
 
     <h1
       style={{
         margin: '16px 0 26px',
-        fontFamily: STENCIL,
-        fontWeight: 700,
-        fontSize: 46,
-        lineHeight: 1,
-        letterSpacing: '0.06em',
-        textTransform: 'uppercase',
+        fontFamily: DISPLAY,
+        fontWeight: 600,
+        fontSize: 42,
+        lineHeight: 1.05,
+        letterSpacing: '0.005em',
         color: 'var(--ct-ink)',
       }}
     >

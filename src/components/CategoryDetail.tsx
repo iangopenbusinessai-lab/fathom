@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { MONO, STENCIL } from '../lib/theme';
+import { ArrowLeft } from 'lucide-react';
+import { DISPLAY, MONO } from '../lib/theme';
 import {
   ChartCategory,
   drillTargetFor,
@@ -159,19 +160,18 @@ export const CategoryDetail: React.FC<CategoryDetailProps> = ({
     <section className="ct-fade" style={{ padding: '28px 0 0' }}>
       {onBack && (
         <button className="ct-link" onClick={onBack}>
-          &larr; All categories
+          <ArrowLeft size={12} strokeWidth={2} aria-hidden="true" style={{ verticalAlign: '-2px', marginRight: 5 }} />All categories
         </button>
       )}
 
       <h1
         style={{
           margin: '16px 0 0',
-          fontFamily: STENCIL,
-          fontWeight: 700,
-          fontSize: 46,
-          lineHeight: 0.98,
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
+          fontFamily: DISPLAY,
+          fontWeight: 600,
+          fontSize: 42,
+          lineHeight: 1.05,
+          letterSpacing: '0.005em',
           color: 'var(--ct-ink)',
         }}
       >
@@ -216,6 +216,10 @@ export const CategoryDetail: React.FC<CategoryDetailProps> = ({
             gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
             gap: 12,
             margin: '26px 0 0',
+            // Two figures stretched across the full wide sheet read as empty
+            // boxes with a number lost in one corner. They cap; the covered-
+            // topics list below is a real list and is allowed the full width.
+            maxWidth: 720,
           }}
         >
           <div style={panel}>
@@ -328,6 +332,10 @@ export const CategoryDetail: React.FC<CategoryDetailProps> = ({
               gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))',
               gap: '14px 26px',
               margin: '16px 0 0',
+              // Each control is a label beside its button; left to fill the
+              // sheet the two ends of one control end up 300px apart and stop
+              // reading as a pair.
+              maxWidth: 860,
             }}
           >
             <Cycle

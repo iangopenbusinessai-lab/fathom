@@ -1,4 +1,5 @@
 import React from 'react';
+import { Check, X } from 'lucide-react';
 import { MONO } from '../../../lib/theme';
 import { ColregsQuestion } from '../constants';
 import { citationOf } from '../../../lib/citation';
@@ -40,16 +41,29 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
         let background = 'transparent';
         let border = 'var(--ct-line)';
         let color = 'var(--ct-ink)';
-        let mark = '';
+        // A drawn tick and cross rather than the ✓ / ✕ characters, which are
+        // rendered by whatever font the platform substitutes and land anywhere
+        // from a dingbat to an emoji. Colourblind mode still adds the word.
+        let mark: React.ReactNode = null;
 
         if (reveal && isAnswer) {
           border = 'var(--ct-stbd)';
           color = 'var(--ct-stbd)';
-          mark = colorblind ? '✓ ok' : '✓';
+          mark = (
+            <>
+              <Check size={14} strokeWidth={2.4} aria-hidden="true" />
+              {colorblind && <span>ok</span>}
+            </>
+          );
         } else if (reveal && isPicked) {
           border = 'var(--ct-port)';
           color = 'var(--ct-port)';
-          mark = colorblind ? '✕ no' : '✕';
+          mark = (
+            <>
+              <X size={14} strokeWidth={2.4} aria-hidden="true" />
+              {colorblind && <span>no</span>}
+            </>
+          );
         } else if (isPicked) {
           border = 'var(--ct-brass)';
           background = 'var(--ct-panel)';
@@ -75,7 +89,18 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
               {'ABCD'[i] ?? ''}
             </span>
             <span style={{ flex: 1 }}>{option}</span>
-            <span style={{ fontFamily: MONO, fontSize: 12, paddingTop: 2 }}>{mark}</span>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                fontFamily: MONO,
+                fontSize: 12,
+                paddingTop: 2,
+              }}
+            >
+              {mark}
+            </span>
           </button>
         );
       })}

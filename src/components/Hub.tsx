@@ -1,33 +1,45 @@
 import React from 'react';
-import { MONO, STENCIL } from '../lib/theme';
-import {
-  CATEGORIES,
-  ChartCategory,
-  SECTION_ORDER,
-  drillTargetFor,
-  questionCount,
-} from '../lib/syllabus';
-import { Progress, masteryPct, overallPct, streakDays, totalAnswered } from '../lib/progress';
+import { ChevronRight } from 'lucide-react';
+import { MONO } from '../lib/theme';
+import { ChartCategory, SyllabusSection, sections } from '../lib/syllabus';
+import { Progress, overallPct, streakDays, totalAnswered } from '../lib/progress';
 
 interface HubProps {
   progress: Progress;
-  // A card opens the category screen, where the run is set up. The two
-  // shortcuts at the top skip that and go straight into a drill's own menu.
-  onOpenCategory: (categoryId: string) => void;
+  // A section card opens that section's category list, which is where an
+  // individual category - and the run set up on it - is reached. The two
+  // shortcuts at the top skip both and go straight into a drill's own menu.
+  onOpenSection: (section: string) => void;
   onOpenDrill: (drillId: string, focus: string) => void;
 }
 
-function tagFor(cat: ChartCategory): string {
-  if (cat.status === 'live') return `${questionCount(cat)} Q`;
-  if (cat.status === 'compass') return 'compass rose';
-  return 'soon';
+// The hub is a welcome screen, not the whole syllabus laid out at once. It
+// used to render every category in every section on one page, which meant the
+// first thing a new arrival saw was a wall of a dozen cards. Now it introduces
+// the app, shows where you stand, and offers the syllabus one section at a
+// time - the section list read from syllabus.ts, so it is however many
+// sections there are rather than a number written here.
+
+// Mastery across a whole section: pooled answers, not a mean of percentages,
+// so a category with four answers cannot outweigh one with two hundred.
+function sectionPct(progress: Progress, cats: ChartCategory[]): number {
+  let answered = 0;
+  let correct = 0;
+  for (const cat of cats) {
+    const c = progress.cats[cat.id];
+    if (!c) continue;
+    answered += c.answered;
+    correct += c.correct;
+  }
+  if (answered === 0) return 0;
+  return Math.round((correct / answered) * 100);
 }
 
-// A section's subtitle. Counting "live" alone would read "0 of 2 live" over
-// the Navigation section, which is wrong - those categories are drillable,
-// just against the rose rather than a written bank - so each case gets its own
-// wording.
-function sectionMeta(cats: ChartCategory[]): string {
+// Counting "live" alone would read "0 of 2 live" over Navigation, which is
+// wrong - those categories are drillable, just against the rose rather than a
+// written bank - so each case gets its own wording.
+function sectionMeta(section: SyllabusSection): string {
+  const cats = section.categories;
   const live = cats.filter((c) => c.status === 'live').length;
   if (live > 0) return `${live} of ${cats.length} live`;
   if (cats.some((c) => c.status === 'compass')) return 'drilled on the rose';
@@ -44,162 +56,146 @@ const statLabel: React.CSSProperties = {
 
 const statValue: React.CSSProperties = { color: 'var(--ct-brass)', fontWeight: 600 };
 
-export const Hub: React.FC<HubProps> = ({ progress, onOpenCategory, onOpenDrill }) => (
-  <>
-    <section style={{ padding: '30px 0 8px' }}>
-      <p
-        style={{
-          maxWidth: '52ch',
-          margin: 0,
-          fontSize: 17,
-          lineHeight: 1.6,
-          color: 'var(--ct-ink)',
-        }}
-      >
-        Drill the Rules of the Road until they answer before you do. Bearings, lights,
-        shapes, signals — cited to the rule, every time.
-      </p>
+export const Hub: React.FC<HubProps> = ({ progress, onOpenSection, onOpenDrill }) => {
+  const all = sections();
 
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 26,
-          marginTop: 22,
-          ...statLabel,
-        }}
-      >
-        <span>
-          Mastery <strong style={statValue}>{overallPct(progress)}%</strong>
-        </span>
-        <span>
-          Drilled <strong style={statValue}>{totalAnswered(progress)}</strong>
-        </span>
-        <span>
-          Streak <strong style={statValue}>{streakDays(progress)} d</strong>
-        </span>
-      </div>
+  return (
+    <>
+      <section style={{ padding: '30px 0 8px' }}>
+        <p
+          className="ct-measure"
+          style={{ margin: 0, fontSize: 17, lineHeight: 1.6, color: 'var(--ct-ink)' }}
+        >
+          Drill the Rules of the Road until they answer before you do. Bearings, lights,
+          shapes, signals and seamanship — cited to the rule, every time.
+        </p>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 24 }}>
-        {/* 'all' is the colregs drill's own across-every-topic filter, so this
-            is its existing mixed exam rather than a second engine. */}
-        <button className="ct-solid" onClick={() => onOpenDrill('colregs', 'all')}>
-          All rules of the road
-        </button>
-        <button className="ct-ghost" onClick={() => onOpenDrill('compass', 'compass')}>
-          Compass rose
-        </button>
-      </div>
-    </section>
+        <div
+          style={{ display: 'flex', flexWrap: 'wrap', gap: 26, marginTop: 22, ...statLabel }}
+        >
+          <span>
+            Mastery <strong style={statValue}>{overallPct(progress)}%</strong>
+          </span>
+          <span>
+            Drilled <strong style={statValue}>{totalAnswered(progress)}</strong>
+          </span>
+          <span>
+            Streak <strong style={statValue}>{streakDays(progress)} d</strong>
+          </span>
+        </div>
 
-    {SECTION_ORDER.map((section) => {
-      const cats = CATEGORIES.filter((c) => c.section === section);
-      if (cats.length === 0) return null;
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 24 }}>
+          {/* 'all' is the colregs drill's own across-every-topic filter, so this
+              is its existing mixed exam rather than a second engine. */}
+          <button className="ct-solid" onClick={() => onOpenDrill('colregs', 'all')}>
+            All rules of the road
+          </button>
+          <button className="ct-ghost" onClick={() => onOpenDrill('compass', 'compass')}>
+            Compass rose
+          </button>
+        </div>
+      </section>
 
-      return (
-        <section key={section} style={{ padding: '34px 0 0' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
-            <h2
-              className="ct-stencil"
-              style={{
-                margin: 0,
-                fontFamily: STENCIL,
-                fontWeight: 600,
-                fontSize: 24,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'var(--ct-ink)',
-              }}
-            >
-              {section}
-            </h2>
-            <span
-              style={{
-                fontFamily: MONO,
-                fontSize: 10,
-                letterSpacing: '0.14em',
-                color: 'var(--ct-muted)',
-              }}
-            >
-              {sectionMeta(cats)}
-            </span>
-          </div>
-
-          <div className="ct-rule" style={{ margin: '12px 0 16px' }} />
-
-          <div
+      <section style={{ padding: '38px 0 0' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
+          <h2
+            className="ct-display"
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))',
-              gap: 12,
+              margin: 0,
+              fontWeight: 600,
+              fontSize: 26,
+              letterSpacing: '0.01em',
+              color: 'var(--ct-ink)',
             }}
           >
-            {cats.map((cat) => {
-              const pct = masteryPct(progress, cat.id);
-              const target = drillTargetFor(cat);
+            The syllabus
+          </h2>
+          <span
+            style={{
+              fontFamily: MONO,
+              fontSize: 10,
+              letterSpacing: '0.14em',
+              color: 'var(--ct-muted)',
+              textTransform: 'uppercase',
+            }}
+          >
+            {all.length} sections
+          </span>
+        </div>
 
-              return (
-                <button
-                  key={cat.id}
-                  className="ct-card"
-                  disabled={target === null}
-                  onClick={target ? () => onOpenCategory(cat.id) : undefined}
+        <div className="ct-rule" style={{ margin: '12px 0 16px' }} />
+
+        <div className="ct-cardgrid">
+          {all.map((section) => {
+            const pct = sectionPct(progress, section.categories);
+
+            return (
+              <button
+                key={section.name}
+                className="ct-card"
+                onClick={() => onOpenSection(section.name)}
+              >
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 10,
+                  }}
+                >
+                  <span
+                    className="ct-display"
+                    style={{ fontSize: 19, fontWeight: 600, lineHeight: 1.2 }}
+                  >
+                    {section.name}
+                  </span>
+                  <ChevronRight
+                    size={16}
+                    strokeWidth={1.8}
+                    aria-hidden="true"
+                    style={{ flex: 'none', color: 'var(--ct-brass)' }}
+                  />
+                </span>
+
+                <span
+                  style={{
+                    fontFamily: MONO,
+                    fontSize: 10,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: 'var(--ct-brass)',
+                  }}
+                >
+                  {section.categories.length}{' '}
+                  {section.categories.length === 1 ? 'topic' : 'topics'} ·{' '}
+                  {sectionMeta(section)}
+                </span>
+
+                <span
+                  style={{ fontSize: 13.5, lineHeight: 1.5, color: 'var(--ct-muted)' }}
+                >
+                  {section.categories.map((c) => c.name).join(', ')}
+                </span>
+
+                <span
+                  style={{ display: 'block', height: 3, background: 'var(--ct-line)' }}
+                  role="img"
+                  aria-label={`Mastery ${pct} percent`}
                 >
                   <span
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: 10,
+                      display: 'block',
+                      height: 3,
+                      width: `${pct}%`,
+                      background: 'var(--ct-brass)',
                     }}
-                  >
-                    <span style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.25 }}>
-                      {cat.name}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: MONO,
-                        fontSize: 10,
-                        letterSpacing: '0.1em',
-                        whiteSpace: 'nowrap',
-                        color: target ? 'var(--ct-brass)' : 'var(--ct-muted)',
-                      }}
-                    >
-                      {tagFor(cat)}
-                    </span>
-                  </span>
-
-                  <span
-                    style={{
-                      fontFamily: MONO,
-                      fontSize: 10.5,
-                      color: 'var(--ct-muted)',
-                      letterSpacing: '0.06em',
-                    }}
-                  >
-                    {cat.rule}
-                  </span>
-
-                  <span
-                    style={{ display: 'block', height: 3, background: 'var(--ct-line)' }}
-                    role="img"
-                    aria-label={`Mastery ${pct} percent`}
-                  >
-                    <span
-                      style={{
-                        display: 'block',
-                        height: 3,
-                        width: `${pct}%`,
-                        background: 'var(--ct-brass)',
-                      }}
-                    />
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-      );
-    })}
-  </>
-);
+                  />
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+    </>
+  );
+};

@@ -43,5 +43,11 @@ export function themeName(theme: ThemeName): string {
 
 export const SANS = "'IBM Plex Sans', system-ui, -apple-system, sans-serif";
 export const MONO = "'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace";
+// STENCIL is now the wordmark's face and nothing else. Every heading that
+// used it - section headers, screen titles, card titles - is set in DISPLAY,
+// so FATHOM keeps the stencil voice it was drawn in while the rest of the
+// site reads as a book rather than as a stencilled crate.
 export const STENCIL =
   "'Big Shoulders Stencil', 'Big Shoulders Stencil Display', 'IBM Plex Sans', sans-serif";
+export const DISPLAY =
+  "'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif";

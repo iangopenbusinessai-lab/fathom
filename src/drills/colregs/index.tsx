@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import {
   COLREGS_QUESTIONS,
   COLREGS_QUESTIONS_BY_CATEGORY,
@@ -10,7 +11,7 @@ import { bestScoreKey, readBestScore, writeBestScore } from '../../lib/storage';
 import { shuffle } from '../../lib/shuffle';
 import { ScenarioCard } from './components/ScenarioCard';
 import { VisualPanel, hasVisual } from '../../components/VisualPanel';
-import { MONO, STENCIL } from '../../lib/theme';
+import { DISPLAY, MONO } from '../../lib/theme';
 import { usePrefs } from '../../lib/prefs';
 import { readProgress, recordAnswer } from '../../lib/progress';
 import { PASS_MARK, categoryBySource } from '../../lib/syllabus';
@@ -545,12 +546,11 @@ export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
         <h1
           style={{
             margin: '14px 0 0',
-            fontFamily: STENCIL,
-            fontWeight: 700,
-            fontSize: 46,
-            lineHeight: 0.98,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
+            fontFamily: DISPLAY,
+            fontWeight: 600,
+            fontSize: 42,
+            lineHeight: 1.05,
+            letterSpacing: '0.005em',
             color: 'var(--ct-ink)',
           }}
         >
@@ -596,7 +596,7 @@ export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
                     gap: 10,
                   }}
                 >
-                  <span style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.25 }}>
+                  <span className="ct-display" style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.25 }}>
                     {meta.label}
                   </span>
                   <span
@@ -637,19 +637,18 @@ export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
             offers it. */}
         {!focused && (
           <button className="ct-link" onClick={() => setMenuStep('category')}>
-            &larr; All topics
+            <ArrowLeft size={12} strokeWidth={2} aria-hidden="true" style={{ verticalAlign: '-2px', marginRight: 5 }} />All topics
           </button>
         )}
 
         <h1
           style={{
             margin: focused ? 0 : '16px 0 0',
-            fontFamily: STENCIL,
-            fontWeight: 700,
-            fontSize: 46,
-            lineHeight: 0.98,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
+            fontFamily: DISPLAY,
+            fontWeight: 600,
+            fontSize: 42,
+            lineHeight: 1.05,
+            letterSpacing: '0.005em',
             color: 'var(--ct-ink)',
           }}
         >
@@ -712,7 +711,7 @@ export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
           }}
         >
           <button className="ct-link ct-link-danger" onClick={handleFinish}>
-            &larr; Abandon
+            <ArrowLeft size={12} strokeWidth={2} aria-hidden="true" style={{ verticalAlign: '-2px', marginRight: 5 }} />Abandon
           </button>
           <span>
             {drillMode === 'exam'
@@ -812,12 +811,11 @@ export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
         <h1
           style={{
             margin: '14px 0 0',
-            fontFamily: STENCIL,
-            fontWeight: 700,
-            fontSize: 66,
-            lineHeight: 0.9,
-            letterSpacing: '0.05em',
-            textTransform: 'uppercase',
+            fontFamily: DISPLAY,
+            fontWeight: 600,
+            fontSize: 62,
+            lineHeight: 1,
+            letterSpacing: '0.005em',
             color: pass ? 'var(--ct-stbd)' : 'var(--ct-port)',
           }}
         >

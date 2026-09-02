@@ -1,10 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { ChartFrame, TrailStep } from './components/ChartFrame';
+import { AboutScreen } from './components/AboutScreen';
 import { CategoryDetail } from './components/CategoryDetail';
 import { Hub } from './components/Hub';
+import { SectionScreen } from './components/SectionScreen';
 import { SettingGroup, SettingsScreen } from './components/SettingsScreen';
 import { DRILLS } from './drills';
-import { CATEGORIES, categoryById, drillTargetFor } from './lib/syllabus';
+import { CATEGORIES, categoryById, drillTargetFor, sectionByName } from './lib/syllabus';
 import { SessionPlan } from './lib/session';
 import { DrillStart, GameMode } from './types';
 import { PrefsProvider, usePrefs } from './lib/prefs';
@@ -16,7 +18,11 @@ import { Progress, clearProgress, masteryPct, readProgress } from './lib/progres
 // top-level menu.
 type Route =
   | { screen: 'hub' }
+  | { screen: 'about' }
   | { screen: 'settings' }
+  // The hub lists sections; a section lists its categories. That middle step
+  // is what keeps the landing screen a welcome rather than a full index.
+  | { screen: 'section'; section: string }
   | { screen: 'category'; categoryId: string }
   // `from` is the category screen the run was launched from, so leaving the
   // drill goes back to where it started rather than all the way to the hub.
@@ -39,6 +45,11 @@ function Shell() {
 
   const openDrill = useCallback((drillId: string, focus: string) => {
     setRoute({ screen: 'drill', drillId, focus });
+  }, []);
+
+  const openSection = useCallback((section: string) => {
+    setProgress(readProgress());
+    setRoute({ screen: 'section', section });
   }, []);
 
   const openCategory = useCallback((categoryId: string) => {
@@ -171,8 +182,16 @@ function Shell() {
   }, [exportProgress, prefs, savePrefs]);
 
   const hubBody = (
-    <Hub progress={progress} onOpenCategory={openCategory} onOpenDrill={openDrill} />
+    <Hub progress={progress} onOpenSection={openSection} onOpenDrill={openDrill} />
   );
+
+  // Every screen below a section repeats the section as a clickable step, so
+  // the trail reads Chart table / Section / Category / Drill and each level is
+  // one click away. The frame supplies the Chart table step itself.
+  const sectionStep = (section: string): TrailStep => ({
+    label: section,
+    onClick: () => openSection(section),
+  });
 
   // Two runs launched from the same category screen must not share a mounted
   // drill, or the second would inherit the first's deck. Counting them gives
@@ -184,13 +203,31 @@ function Shell() {
   // you can click back to.
   let trail: TrailStep[] = [];
   let body: React.ReactNode;
+  let current: 'about' | 'settings' | undefined;
 
   if (route.screen === 'settings') {
     trail = [{ label: 'Settings' }];
+    current = 'settings';
     body = <SettingsScreen groups={settingGroups} />;
+  } else if (route.screen === 'about') {
+    trail = [{ label: 'About' }];
+    current = 'about';
+    body = <AboutScreen />;
+  } else if (route.screen === 'section') {
+    const section = sectionByName(route.section);
+    if (section) trail = [{ label: section.name }];
+    body = section ? (
+      <SectionScreen
+        section={section}
+        progress={progress}
+        onOpenCategory={openCategory}
+      />
+    ) : (
+      hubBody
+    );
   } else if (route.screen === 'category') {
     const cat = categoryById(route.categoryId);
-    if (cat) trail = [{ label: cat.section }, { label: cat.name }];
+    if (cat) trail = [sectionStep(cat.section), { label: cat.name }];
     body = cat ? (
       <CategoryDetail
         category={cat}
@@ -207,7 +244,7 @@ function Shell() {
       const cat = route.from ? categoryById(route.from) : null;
       trail = cat
         ? [
-            { label: cat.section },
+            sectionStep(cat.section),
             { label: cat.name, onClick: () => openCategory(cat.id) },
             { label: drill.title },
           ]
@@ -239,6 +276,8 @@ function Shell() {
       theme={prefs.theme}
       onGoHub={goHub}
       onGoSettings={() => setRoute({ screen: 'settings' })}
+      onGoAbout={() => setRoute({ screen: 'about' })}
+      current={current}
       trail={trail}
     >
       {body}

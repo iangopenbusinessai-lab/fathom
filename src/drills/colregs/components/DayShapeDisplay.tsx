@@ -78,8 +78,8 @@ export function shapeNode(shape: DayShapeName, cx: number, cy: number, key: stri
 const SHAPE_LABELS: Record<DayShapeName, string> = {
   'ball':      'Ball',
   'diamond':   'Diamond',
-  'cone-down': 'Cone ▼',
-  'cone-up':   'Cone ▲',
+  'cone-down': 'Cone, apex down',
+  'cone-up':   'Cone, apex up',
   'cylinder':  'Cylinder',
 };
 
