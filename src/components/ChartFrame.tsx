@@ -283,19 +283,51 @@ export const ChartFrame: React.FC<ChartFrameProps> = ({
                 textAlign: 'left',
               }}
             >
+              {/* The Fathom mark: a six-spindle helm with a stencil-cut F at
+                  its centre. The F is broken by two stencil bridges, which is
+                  what ties it to the FATHOM wordmark beside it rather than
+                  leaving the two merely adjacent.
+
+                  Drawn in currentColor and coloured by `color` on the svg, so
+                  the one mark follows the theme instead of needing a brass and
+                  a navy copy. public/favicon.svg carries the same shape with
+                  the bridges removed - they fill in below about 32px. */}
               <svg
                 width="34"
                 height="34"
-                viewBox="0 0 48 48"
-                fill="none"
-                stroke="var(--ct-brass)"
-                strokeWidth="1.7"
+                viewBox="0 0 100 100"
+                style={{ color: 'var(--ct-brass)', flex: 'none' }}
                 aria-hidden="true"
               >
-                <circle cx="24" cy="24" r="8.5" />
-                <circle cx="24" cy="24" r="15" />
-                <circle cx="24" cy="24" r="2.6" fill="var(--ct-brass)" stroke="none" />
-                <path d="M24 1.5V15M24 33V46.5M1.5 24H15M33 24H46.5M8.1 8.1l7.6 7.6M32.3 32.3l7.6 7.6M39.9 8.1l-7.6 7.6M15.7 32.3l-7.6 7.6" />
+                <mask id="ct-mark-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
+                  <rect width="100" height="100" fill="#fff" />
+                  <g fill="#000">
+                    <rect x="36" y="43" width="14" height="3.2" />
+                    <rect x="51" y="28" width="3.2" height="30" />
+                  </g>
+                </mask>
+                <g stroke="currentColor" strokeWidth="7.5" strokeLinecap="round">
+                  <line x1="81.2" y1="68" x2="85.9" y2="70.75" />
+                  <line x1="50" y1="86" x2="50" y2="91.5" />
+                  <line x1="18.8" y1="68" x2="14.1" y2="70.75" />
+                  <line x1="18.8" y1="32" x2="14.1" y2="29.25" />
+                  <line x1="50" y1="14" x2="50" y2="8.5" />
+                  <line x1="81.2" y1="32" x2="85.9" y2="29.25" />
+                </g>
+                <g fill="currentColor">
+                  <circle cx="87.7" cy="71.75" r="4.6" />
+                  <circle cx="50" cy="93.5" r="4.6" />
+                  <circle cx="12.3" cy="71.75" r="4.6" />
+                  <circle cx="12.3" cy="28.25" r="4.6" />
+                  <circle cx="50" cy="6.5" r="4.6" />
+                  <circle cx="87.7" cy="28.25" r="4.6" />
+                </g>
+                <circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" strokeWidth="8" />
+                <g fill="currentColor" mask="url(#ct-mark-cut)">
+                  <rect x="38.5" y="31" width="9" height="40" rx="1.5" />
+                  <rect x="38.5" y="31" width="25" height="9" rx="1.5" />
+                  <rect x="38.5" y="47" width="19" height="9" rx="1.5" />
+                </g>
               </svg>
               <span style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <span

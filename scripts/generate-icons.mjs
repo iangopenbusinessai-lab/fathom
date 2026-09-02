@@ -3,8 +3,8 @@
 // to `npx sharp-cli`, which fetches it on demand, so nothing heavy or platform
 // specific lands in package.json for a task that runs once per icon change.
 //
-//   node scripts/generate-icons.mjs                    (regenerate as shipped)
-//   node scripts/generate-icons.mjs icon-depth-rings   (switch concepts)
+//   node scripts/generate-icons.mjs               (regenerate as shipped)
+//   node scripts/generate-icons.mjs icon-other    (rasterise a different source)
 //
 // Anything written here is committed - the build does not run it.
 
@@ -14,7 +14,7 @@ import path from 'node:path';
 
 const publicDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public');
 
-const source = process.argv[2] ?? 'icon-sounding-line';
+const source = process.argv[2] ?? 'icon-wheel';
 
 // [source svg, output png, pixel size]
 const targets = [
