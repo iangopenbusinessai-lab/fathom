@@ -45,38 +45,37 @@ type CategoryFilter = ColregsCategory | 'all';
 // exam.
 const EXAM_QUESTION_MS = 15000;
 
-export const QUESTION_LIGHTS: Partial<Record<string, LightName[]>> = {
-  'nl-01': ['starboard'],
-  'nl-02': ['port'],
-  'nl-03': ['masthead'],
-  'nl-04': ['masthead', 'port', 'starboard', 'stern'],
-  'nl-05': ['anchor'],
-  'nl-06': ['stern'],
-  'nl-07': ['allRoundRed1', 'allRoundRed2'],
-  'nl-08': ['masthead', 'masthead2', 'masthead3', 'port', 'starboard', 'stern'],
-  'nl-09': ['masthead', 'port', 'starboard', 'stern', 'allRoundRed1', 'allRoundRed2', 'allRoundRed3'],
-  'nl-10': ['allRoundWhite', 'allRoundRed1'],
-  // Rule 25(a): sailing vessel underway - sidelights and sternlight, no masthead.
-  'nl-11': ['port', 'starboard', 'stern'],
-  // Rule 23(d)(i): power-driven under 12 m - all-round white plus sidelights.
-  'nl-12': ['allRoundWhite', 'port', 'starboard'],
-  // Rule 25(b): tricolour lantern - an observer sees these same three sectors.
-  'nl-13': ['port', 'starboard', 'stern'],
-  // Rule 26(b)(i): trawling - green over white, plus sidelights and sternlight.
-  'nl-14': ['allRoundGreen1', 'allRoundWhite2', 'port', 'starboard', 'stern'],
-  // Rule 26(c)(i): fishing other than trawling - red over white.
-  'nl-15': ['allRoundRed1', 'allRoundWhite2'],
-  // Rule 27(b)(i): RAM - red, white, red in a vertical line.
-  'nl-16': ['allRoundRed1', 'allRoundWhite2', 'allRoundRed3'],
-  // Rule 24(a)(iv): towing - yellow towing light above the sternlight.
-  'nl-17': ['masthead', 'port', 'starboard', 'stern', 'allRoundYellow'],
-  // Rule 30(a): at anchor, 50 m or more - forward light and a lower one aft.
-  'nl-18': ['anchor', 'allRoundWhite'],
-  // Rule 23(b): air-cushion in non-displacement mode - all-round flashing yellow.
-  'nl-19': ['masthead', 'port', 'starboard', 'stern', 'allRoundYellow'],
-  // Rule 21(b): the sidelight arcs themselves are the question.
-  'nl-20': ['port', 'starboard'],
-};
+// EMPTY, DELIBERATELY. Every one of the twenty navigation lights questions
+// was audited against the leak rule the later components follow - the diagram
+// may be the stimulus, never the answer - and all twenty failed it, so none of
+// them carries a diagram now.
+//
+// The direction of the question is what decides it:
+//
+//   configuration -> identify   "here is a light pattern, what is this vessel"
+//                               The picture is the stimulus. Correct.
+//   situation -> configuration  "what colour is her sidelight", "how many
+//                               masthead lights", "where is the anchor light"
+//                               The picture IS the answer. A leak.
+//
+// The whole nav lights bank is written in the second direction: every prompt
+// names the vessel or the situation and asks which lights she shows. Drawing
+// the lights therefore answered the question before it was read, and
+// LightDisplay makes that worse than it sounds, because it prints a text label
+// beside every lit light. For nl-01, "what colour is a vessel's starboard
+// sidelight", it drew a green dot captioned "Stbd". The candidate did not have
+// to know the answer, or even to look hard.
+//
+// This is not a case for a redrawn diagram. There is nothing to draw for
+// "which lights does she show" that is not the list of lights she shows, so
+// text-only is the right answer and not a fallback - the same call BuoyDisplay
+// makes for the meaning questions and DistressDisplay makes for the colour
+// ones.
+//
+// LightDisplay itself is kept and is still wired through VisualPanel. What it
+// wants is a question asked the other way round - a pattern shown, the vessel
+// named - and the day this bank gains one, it is a line in this map.
+export const QUESTION_LIGHTS: Partial<Record<string, LightName[]>> = {};
 
 export interface DayShapeSpec {
   shapes: DayShapeName[];

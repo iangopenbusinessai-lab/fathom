@@ -24,6 +24,23 @@ interface LightDisplayProps {
   label?: string;
 }
 
+// This was the first visual component in the app and it predates the rule the
+// later ones are built to: the diagram may be the stimulus of a question,
+// never its answer. It does not obey that rule by itself and cannot be made
+// to, because what it draws IS a light configuration - it is honest only
+// beside a question that shows a pattern and asks what vessel it is.
+//
+// It is worse than a plain silhouette in one specific way: every lit light is
+// captioned with its own name, and the hull is captioned BOW, STERN, PORT and
+// STBD. So it does not merely depict the answer to "what colour is her
+// starboard sidelight", it writes it out. That caption is why the whole
+// navigation lights bank was taken off diagrams rather than some of it - see
+// QUESTION_LIGHTS in ../index.tsx, which records the audit.
+//
+// Nothing maps to this component today. Keep the captions in mind before
+// mapping anything to it: a question that asks what is being shown is safe
+// here, and any question that asks what a named vessel shows is not.
+
 const LIGHT_COLORS: Record<LightName, string> = {
   masthead:      '#ffffff',
   masthead2:     '#ffffff',
