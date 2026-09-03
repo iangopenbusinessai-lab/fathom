@@ -7,7 +7,8 @@ export type ColregsCategory =
   | 'anchor-types'
   | 'buoyage'
   | 'chart-symbols'
-  | 'distress-signals';
+  | 'distress-signals'
+  | 'vhf-procedure';
 
 export interface ColregsQuestion {
   id: string;
@@ -32,7 +33,15 @@ export const NON_COLREGS_CATEGORIES: ColregsCategory[] = [
   'anchor-types',
   'buoyage',
   'chart-symbols',
+  'vhf-procedure',
 ];
+
+// Distress signals are NOT in that list, and the near miss is worth saying out
+// loud: Annex IV to the Convention is headed "Distress Signals" and Rule 37
+// sends a vessel in distress to it, so that category has a real citation and
+// takes the ordinary path. VHF procedure sits beside it in the same section
+// and is the opposite case - channel discipline and the three priority calls
+// are radio regulation, not COLREGS, and no rule number covers them.
 
 export function isColregsGoverned(question: ColregsQuestion): boolean {
   return !NON_COLREGS_CATEGORIES.includes(question.category);
@@ -49,13 +58,15 @@ export function isColregsGoverned(question: ColregsQuestion): boolean {
 // it (the ICW overlay lives there and nowhere in IALA), and the two ground
 // tackle labels are seamanship, which has no publication behind it at all.
 // "Chart No. 1" is the NOAA and NGA publication every symbol and abbreviation
-// in the chart symbols bank is read out of.
+// in the chart symbols bank is read out of, and "Radio procedure" covers the
+// VHF calls, which are governed by radio regulation rather than by the Rules.
 export const TOPIC_LABELS = [
   'Ground tackle',
   'Holding ground',
   'IALA-B',
   'US ATON',
   'Chart No. 1',
+  'Radio procedure',
 ] as const;
 
 // --- NAVIGATION LIGHTS (20 questions) ---
@@ -2074,6 +2085,231 @@ const distressSignalsQuestions: ColregsQuestion[] = [
   },
 ];
 
+// --- VHF PROCEDURE (17 questions) ---
+//
+// Not COLREGS. What may be said on a marine VHF set, and on which channel, is
+// radio regulation - the FCC in US waters, the ITU internationally - and there
+// is no rule number to cite, so these explanations open with the topic label
+// "Radio procedure". The distress signals category next door is the opposite
+// case and carries a real Annex IV citation; the two must not be confused.
+//
+// Text questions throughout, and no diagram: a radio call is words in an
+// order. What a candidate is examined on is which of the three priority calls
+// a situation deserves and what is said in what sequence, and a picture of a
+// handset would be scenery around that.
+//
+// The three calls are spelled here as they are spoken - Mayday, Pan-Pan,
+// Securite - and each is said three times at the head of the call. The
+// repetition is not emphasis: it is what lets a listener who caught only the
+// tail of the first word know what is coming.
+
+const vhfProcedureQuestions: ColregsQuestion[] = [
+  {
+    id: 'vf-01',
+    category: 'vhf-procedure',
+    prompt:
+      'Which call is made when a vessel or a person is in grave and imminent danger and requires immediate assistance?',
+    options: ['Mayday', 'Pan-Pan', 'Securite', 'Seelonce'],
+    correctAnswer: 'Mayday',
+    explanation:
+      'Radio procedure: Mayday is the distress call, and the threshold for it is grave and imminent danger requiring immediate assistance. Nothing outranks it - every other station on the channel stops transmitting for it.',
+  },
+  {
+    id: 'vf-02',
+    category: 'vhf-procedure',
+    prompt:
+      'Which call is made for an urgent message about the safety of a vessel or a person, where nobody is in immediate danger of losing their life?',
+    options: ['Pan-Pan', 'Mayday', 'Securite', 'Seelonce'],
+    correctAnswer: 'Pan-Pan',
+    explanation:
+      'Radio procedure: Pan-Pan is the urgency call, one step below distress. It is the call for a situation that is serious and getting worse but has not yet become a matter of life - and it is the call most often skipped by people who think it is not bad enough yet to use the radio at all.',
+  },
+  {
+    id: 'vf-03',
+    category: 'vhf-procedure',
+    prompt:
+      'Which call announces a message about navigational safety or an important meteorological warning?',
+    options: ['Securite', 'Pan-Pan', 'Mayday', 'Seelonce'],
+    correctAnswer: 'Securite',
+    explanation:
+      'Radio procedure: Securite, spoken say-cure-ee-tay, is the safety call - the lowest of the three priorities. Coast stations use it to open a gale warning or a navigational warning, and a vessel may use it too, to report a hazard she has just seen.',
+  },
+  {
+    id: 'vf-04',
+    category: 'vhf-procedure',
+    prompt: 'On which VHF channel are all three of those calls made?',
+    options: ['Channel 16', 'Channel 13', 'Channel 22A', 'Channel 9'],
+    correctAnswer: 'Channel 16',
+    explanation:
+      'Radio procedure: Channel 16 is the international distress, safety and calling channel, and the three priority calls are made there. In US waters the announcement is often made on 16 and the message itself passed on 22A once the Coast Guard answers, which is why 16 has to be kept clear.',
+  },
+  {
+    id: 'vf-05',
+    category: 'vhf-procedure',
+    prompt: 'How many times is the word "Mayday" spoken at the start of a distress call?',
+    options: ['Three times', 'Once', 'Twice', 'Continuously until answered'],
+    correctAnswer: 'Three times',
+    explanation:
+      'Radio procedure: Three times - "Mayday, Mayday, Mayday". Pan-Pan and Securite are given three times too. A listener who caught only the end of the first word still hears the next two, and knows in about two seconds what kind of call this is.',
+  },
+  {
+    id: 'vf-06',
+    category: 'vhf-procedure',
+    prompt: 'What immediately follows "Mayday, Mayday, Mayday" in a distress call?',
+    options: [
+      '"This is" followed by the vessel\'s name, spoken three times',
+      'Your position, given as latitude and longitude',
+      'The nature of the distress',
+      'The number of persons on board',
+    ],
+    correctAnswer: '"This is" followed by the vessel\'s name, spoken three times',
+    explanation:
+      'Radio procedure: "This is" and then the vessel\'s name three times, so that a station straining to hear gets three chances at who is calling. The call sign follows the name where the vessel has one. Everything else in the call comes after you have been identified.',
+  },
+  {
+    id: 'vf-07',
+    category: 'vhf-procedure',
+    prompt:
+      'Having said "Mayday" once more and given your vessel\'s name, what is the next thing you pass?',
+    options: [
+      'Your position',
+      'The number of persons on board',
+      'The nature of the distress',
+      'The kind of assistance you want',
+    ],
+    correctAnswer: 'Your position',
+    explanation:
+      'Radio procedure: Position comes first of the details, because it is the one piece of the call that everything else depends on - a rescue that knows what is wrong but not where you are cannot start. Give it as latitude and longitude, or as a bearing and distance from a charted mark.',
+  },
+  {
+    id: 'vf-08',
+    category: 'vhf-procedure',
+    prompt: 'After the position, what else does a distress call have to carry?',
+    options: [
+      'The nature of the distress, the assistance you want, and the number of persons on board',
+      'The nature of the distress and your intended destination',
+      'The number of persons on board and the vessel\'s registration number',
+      'The name of your insurer and the vessel\'s home port',
+    ],
+    correctAnswer:
+      'The nature of the distress, the assistance you want, and the number of persons on board',
+    explanation:
+      'Radio procedure: Nature of the distress, assistance required, and persons on board - then anything else that would help, such as what the vessel looks like and whether she is being abandoned. The head count is what the search is still working from hours later, so it is never left out.',
+  },
+  {
+    id: 'vf-09',
+    category: 'vhf-procedure',
+    prompt:
+      'There is a fire in your engine compartment. It is spreading, you cannot control it, and you are preparing to abandon. Which call do you make?',
+    options: ['Mayday', 'Pan-Pan', 'Securite', 'A routine call to the marina on a working channel'],
+    correctAnswer: 'Mayday',
+    explanation:
+      'Radio procedure: A fire out of control on board, with the crew about to take to the water, is grave and imminent danger - Mayday, without hesitating over whether it is bad enough. A call made early can be downgraded later; one made late cannot be made earlier.',
+  },
+  {
+    id: 'vf-10',
+    category: 'vhf-procedure',
+    prompt:
+      'Your engine has failed and you are drifting slowly toward a rocky shore about a mile downwind. Nobody is hurt and the boat is sound. Which call do you make?',
+    options: ['Pan-Pan', 'Mayday', 'Securite', 'No call - wait until you are closer to the rocks'],
+    correctAnswer: 'Pan-Pan',
+    explanation:
+      'Radio procedure: This is the textbook urgency call - the vessel is in trouble and the trouble is getting worse, but nobody is yet in danger of their life. Pan-Pan now brings a tow before the situation turns into the Mayday it would otherwise become.',
+  },
+  {
+    id: 'vf-11',
+    category: 'vhf-procedure',
+    prompt:
+      'You pass a half-submerged shipping container drifting in a busy fairway. Which call do you make?',
+    options: ['Securite', 'Pan-Pan', 'Mayday', 'None - report it by telephone once ashore'],
+    correctAnswer: 'Securite',
+    explanation:
+      'Radio procedure: A hazard to navigation that threatens nobody at this moment is a safety message - Securite, then the position and description of what you saw. The next boat down the channel may be smaller, faster, or looking the other way.',
+  },
+  {
+    id: 'vf-12',
+    category: 'vhf-procedure',
+    prompt:
+      'A coast station is about to broadcast a gale warning. Which word will open the announcement?',
+    options: ['Securite', 'Mayday', 'Pan-Pan', 'Seelonce'],
+    correctAnswer: 'Securite',
+    explanation:
+      'Radio procedure: Meteorological warnings and navigational warnings are safety traffic, so a coast station opens with Securite on 16 and then names the channel the broadcast itself will be made on.',
+  },
+  {
+    id: 'vf-13',
+    category: 'vhf-procedure',
+    prompt:
+      'You hear a Mayday from a vessel some distance away. You are not in a position to help. What do you do?',
+    options: [
+      'Keep silent on the channel, listen, and write down what you hear',
+      'Answer at once to say that you cannot help',
+      'Switch off the radio so you do not add to the traffic',
+      'Change to a working channel and carry on with your own business',
+    ],
+    correctAnswer: 'Keep silent on the channel, listen, and write down what you hear',
+    explanation:
+      'Radio procedure: Silence and a written note. If nobody nearer answers, what you wrote down may be all anyone has. The station in distress, or a station handling the traffic, can impose silence on the channel with "Seelonce Mayday", and that binds every set within range.',
+  },
+  {
+    id: 'vf-14',
+    category: 'vhf-procedure',
+    prompt:
+      'You can see a boat in serious trouble, and you have heard her try to call for help on a radio that is clearly not transmitting. What do you send?',
+    options: [
+      'A Mayday Relay, giving her position and what you can see',
+      'A Mayday, as though the distress were your own',
+      'A Pan-Pan, because your own vessel is not in danger',
+      'Nothing on the radio - close her and take the crew off first',
+    ],
+    correctAnswer: 'A Mayday Relay, giving her position and what you can see',
+    explanation:
+      'Radio procedure: "Mayday Relay" is the call for a distress that is not your own - a vessel whose radio has failed, or one you have heard whose call nobody answered. You give her position and situation, and identify your own vessel as the station relaying, so nobody comes looking for the wrong boat.',
+  },
+  {
+    id: 'vf-15',
+    category: 'vhf-procedure',
+    prompt: 'You want to arrange a berth with a marina on VHF. How is the channel used?',
+    options: [
+      'Call briefly on 16, agree a working channel, and pass the whole message there',
+      'Pass the whole message on 16, since that is the calling channel',
+      'Call on 16 and wait there until the marina is ready to deal with you',
+      'Use 16 only if the marina does not answer on a working channel',
+    ],
+    correctAnswer: 'Call briefly on 16, agree a working channel, and pass the whole message there',
+    explanation:
+      'Radio procedure: 16 is for calling and for the three priority calls, not for conversation. Establish contact, agree a working channel, and go there - the boat whose Mayday comes thirty seconds later needs the channel you would otherwise be filling with a berthing chat.',
+  },
+  {
+    id: 'vf-16',
+    category: 'vhf-procedure',
+    prompt: 'What is the difference between "Over" and "Out"?',
+    options: [
+      'Over invites a reply; Out ends the exchange, and the two are never said together',
+      'Over ends the exchange; Out invites a reply',
+      'They mean the same thing, and "Over and out" is the correct full form',
+      'Over is used on 16 and Out is used on working channels',
+    ],
+    correctAnswer: 'Over invites a reply; Out ends the exchange, and the two are never said together',
+    explanation:
+      'Radio procedure: Over hands the channel to the other station and expects an answer. Out says the exchange is finished and no answer is expected. "Over and out" is the two contradicting each other in one breath, which is why it exists in films and not on the water.',
+  },
+  {
+    id: 'vf-17',
+    category: 'vhf-procedure',
+    prompt: 'You have sent a DSC distress alert from your radio. What do you do next?',
+    options: [
+      'Follow it immediately with a spoken Mayday call on Channel 16',
+      'Wait silently for an acknowledgement before transmitting anything',
+      'Send the alert again every minute until someone answers',
+      'Switch to a working channel and call for help there',
+    ],
+    correctAnswer: 'Follow it immediately with a spoken Mayday call on Channel 16',
+    explanation:
+      'Radio procedure: The digital alert carries your identity and, if the set knows it, your position - it does not carry what is wrong or how many people are aboard. The spoken Mayday on 16 is what makes it a call anyone can act on. An alert sent by accident is cancelled, out loud on 16, and never simply switched off and ignored.',
+  },
+];
+
 // --- COMBINED EXPORT ---
 
 export const COLREGS_QUESTIONS: ColregsQuestion[] = [
@@ -2086,6 +2322,7 @@ export const COLREGS_QUESTIONS: ColregsQuestion[] = [
   ...buoyageQuestions,
   ...chartSymbolsQuestions,
   ...distressSignalsQuestions,
+  ...vhfProcedureQuestions,
 ];
 
 export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuestion[]> = {
@@ -2098,6 +2335,7 @@ export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuest
   'buoyage': buoyageQuestions,
   'chart-symbols': chartSymbolsQuestions,
   'distress-signals': distressSignalsQuestions,
+  'vhf-procedure': vhfProcedureQuestions,
 };
 
 export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
@@ -2110,4 +2348,5 @@ export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
   'buoyage': 'Buoyage',
   'chart-symbols': 'Chart Symbols',
   'distress-signals': 'Distress Signals',
+  'vhf-procedure': 'VHF Procedure',
 };

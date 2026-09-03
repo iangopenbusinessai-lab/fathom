@@ -166,10 +166,19 @@ export const CATEGORIES: ChartCategory[] = [
     id: 'vhf',
     name: 'VHF procedure',
     section: 'Signals and communication',
-    rule: 'GMDSS / SMCP',
-    status: 'soon',
-    blurb: 'Channel discipline, priority calls and standard marine phrases.',
-    topics: ['Channel 16 and DSC', 'Mayday / Pan-pan / Securite', 'Standard phrases'],
+    rule: 'Radio procedure',
+    status: 'live',
+    source: 'vhf-procedure',
+    blurb:
+      'The three priority calls and which situation earns which, the order a distress call is given in, and the channel discipline that keeps 16 clear for the boat that needs it next.',
+    topics: [
+      'Mayday, Pan-Pan and Securite',
+      'Channel 16 and working channels',
+      'The order of a distress call',
+      'Mayday Relay',
+      'DSC alerts',
+      'Over, Out and radio silence',
+    ],
   },
   {
     id: 'anchors',

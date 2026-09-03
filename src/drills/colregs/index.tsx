@@ -297,6 +297,7 @@ const CATEGORY_ORDER: CategoryFilter[] = [
   'buoyage',
   'chart-symbols',
   'distress-signals',
+  'vhf-procedure',
 ];
 
 // `sub` is the descriptor only - the question count is prepended at render
@@ -312,6 +313,7 @@ const CATEGORY_META: Record<CategoryFilter, { label: string; sub: string }> = {
   'buoyage':           { label: 'Buoyage',                sub: 'IALA marks and the ICW'   },
   'chart-symbols':     { label: 'Chart symbols',          sub: 'symbols and abbreviations' },
   'distress-signals':  { label: 'Distress signals',       sub: 'the Annex IV list'        },
+  'vhf-procedure':     { label: 'VHF procedure',          sub: 'priority calls on 16'     },
 };
 
 // The syllabus card a question belongs to, so its answer lands on the right
