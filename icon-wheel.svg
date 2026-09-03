@@ -1,11 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <title>Fathom</title>
-  <!-- Maskable variant: full-bleed navy plate, mark held inside a 19% safe
-       zone so it survives whatever shape a launcher masks it to - circle,
-       squircle, rounded square. From the "Stencil-cut F" handoff in the Fathom
-       logo exploration; same geometry as icon-wheel.svg, pulled in further. -->
+  <!-- App icon: the Fathom mark in brass on a navy plate, 11% padding.
+       From the "Stencil-cut F" handoff in the Fathom logo exploration.
+
+       This is the source for icon-192.png and icon-512.png - see
+       scripts/generate-icons.mjs. The mark keeps its stencil bridges here
+       because it is never drawn small enough for them to fill in; the tab
+       favicon uses the bridge-less variant instead. -->
   <rect width="512" height="512" fill="#0a1929" />
-  <g transform="translate(97 97) scale(3.18)">
+  <g transform="translate(56 56) scale(4)">
     <mask id="cut" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
       <rect width="100" height="100" fill="#fff" />
       <g fill="#000">
