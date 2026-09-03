@@ -5,7 +5,8 @@ export type ColregsCategory =
   | 'day-shapes'
   | 'vessel-types'
   | 'anchor-types'
-  | 'buoyage';
+  | 'buoyage'
+  | 'chart-symbols';
 
 export interface ColregsQuestion {
   id: string;
@@ -26,7 +27,11 @@ export interface ColregsQuestion {
 // rules, so the next one - PFD types, fire safety - is added here and every
 // consumer follows. See src/lib/citation.ts and
 // src/__tests__/citationFormat.test.ts.
-export const NON_COLREGS_CATEGORIES: ColregsCategory[] = ['anchor-types', 'buoyage'];
+export const NON_COLREGS_CATEGORIES: ColregsCategory[] = [
+  'anchor-types',
+  'buoyage',
+  'chart-symbols',
+];
 
 export function isColregsGoverned(question: ColregsQuestion): boolean {
   return !NON_COLREGS_CATEGORIES.includes(question.category);
@@ -42,11 +47,14 @@ export function isColregsGoverned(question: ColregsQuestion): boolean {
 // in, "US ATON" is the Coast Guard's own aid-to-navigation practice on top of
 // it (the ICW overlay lives there and nowhere in IALA), and the two ground
 // tackle labels are seamanship, which has no publication behind it at all.
+// "Chart No. 1" is the NOAA and NGA publication every symbol and abbreviation
+// in the chart symbols bank is read out of.
 export const TOPIC_LABELS = [
   'Ground tackle',
   'Holding ground',
   'IALA-B',
   'US ATON',
+  'Chart No. 1',
 ] as const;
 
 // --- NAVIGATION LIGHTS (20 questions) ---
@@ -1540,6 +1548,270 @@ const buoyageQuestions: ColregsQuestion[] = [
   },
 ];
 
+// --- CHART SYMBOLS (17 questions) ---
+//
+// Not COLREGS either: these are read out of U.S. Chart No. 1, the NOAA and NGA
+// publication of symbols, abbreviations and terms, so the explanations open
+// with that label. See NON_COLREGS_CATEGORIES above.
+//
+// These questions carry NO diagram, and that is a decision rather than an
+// omission. What is being tested is what a printed abbreviation stands for -
+// "Iso", "PA", "Fl(2+1) R 6s" - and the abbreviation is already the picture.
+// Drawing a chart extract around it would add scenery to a reading exercise
+// and would have to invent a plausible piece of coastline to do it. The few
+// entries that are genuinely graphic - the underlined sounding, the magenta
+// flare - are described in words for the same reason: what a candidate has to
+// carry to the chart table is the rule, not one rendering of it.
+//
+// The whole bank is written for US charts. Depth units are the case that
+// matters: a NOAA chart may be in feet, fathoms or metres and says which in
+// its title block, so no question here assumes one.
+
+const chartSymbolsQuestions: ColregsQuestion[] = [
+  {
+    id: 'cs-01',
+    category: 'chart-symbols',
+    prompt: 'A lighted buoy on the chart is annotated "Fl G 4s". What does that describe?',
+    options: [
+      'A green light flashing once every 4 seconds',
+      'A green light flashing 4 times in quick succession',
+      'A green light visible for 4 nautical miles',
+      'A green light 4 feet above the water',
+    ],
+    correctAnswer: 'A green light flashing once every 4 seconds',
+    explanation:
+      'Chart No. 1: A light description reads as character, colour, period, and then height and range where they are given. "Fl" is flashing, "G" is green, and "4s" is the period - the time for one complete cycle, so one flash every four seconds. Timing that period with a watch is how a light is identified at night.',
+  },
+  {
+    id: 'cs-02',
+    category: 'chart-symbols',
+    prompt: 'What does the light character "Q" mean on a chart?',
+    options: [
+      'Quick flashing - a rapid, continuous flash of about 60 per minute',
+      'Quenched - a light that has been reported extinguished',
+      'Quarantine anchorage light',
+      'A light whose character has not been established',
+    ],
+    correctAnswer: 'Quick flashing - a rapid, continuous flash of about 60 per minute',
+    explanation:
+      'Chart No. 1: "Q" is quick flashing, around 50 to 79 flashes a minute, and "VQ" is very quick, around 80 to 159. The quick rhythms belong mostly to cardinal marks, where the number of flashes in the group is what names the quadrant.',
+  },
+  {
+    id: 'cs-03',
+    category: 'chart-symbols',
+    prompt: 'What does the light character "Iso" mean?',
+    options: [
+      'Isophase - equal periods of light and darkness',
+      'Isolated - a light on a danger with clear water all round it',
+      'A light of the same colour as the one before it in the sequence',
+      'An intermittent light of no fixed period',
+    ],
+    correctAnswer: 'Isophase - equal periods of light and darkness',
+    explanation:
+      'Chart No. 1: Isophase means the light is on exactly as long as it is off. It is the middle of the three steady rhythms - flashing is mostly dark, occulting is mostly lit, isophase is even - and telling them apart by eye is what the period is timed for.',
+  },
+  {
+    id: 'cs-04',
+    category: 'chart-symbols',
+    prompt: 'What does the light character "Occ" mean?',
+    options: [
+      'Occulting - the light is on longer than it is off',
+      'Occulting - the light is off longer than it is on',
+      'Occasional - a light exhibited only when shipping is expected',
+      'A light obscured over part of its arc',
+    ],
+    correctAnswer: 'Occulting - the light is on longer than it is off',
+    explanation:
+      'Chart No. 1: An occulting light is a steady light interrupted by short eclipses - lit for longer than it is dark. It is the exact opposite of a flashing light, which is dark for longer than it is lit, and reversing the two is the commonest error on this page.',
+  },
+  {
+    id: 'cs-05',
+    category: 'chart-symbols',
+    prompt: 'What does "F" mean when it opens a light description, as in "F R"?',
+    options: [
+      'Fixed - a steady light that does not flash at all',
+      'Flashing, when no period is given',
+      'Fog light, exhibited only in reduced visibility',
+      'Floating - the light is on a buoy rather than a structure',
+    ],
+    correctAnswer: 'Fixed - a steady light that does not flash at all',
+    explanation:
+      'Chart No. 1: "F" is fixed - continuous and unchanging. "F R" is a fixed red light. Flashing is "Fl", with the l, and a fixed light with a flash worked into it is written "F Fl".',
+  },
+  {
+    id: 'cs-06',
+    category: 'chart-symbols',
+    prompt: 'A buoy is charted as "Mo(A) W 8s". What is the light doing, and what kind of mark is it?',
+    options: [
+      'Flashing Morse code A - short then long - which is the light of a safe water mark',
+      'Flashing Morse code A - long then short - which warns of an isolated danger',
+      'Showing a single flash every 8 seconds, marking an anchorage',
+      'Showing an alternating white light, marking the start of a traffic scheme',
+    ],
+    correctAnswer:
+      'Flashing Morse code A - short then long - which is the light of a safe water mark',
+    explanation:
+      'Chart No. 1: "Mo(A)" is a light flashing the Morse letter A, a short flash followed by a long one, repeating every 8 seconds here. That rhythm belongs to the safe water mark - the red and white striped fairway, mid-channel and landfall buoys - so hearing it described is enough to name the mark.',
+  },
+  {
+    id: 'cs-07',
+    category: 'chart-symbols',
+    prompt: 'A buoy is charted as "Fl(2+1) R 6s". What does the (2+1) grouping tell you?',
+    options: [
+      'It is a composite group flashing light, the character of a preferred-channel junction mark',
+      'It flashes twice, then once more only in reduced visibility',
+      'It carries two lights on one structure, one of them a spare',
+      'It flashes three times every 6 seconds with no significance to the grouping',
+    ],
+    correctAnswer:
+      'It is a composite group flashing light, the character of a preferred-channel junction mark',
+    explanation:
+      'Chart No. 1: A composite group - two flashes, a pause, then one - is the rhythm reserved for preferred-channel marks, the red-and-green banded buoys at a junction. The colour of the light matches the colour of the topmost band, which is the band that says which channel is the main one.',
+  },
+  {
+    id: 'cs-08',
+    category: 'chart-symbols',
+    prompt: 'A sounding on the chart is annotated "Cy". What is the bottom there?',
+    options: ['Clay', 'Coral', 'Cobbles', 'Chalk'],
+    correctAnswer: 'Clay',
+    explanation:
+      'Chart No. 1: "Cy" is clay. The nature-of-the-bottom abbreviations are what an anchorage is chosen on, and the short ones are worth knowing cold: S sand, M mud, Rk rock, Sh shells, G gravel, Wd weed.',
+  },
+  {
+    id: 'cs-09',
+    category: 'chart-symbols',
+    prompt:
+      'You are looking for somewhere to anchor and the soundings in the bay are annotated "Co". Why is that a poor choice of berth?',
+    options: [
+      'Co is coral - a bottom that holds badly, cuts rode, and is damaged by anchoring',
+      'Co is cobbles - the anchor will bury too deep to break out again',
+      'Co is a cable area, where anchoring is prohibited',
+      'Co is a coastguard zone, closed to anchoring without permission',
+    ],
+    correctAnswer:
+      'Co is coral - a bottom that holds badly, cuts rode, and is damaged by anchoring',
+    explanation:
+      'Chart No. 1: "Co" is coral. A submarine cable area is charted as its own symbol with the word spelled out, not as this abbreviation. Coral gives an anchor little to bite, chafes through rode, and anchoring on it is restricted or banned in much of the water it is found in.',
+  },
+  {
+    id: 'cs-10',
+    category: 'chart-symbols',
+    prompt: 'A figure on the chart is printed underlined, as "3". What does the underline mean?',
+    options: [
+      'It is a drying height - the feature uncovers at low water, and the figure is how far it stands above chart datum',
+      'It is a sounding taken from an older survey and not since confirmed',
+      'It is a charted depth that has been reported as shoaler than shown',
+      'It is a height above mean high water rather than above chart datum',
+    ],
+    correctAnswer:
+      'It is a drying height - the feature uncovers at low water, and the figure is how far it stands above chart datum',
+    explanation:
+      'Chart No. 1: An underlined figure is a drying height, not a depth. The ground it sits on is covered and uncovered by the tide, and the number is how far it dries ABOVE chart datum - so the water over it is the height of tide minus that figure, and at datum there is none.',
+  },
+  {
+    id: 'cs-11',
+    category: 'chart-symbols',
+    prompt: 'How do you know whether the soundings on a chart are in feet, fathoms or metres?',
+    options: [
+      'The chart says so in its title block, and often in the margin as well',
+      'All charts issued for United States waters are in feet',
+      'All charts issued since the 1980s are in metres',
+      'It is inferred from the scale - large-scale charts are in feet, small-scale in fathoms',
+    ],
+    correctAnswer: 'The chart says so in its title block, and often in the margin as well',
+    explanation:
+      'Chart No. 1: The unit of depth is stated on the chart itself, in the title block, and it varies from chart to chart in US waters - feet, fathoms, and metres are all in issue. Assuming the unit rather than reading it is how a fathoms chart gets navigated as though it were feet.',
+  },
+  {
+    id: 'cs-12',
+    category: 'chart-symbols',
+    prompt: 'A charted rock carries the note "PA". What is being said?',
+    options: [
+      'Position approximate - the feature exists, but where it is shown cannot be relied on',
+      'Position accurate - the feature has been fixed by a recent survey',
+      'Partly awash - the rock covers and uncovers with the tide',
+      'Prohibited anchorage in the area around it',
+    ],
+    correctAnswer:
+      'Position approximate - the feature exists, but where it is shown cannot be relied on',
+    explanation:
+      'Chart No. 1: "PA" is position approximate. Its neighbours on the page are "PD", position doubtful, and "ED", existence doubtful, where even whether the thing is there is unsettled. All three are reasons to give a wide berth rather than to pass close on the charted position.',
+  },
+  {
+    id: 'cs-13',
+    category: 'chart-symbols',
+    prompt: 'What does the abbreviation "Wk" mark?',
+    options: [
+      'A wreck',
+      'A weed-covered bottom',
+      'A working area, such as a dredging operation',
+      'A wharf',
+    ],
+    correctAnswer: 'A wreck',
+    explanation:
+      'Chart No. 1: "Wk" is a wreck. Which wreck symbol it is drawn with says how much water is over it - a dangerous wreck, a wreck with a known depth over it, or a hull showing - and the sounding beside it, where there is one, is the least depth found over the wreck itself.',
+  },
+  {
+    id: 'cs-14',
+    category: 'chart-symbols',
+    prompt: 'An aid to navigation is charted as "Bn". What kind of aid is it?',
+    options: [
+      'A beacon - a fixed aid built on the bottom or on shore, not a floating one',
+      'A bell buoy, which sounds on the swell',
+      'A bearing line printed on the chart for a range',
+      'A basin marker at the entrance to a harbour',
+    ],
+    correctAnswer: 'A beacon - a fixed aid built on the bottom or on shore, not a floating one',
+    explanation:
+      'Chart No. 1: "Bn" is a beacon, a fixed structure. The distinction from a buoy is the one that matters to a piloting fix: a beacon does not move, so a bearing on it is worth taking, where a buoy can drag, drift off station, or be shifted without notice.',
+  },
+  {
+    id: 'cs-15',
+    category: 'chart-symbols',
+    prompt: 'A magenta circle on the chart is labelled "Racon(B)". What is at that spot?',
+    options: [
+      'A radar transponder beacon, which paints the Morse letter B outward from its position on your radar',
+      'A radio beacon transmitting the letter B for direction finding',
+      'A radar reflector fitted to an unlit buoy',
+      'A reporting point where traffic calls in on VHF',
+    ],
+    correctAnswer:
+      'A radar transponder beacon, which paints the Morse letter B outward from its position on your radar',
+    explanation:
+      'Chart No. 1: A racon answers your radar pulse, so a coded flash - here Morse B, long-short-short-short - appears on the screen as a line running outward from the racon along its bearing. It is what makes a bridge pier or a landfall buoy identifiable on radar in poor visibility.',
+  },
+  {
+    id: 'cs-16',
+    category: 'chart-symbols',
+    prompt: 'Lights, buoy light flares, restricted areas and recommended tracks are all printed in magenta. Why that colour?',
+    options: [
+      'It is the colour reserved for information the mariner must not miss, and it stays readable under a red night light',
+      'It is the colour reserved for features added since the chart was first printed',
+      'It marks everything that is privately maintained rather than federally maintained',
+      'It marks everything whose position is approximate',
+    ],
+    correctAnswer:
+      'It is the colour reserved for information the mariner must not miss, and it stays readable under a red night light',
+    explanation:
+      'Chart No. 1: Magenta is the chart\'s emphasis colour - lights and their flares, radar beacons, restricted and prohibited areas, recommended tracks and traffic schemes. It was chosen because it survives being read under the red light of a darkened wheelhouse, where an ordinary red print would vanish into the paper.',
+  },
+  {
+    id: 'cs-17',
+    category: 'chart-symbols',
+    prompt: 'What is "U.S. Chart No. 1"?',
+    options: [
+      'The NOAA and NGA publication listing the symbols, abbreviations and terms used on US charts',
+      'The largest-scale chart of the approaches to New York, the first ever issued by NOAA',
+      'The index chart from which all other US chart numbers are allocated',
+      'The Coast Guard publication listing every lighted aid to navigation in US waters',
+    ],
+    correctAnswer:
+      'The NOAA and NGA publication listing the symbols, abbreviations and terms used on US charts',
+    explanation:
+      'Chart No. 1: Despite the name it is a booklet, not a chart - the joint NOAA and NGA key to every symbol, abbreviation and term used on paper and electronic navigational charts. The lighted aids in a region are listed in the Coast Guard\'s Light List instead, which is a different book for a different question.',
+  },
+];
+
 // --- COMBINED EXPORT ---
 
 export const COLREGS_QUESTIONS: ColregsQuestion[] = [
@@ -1550,6 +1822,7 @@ export const COLREGS_QUESTIONS: ColregsQuestion[] = [
   ...vesselTypesQuestions,
   ...anchorTypesQuestions,
   ...buoyageQuestions,
+  ...chartSymbolsQuestions,
 ];
 
 export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuestion[]> = {
@@ -1560,6 +1833,7 @@ export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuest
   'vessel-types': vesselTypesQuestions,
   'anchor-types': anchorTypesQuestions,
   'buoyage': buoyageQuestions,
+  'chart-symbols': chartSymbolsQuestions,
 };
 
 export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
@@ -1570,4 +1844,5 @@ export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
   'vessel-types': 'Vessel Types',
   'anchor-types': 'Anchor Types',
   'buoyage': 'Buoyage',
+  'chart-symbols': 'Chart Symbols',
 };

@@ -274,6 +274,7 @@ const CATEGORY_ORDER: CategoryFilter[] = [
   'vessel-types',
   'anchor-types',
   'buoyage',
+  'chart-symbols',
 ];
 
 // `sub` is the descriptor only - the question count is prepended at render
@@ -287,6 +288,7 @@ const CATEGORY_META: Record<CategoryFilter, { label: string; sub: string }> = {
   'vessel-types':      { label: 'Vessel types',          sub: 'identify by shape and rig' },
   'anchor-types':      { label: 'Anchor types',          sub: 'ground tackle and holding' },
   'buoyage':           { label: 'Buoyage',                sub: 'IALA marks and the ICW'   },
+  'chart-symbols':     { label: 'Chart symbols',          sub: 'symbols and abbreviations' },
 };
 
 // The syllabus card a question belongs to, so its answer lands on the right

@@ -202,13 +202,18 @@ export const CATEGORIES: ChartCategory[] = [
     id: 'chart',
     name: 'Chart symbols',
     section: 'Aids to navigation',
-    rule: 'INT 1 / Chart 5011',
-    status: 'soon',
-    blurb: 'Symbols, abbreviations and terms from Chart 5011.',
+    rule: 'U.S. Chart No. 1',
+    status: 'live',
+    source: 'chart-symbols',
+    blurb:
+      'Reading a US chart: what a light description says, what an abbreviation beside a sounding means, and which notes are telling you not to trust the position.',
     topics: [
-      'Depths and drying heights',
-      'Seabed and hazards',
-      'Light and fog signal notation',
+      'Light characters and periods',
+      'Nature of the bottom',
+      'Depths, units and drying heights',
+      'Wrecks, beacons and racons',
+      'Doubtful positions',
+      'What the magenta is for',
     ],
   },
 ];
@@ -217,9 +222,9 @@ export const CATEGORIES: ChartCategory[] = [
 // the home for the knowledge a candidate is examined on that no rule, annex or
 // buoyage system governs - anchors first, with PFD types and fire safety
 // earmarked behind them. The four sections above it are each anchored to a
-// published source (the COLREGS, its annexes, IALA, Chart 5011); this one is
-// defined by the absence of one, which is why it could not be folded into any
-// of them. See NON_COLREGS_CATEGORIES in ../drills/colregs/constants.
+// published source (the COLREGS, its annexes, IALA, U.S. Chart No. 1); this
+// one is defined by the absence of one, which is why it could not be folded
+// into any of them. See NON_COLREGS_CATEGORIES in ../drills/colregs/constants.
 export const SECTION_ORDER: string[] = [
   'Navigation',
   'Rules of the road',
