@@ -12,11 +12,20 @@ interface ScenarioCardProps {
   options: string[];
   selectedAnswer: string | null;
   // Practice reveals the verdict and the explanation in place; exam mode holds
-  // both back and moves on by itself.
+  // both back.
   reveal: boolean;
+  // The question is finished and no further pick counts. Separate from
+  // `selectedAnswer` because a timed question can finish with nothing picked -
+  // the clock ran out - and the options must lock then too.
+  locked: boolean;
   colorblind: boolean;
   showCitations: boolean;
   onSelect: (answer: string) => void;
+  // Nothing in this drill advances on its own. The run sits on the answered
+  // question, explanation and citation in view, until this button is pressed.
+  awaitingNext: boolean;
+  nextLabel: string;
+  onNext: () => void;
 }
 
 export const ScenarioCard: React.FC<ScenarioCardProps> = ({
@@ -24,12 +33,19 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
   options,
   selectedAnswer,
   reveal,
+  locked,
   colorblind,
   showCitations,
   onSelect,
+  awaitingNext,
+  nextLabel,
+  onNext,
 }) => {
-  const isAnswered = selectedAnswer !== null;
+  const isAnswered = selectedAnswer !== null || locked;
   const isCorrect = selectedAnswer === question.correctAnswer;
+  // Locked with nothing picked means the clock ran out. Calling that
+  // "Incorrect" reads as a wrong answer the reader never gave.
+  const ranOut = locked && selectedAnswer === null;
   const cite = citationOf(question);
 
   return (
@@ -123,7 +139,7 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
               color: isCorrect ? 'var(--ct-stbd)' : 'var(--ct-port)',
             }}
           >
-            {isCorrect ? 'Correct' : 'Incorrect'}
+            {isCorrect ? 'Correct' : ranOut ? 'Time expired' : 'Incorrect'}
             {/* The citation keeps its own case. COLREGS subparagraph letters
                 are lowercase - "Rule 25(b)" - and the uppercase treatment of
                 this line would print "RULE 25(B)", a shape the citation format
@@ -144,6 +160,16 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
             {question.explanation}
           </p>
         </div>
+      )}
+
+      {awaitingNext && (
+        <button
+          className="ct-solid ct-fade"
+          onClick={onNext}
+          style={{ marginTop: 16, alignSelf: 'flex-start' }}
+        >
+          {nextLabel}
+        </button>
       )}
     </div>
   );

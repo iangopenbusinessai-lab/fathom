@@ -131,6 +131,19 @@ Every drill follows this structure:
 - Multiple-choice options are shuffled per draw, never rendered in bank order,
   and correctness is decided on option **text**, never on an index
 - Shared scoring and timer logic pattern from compass drill
+- **The colregs quiz never advances by itself.** Answering, or the clock
+  expiring, locks the options and shows a "Next question" button; that button
+  is the only thing that calls `advance()`. There is no auto-advance timeout -
+  the 1.2s/2s one that used to follow an answer was not long enough to read an
+  explanation and a rule citation. `src/__tests__/quizFlow.test.tsx` pins it.
+- **VisualPanel and ScenarioCard are siblings and their keys must differ.**
+  Both were keyed on the bare question id; React's answer to duplicate sibling
+  keys is that children "may be duplicated and/or omitted", and it stopped
+  unmounting the diagram, so every picture drawn piled up in the DOM under the
+  questions after it - including the ones built with no diagram on purpose.
+  They are `visual-<id>` and `card-<id>` now. Same test pins it, and it is a
+  DOM test (jsdom, via a `@vitest-environment` docblock) because a single
+  static render cannot see a reconciliation bug.
 
 ## Deployment
 Pushing to main deploys automatically - see .github/workflows/ci.yml, which

@@ -329,7 +329,7 @@ export function presentationOrder(question: ColregsQuestion): string[] {
   return shuffle(question.options);
 }
 
-function getPool(filter: CategoryFilter): ColregsQuestion[] {
+export function getPool(filter: CategoryFilter): ColregsQuestion[] {
   return filter === 'all' ? COLREGS_QUESTIONS : COLREGS_QUESTIONS_BY_CATEGORY[filter];
 }
 
@@ -349,7 +349,7 @@ export function pickExcluding(pool: ColregsQuestion[], excludeId: string | null)
   return from[Math.floor(Math.random() * from.length)];
 }
 
-const CATEGORY_ORDER: CategoryFilter[] = [
+export const CATEGORY_ORDER: CategoryFilter[] = [
   'all',
   'navigation-lights',
   'sound-signals',
@@ -434,6 +434,10 @@ export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
   const [current, setCurrent] = useState<ColregsQuestion | null>(null);
   const [options, setOptions] = useState<string[]>([]);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  // Set when a timed question's clock runs out unanswered. It locks the
+  // options and brings up the Next button exactly as answering does, so a
+  // question is never left with no way forward and never moves on by itself.
+  const [timeExpired, setTimeExpired] = useState(false);
   const [drillMode, setDrillMode] = useState<DrillMode>('practice');
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
@@ -450,7 +454,6 @@ export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
   // dependency that would re-create it mid-question.
   const questionMsRef = useRef<number | null>(null);
 
-  const advanceRef = useRef<number | null>(null);
   const timerRef = useRef<number | null>(null);
   const timedOutRef = useRef(false);
 
@@ -461,8 +464,9 @@ export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
     setOptions(presentationOrder(question));
   }, []);
 
+  // Only the per-question clock is left to cancel - there is no pending
+  // advance to call off any more.
   const clearTimers = useCallback(() => {
-    if (advanceRef.current) clearTimeout(advanceRef.current);
     if (timerRef.current) cancelAnimationFrame(timerRef.current);
   }, []);
 
@@ -476,6 +480,7 @@ export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
   const advance = useCallback((currentDeck: ColregsQuestion[], usesDeck: boolean) => {
     timedOutRef.current = false;
     setSelectedAnswer(null);
+    setTimeExpired(false);
 
     if (usesDeck) {
       const next = [...currentDeck];
@@ -518,12 +523,21 @@ export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
       }
     }
 
+    // Stops this question's clock. Nothing is scheduled to follow it: the run
+    // waits here until the reader presses Next. This used to queue an advance
+    // 1.2s (correct) or 2s (wrong) later, which is not long enough to read an
+    // explanation and a rule citation, and gave the reader no say in it.
     clearTimers();
+  }, [selectedAnswer, current, clearTimers, prefs.haptics]);
 
-    advanceRef.current = window.setTimeout(() => {
-      advance(deck, deckRun);
-    }, isCorrect ? 1200 : 2000);
-  }, [selectedAnswer, current, deck, deckRun, advance, clearTimers, prefs.haptics]);
+  // --- The one way forward ---
+
+  // Every advance in the drill goes through here, and the only thing that
+  // calls it is the Next button. There is no timer path any more.
+  const handleNext = useCallback(() => {
+    clearTimers();
+    advance(deck, deckRun);
+  }, [advance, clearTimers, deck, deckRun]);
 
   // --- Exam timer ---
 
@@ -541,13 +555,15 @@ export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
         if (next <= 0 && !timedOutRef.current) {
           timedOutRef.current = true;
           setAnswered(a => a + 1);
-          advanceRef.current = window.setTimeout(() => {
-            advance(deck, deckRun);
-          }, 1200);
+          // The clock running out ends the question, it does not end the
+          // reading of it: the options lock, practice reveals the answer, and
+          // the Next button is what moves on.
+          setTimeExpired(true);
           return 0;
         }
         return Math.max(0, next);
       });
+      if (timedOutRef.current) return;
       timerRef.current = requestAnimationFrame(loop);
     };
     timerRef.current = requestAnimationFrame(loop);
@@ -579,6 +595,7 @@ export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
     setScore(0);
     setAnswered(0);
     setSelectedAnswer(null);
+    setTimeExpired(false);
     setTimeLeft(perQuestion ?? EXAM_QUESTION_MS);
     timedOutRef.current = false;
 
@@ -619,6 +636,7 @@ export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
     setCurrent(null);
     setOptions([]);
     setSelectedAnswer(null);
+    setTimeExpired(false);
   };
 
   // Swap in the stored best whenever the category+mode pair changes, so the
@@ -654,6 +672,13 @@ export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
   // The diagram itself is drawn by the shared VisualPanel, off the same maps
   // declared above; this only asks whether there is one.
   const showPanel = current ? hasVisual(current.id) : false;
+
+  // A question is finished - by an answer or by the clock - and is waiting for
+  // the reader to move it on.
+  const awaitingNext = selectedAnswer !== null || timeExpired;
+  // A deck knows when it is on its last question, so the button can say where
+  // it leads rather than promising a question that is not coming.
+  const isLastOfDeck = deckRun && deck.length <= 1;
 
   const timerSeconds = Math.ceil(timeLeft / 1000);
   const timerWarning = timerSeconds <= 5;
@@ -893,26 +918,39 @@ export default function ColregsDrill({ focus, start, onExit }: DrillProps) {
         </h2>
 
         <div className={`ct-quizbody${showPanel ? ' ct-has-visual' : ''}`}>
+          {/* These two are siblings, and their keys MUST differ. Both were
+              keyed on the bare question id, and React's response to two
+              children sharing a key is documented as "may be duplicated
+              and/or omitted": it stopped unmounting the diagram, so every
+              picture drawn stayed in the DOM and piled up under the next
+              question - including questions built with no diagram on purpose,
+              where the previous anchor then sat beside "which anchor for this
+              bottom?" and gave the answer away. The id still drives the
+              remount; the prefix is what keeps the two apart. */}
           {showPanel && (
             <VisualPanel
-              key={current.id}
+              key={`visual-${current.id}`}
               questionId={current.id}
               revealed={selectedAnswer !== null}
             />
           )}
 
           <ScenarioCard
-            key={current.id}
+            key={`card-${current.id}`}
             question={current}
             options={options}
             selectedAnswer={selectedAnswer}
-            // Practice reveals the verdict in place; the exam advances by
-            // itself and holds it back. Unchanged from before the reskin -
-            // only where it is expressed has moved.
-            reveal={selectedAnswer !== null && drillMode === 'practice'}
+            // Practice reveals the verdict in place - and does so on a
+            // timeout too, where the reader has the most to learn and nothing
+            // of their own to look at. The exam still holds it back.
+            reveal={awaitingNext && drillMode === 'practice'}
+            locked={awaitingNext}
             colorblind={prefs.colorblind}
             showCitations={prefs.showCitations}
             onSelect={handleSelect}
+            awaitingNext={awaitingNext}
+            nextLabel={isLastOfDeck ? 'See results' : 'Next question'}
+            onNext={handleNext}
           />
         </div>
       </section>

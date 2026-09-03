@@ -112,9 +112,11 @@ export function hasVisual(questionId: string): boolean {
 export const VisualPanel: React.FC<VisualPanelProps> = ({ questionId, revealed }) => {
   const inner = resolveVisual(questionId, revealed);
 
-  // A question with no mapping draws nothing at all. The caller keys this
-  // component on the question id as well, so a diagram can never survive into
-  // the next question even for a frame.
+  // A question with no mapping draws nothing at all. That is necessary but it
+  // was not sufficient: this panel and the ScenarioCard beside it are siblings,
+  // and while they shared the key `current.id` React stopped unmounting this
+  // one, so returning null here still left the previous diagram in the
+  // document. The caller keys them apart now - see the note there.
   if (!inner) return null;
 
   return (
