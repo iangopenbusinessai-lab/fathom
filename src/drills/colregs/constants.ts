@@ -8,7 +8,8 @@ export type ColregsCategory =
   | 'buoyage'
   | 'chart-symbols'
   | 'distress-signals'
-  | 'vhf-procedure';
+  | 'vhf-procedure'
+  | 'pfd-types';
 
 export interface ColregsQuestion {
   id: string;
@@ -34,6 +35,7 @@ export const NON_COLREGS_CATEGORIES: ColregsCategory[] = [
   'buoyage',
   'chart-symbols',
   'vhf-procedure',
+  'pfd-types',
 ];
 
 // Distress signals are NOT in that list, and the near miss is worth saying out
@@ -60,6 +62,8 @@ export function isColregsGoverned(question: ColregsQuestion): boolean {
 // "Chart No. 1" is the NOAA and NGA publication every symbol and abbreviation
 // in the chart symbols bank is read out of, and "Radio procedure" covers the
 // VHF calls, which are governed by radio regulation rather than by the Rules.
+// "Life-saving equipment" is the Coast Guard's own carriage and approval
+// requirements, which are equipment regulation and not a rule of the road.
 export const TOPIC_LABELS = [
   'Ground tackle',
   'Holding ground',
@@ -67,6 +71,7 @@ export const TOPIC_LABELS = [
   'US ATON',
   'Chart No. 1',
   'Radio procedure',
+  'Life-saving equipment',
 ] as const;
 
 // --- NAVIGATION LIGHTS (20 questions) ---
@@ -2310,6 +2315,257 @@ const vhfProcedureQuestions: ColregsQuestion[] = [
   },
 ];
 
+// --- PFD TYPES (16 questions) ---
+//
+// Seamanship, not COLREGS: what a boat has to carry and how a device is
+// approved is Coast Guard equipment regulation, so these explanations open
+// with the topic label "Life-saving equipment".
+//
+// TWO LABELLING SCHEMES, BOTH CURRENT. The Type I to Type V codes are being
+// retired in favour of performance levels - 50, 70, 100, 150 - and the change
+// has been rolling out through the labels since January 2025. Neither scheme
+// is "the answer": a device bought last decade is marked with a type, one
+// bought new may be marked with a level, and both are aboard boats right now
+// and both are legal. So the bank teaches the types, teaches the levels, and
+// teaches the mapping between them, and no question is written as though one
+// scheme had replaced the other outright. That is the single most likely thing
+// for a later edit to get wrong here.
+//
+// The buoyancy figures quoted are for adult sizes. Child and infant devices
+// carry lower figures on the same type or level, which is why the questions
+// that quote a number say whose it is.
+
+const pfdTypesQuestions: ColregsQuestion[] = [
+  {
+    id: 'pf-01',
+    category: 'pfd-types',
+    prompt:
+      'This device has a deep collar that sits behind the wearer\'s head and two heavy chest panels. Under the older labelling, what is it?',
+    options: [
+      'A Type I offshore life jacket',
+      'A Type III flotation aid',
+      'A Type IV throwable device',
+      'A Type V special-use device',
+    ],
+    correctAnswer: 'A Type I offshore life jacket',
+    explanation:
+      'Life-saving equipment: The deep collar is the offshore jacket. It carries the most buoyancy of the wearable types, 22 pounds for an adult, and it is built to turn most unconscious wearers face-up - the collar is the part doing that work. It is the device for open water where rescue may be hours away.',
+  },
+  {
+    id: 'pf-02',
+    category: 'pfd-types',
+    prompt:
+      'This device is a zip-fronted vest with armholes, no collar, and it stops at the waist. Under the older labelling, what is it?',
+    options: [
+      'A Type III flotation aid',
+      'A Type I offshore life jacket',
+      'A Type II near-shore vest',
+      'A Type IV throwable device',
+    ],
+    correctAnswer: 'A Type III flotation aid',
+    explanation:
+      'Life-saving equipment: A flotation aid is cut for movement and comfort, which is why it gets worn - and a jacket in the locker floats nobody. It carries 15.5 pounds of buoyancy for an adult and will NOT reliably turn an unconscious wearer face-up, so it belongs where help is close and the water is calm.',
+  },
+  {
+    id: 'pf-03',
+    category: 'pfd-types',
+    prompt:
+      'This device is a ring with grab lines seized round the outside of it. Under the older labelling, what is it?',
+    options: [
+      'A Type IV throwable device',
+      'A Type II near-shore vest',
+      'A Type V special-use device',
+      'A Type I offshore life jacket',
+    ],
+    correctAnswer: 'A Type IV throwable device',
+    explanation:
+      'Life-saving equipment: A ring buoy is a throwable, not a wearable. The grab lines are the giveaway - they are there for someone already in the water to take hold of. It is thrown to a person overboard and never counts as one of the wearable devices the boat has to carry.',
+  },
+  {
+    id: 'pf-04',
+    category: 'pfd-types',
+    prompt:
+      'This device is a square foam cushion with a grab strap on each side. Under the older labelling, what is it?',
+    options: [
+      'A Type IV throwable device',
+      'A Type III flotation aid',
+      'A Type V special-use device',
+      'A Type II near-shore vest',
+    ],
+    correctAnswer: 'A Type IV throwable device',
+    explanation:
+      'Life-saving equipment: The buoyant cushion is a throwable, the same class as the ring buoy. The straps are for hands, not shoulders. Sitting on one is what most of them do for a living, but the moment it is needed it goes over the side, not on.',
+  },
+  {
+    id: 'pf-05',
+    category: 'pfd-types',
+    prompt:
+      'This device is worn flat and deflated, with suspender straps, a small gas cylinder and a pull tab. Under the older labelling, what is it?',
+    options: [
+      'A Type V special-use device',
+      'A Type I offshore life jacket',
+      'A Type IV throwable device',
+      'A Type III flotation aid',
+    ],
+    correctAnswer: 'A Type V special-use device',
+    explanation:
+      'Life-saving equipment: An inflatable is a special-use device. It is comfortable enough to be worn all day, which is its whole argument, and once inflated many of them give more buoyancy than a foam jacket. The catch is on its own label: a special-use device only counts toward the boat\'s requirement when it is worn as that label says.',
+  },
+  {
+    id: 'pf-06',
+    category: 'pfd-types',
+    prompt: 'Which of the wearable types is designed to turn most unconscious wearers face-up?',
+    options: [
+      'Type I',
+      'Type III',
+      'Type IV',
+      'None of them will turn an unconscious wearer',
+    ],
+    correctAnswer: 'Type I',
+    explanation:
+      'Life-saving equipment: Turning an unconscious wearer face-up is what separates the offshore jacket from the rest. A Type II will turn some wearers, though not as reliably; a Type III is not designed to and generally will not. It is the difference between a device that keeps you alive while you are conscious and one that keeps you alive when you are not.',
+  },
+  {
+    id: 'pf-07',
+    category: 'pfd-types',
+    prompt: 'What is the minimum buoyancy of an adult Type I offshore life jacket?',
+    options: ['22 pounds', '15.5 pounds', '7 pounds', '35 pounds'],
+    correctAnswer: '22 pounds',
+    explanation:
+      'Life-saving equipment: 22 pounds for an adult offshore jacket, against 15.5 for a near-shore vest or a flotation aid. The extra buoyancy is what floats a person high enough for the collar to do its work, and it is most of the reason the offshore jacket is as bulky as it is.',
+  },
+  {
+    id: 'pf-08',
+    category: 'pfd-types',
+    prompt:
+      'Which wearable type is intended for calm inland water where a quick rescue is likely, and carries 15.5 pounds of buoyancy for an adult?',
+    options: [
+      'Type II - the near-shore vest',
+      'Type I - the offshore life jacket',
+      'Type IV - the throwable device',
+      'Type V - the special-use device',
+    ],
+    correctAnswer: 'Type II - the near-shore vest',
+    explanation:
+      'Life-saving equipment: The near-shore vest is the yoke-shaped jacket found in most rental lockers. It has the same 15.5 pounds as a flotation aid but is cut as a yoke rather than as a vest, and it will turn some unconscious wearers face-up where a flotation aid will not.',
+  },
+  {
+    id: 'pf-09',
+    category: 'pfd-types',
+    prompt: 'Why can a Type IV device never be counted as one of the wearable PFDs a boat carries?',
+    options: [
+      'It is designed to be thrown to a person in the water, not worn, so it does nothing for someone who is knocked overboard unconscious',
+      'It has too little buoyancy to hold up an adult',
+      'It is approved only for vessels under 16 feet',
+      'It is approved only for use on inland waters',
+    ],
+    correctAnswer:
+      'It is designed to be thrown to a person in the water, not worn, so it does nothing for someone who is knocked overboard unconscious',
+    explanation:
+      'Life-saving equipment: A throwable has to be thrown by somebody who saw you go. Boats 16 feet and over carry at least one throwable IN ADDITION to a wearable device for every person aboard - it is an extra, not a substitute, and the two requirements are counted separately.',
+  },
+  {
+    id: 'pf-10',
+    category: 'pfd-types',
+    prompt: 'Under what condition does a Type V special-use device satisfy the carriage requirement?',
+    options: [
+      'Only when it is worn, and worn in the way its own label specifies',
+      'Only when it is stowed where it can be reached within 30 seconds',
+      'Only on vessels under 26 feet',
+      'It always satisfies it, the same as any other type',
+    ],
+    correctAnswer: 'Only when it is worn, and worn in the way its own label specifies',
+    explanation:
+      'Life-saving equipment: A special-use device counts only while it is being worn as labelled - that condition is printed on the device itself, and the label is part of the approval. An inflatable in a cockpit locker is not a life jacket for legal purposes and is not one in practice either.',
+  },
+  {
+    id: 'pf-11',
+    category: 'pfd-types',
+    prompt:
+      'You are crossing offshore in cold water, hours from the nearest help, and you may end up in the water for a long time. Which device do you want?',
+    options: [
+      'An offshore life jacket - Type I, or Level 150 under the new labelling',
+      'A flotation aid - Type III, or Level 70',
+      'A throwable cushion, kept within reach',
+      'Any device, provided one is aboard for each person',
+    ],
+    correctAnswer: 'An offshore life jacket - Type I, or Level 150 under the new labelling',
+    explanation:
+      'Life-saving equipment: Offshore, cold, and a long wait is exactly the case the offshore jacket was designed for: the most buoyancy, the best chance of turning you face-up, and enough freeboard to keep your mouth clear in a sea. Comfort matters less on a passage where you are not wearing it to move around in.',
+  },
+  {
+    id: 'pf-12',
+    category: 'pfd-types',
+    prompt:
+      'You are paddling and dinghy sailing on a lake, close to shore and in company, and you need to move freely. Which device fits the use?',
+    options: [
+      'A flotation aid - Type III, or Level 70',
+      'An offshore life jacket - Type I, or Level 150',
+      'A throwable ring buoy',
+      'No device is required in sheltered water',
+    ],
+    correctAnswer: 'A flotation aid - Type III, or Level 70',
+    explanation:
+      'Life-saving equipment: A flotation aid is the right answer here for a reason that is not written in the buoyancy table: it is the one that will actually be worn while you are hiking out or paddling. Rescue is minutes away and the water is flat, which is the case the flotation aid is rated for.',
+  },
+  {
+    id: 'pf-13',
+    category: 'pfd-types',
+    prompt:
+      'The Coast Guard is retiring the Type I to Type V codes. What is replacing them on new labels?',
+    options: [
+      'Performance levels - 50, 70, 100 and 150 - with the higher number meaning more performance in rougher water',
+      'A pass or fail approval mark with no grading between devices',
+      'A colour code, with orange for offshore and yellow for inland',
+      'The buoyancy in pounds, printed on its own with no other classification',
+    ],
+    correctAnswer:
+      'Performance levels - 50, 70, 100 and 150 - with the higher number meaning more performance in rougher water',
+    explanation:
+      'Life-saving equipment: The new labels carry a performance level and a set of icons showing where the device should and should not be used. The numbers run 50, 70, 100 and 150, and they climb with buoyancy and with the ability to right and support a wearer. The scheme lines the United States up with the international one.',
+  },
+  {
+    id: 'pf-14',
+    category: 'pfd-types',
+    prompt:
+      'A new life jacket is labelled Level 150. Which of the older type codes is it closest to?',
+    options: ['Type I', 'Type III', 'Type IV', 'Type V'],
+    correctAnswer: 'Type I',
+    explanation:
+      'Life-saving equipment: Level 150 is the offshore end of the scale, where the Type I jacket sat - most buoyancy, best chance of turning an unconscious wearer. Level 70 sits roughly where the flotation aid was, and Level 50 covers the special-use devices for sheltered water and strong swimmers. The mapping is approximate, because the tests behind the two schemes are not identical.',
+  },
+  {
+    id: 'pf-15',
+    category: 'pfd-types',
+    prompt:
+      'Your life jackets are labelled with the old type codes. Are they still acceptable now that performance levels are appearing?',
+    options: [
+      'Yes - an approved device labelled with a type remains acceptable; the change is to how new devices are labelled',
+      'No - every device must be relabelled or replaced before the boat may be used',
+      'Only for vessels under 26 feet',
+      'Only on inland waters, not offshore',
+    ],
+    correctAnswer:
+      'Yes - an approved device labelled with a type remains acceptable; the change is to how new devices are labelled',
+    explanation:
+      'Life-saving equipment: The transition is a labelling change, not a recall. Type-marked devices in good condition remain approved and remain legal, which is why both schemes are aboard boats at the same time and why a candidate has to be able to read either. What has always mattered more than the label is condition: a jacket with rotted webbing or a fired cylinder is no jacket at all.',
+  },
+  {
+    id: 'pf-16',
+    category: 'pfd-types',
+    prompt: 'What do the icons on a new performance-level label tell you?',
+    options: [
+      'Where the device is suitable to use, and what it should not be relied on for',
+      'The date the device was manufactured and the date it expires',
+      'The name of the laboratory that tested the device',
+      'The size of vessel the device may be carried aboard',
+    ],
+    correctAnswer: 'Where the device is suitable to use, and what it should not be relied on for',
+    explanation:
+      'Life-saving equipment: The icon panel is the plain-language half of the new label - the water the device is meant for, whether it must be worn to count, whether it needs to be inflated, and warnings such as its not being intended to turn an unconscious wearer. It exists because "Type III" told a first-time buyer nothing at all.',
+  },
+];
+
 // --- COMBINED EXPORT ---
 
 export const COLREGS_QUESTIONS: ColregsQuestion[] = [
@@ -2323,6 +2579,7 @@ export const COLREGS_QUESTIONS: ColregsQuestion[] = [
   ...chartSymbolsQuestions,
   ...distressSignalsQuestions,
   ...vhfProcedureQuestions,
+  ...pfdTypesQuestions,
 ];
 
 export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuestion[]> = {
@@ -2336,6 +2593,7 @@ export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuest
   'chart-symbols': chartSymbolsQuestions,
   'distress-signals': distressSignalsQuestions,
   'vhf-procedure': vhfProcedureQuestions,
+  'pfd-types': pfdTypesQuestions,
 };
 
 export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
@@ -2349,4 +2607,5 @@ export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
   'chart-symbols': 'Chart Symbols',
   'distress-signals': 'Distress Signals',
   'vhf-procedure': 'VHF Procedure',
+  'pfd-types': 'PFD Types',
 };

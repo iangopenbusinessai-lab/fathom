@@ -33,6 +33,7 @@ import { DayShapeName, MastPosition, ShapeArrangement } from './components/DaySh
 import { AnchorTypeName } from './components/AnchorDisplay';
 import { BuoyName } from './components/BuoyDisplay';
 import { DistressSignalName } from './components/DistressDisplay';
+import { PfdFormName } from './components/PfdDisplay';
 
 type DrillState = 'idle' | 'playing' | 'finished';
 type DrillMode = 'practice' | 'exam';
@@ -232,6 +233,23 @@ export const QUESTION_DISTRESS: Partial<Record<string, DistressSignalName>> = {
   'di-08': 'flames',
 };
 
+// The PFD shown for the five identification questions, keyed by FORM rather
+// than by type code - see the note in components/PfdDisplay.tsx, which has to
+// answer to two labelling schemes at once.
+//
+// The near-shore vest (pf-08) has no diagram: it is the same yoke form as the
+// offshore jacket and differs by bulk and buoyancy, so a drawing of it would
+// be a drawing of pf-01 with a different answer. The scenario and performance
+// level questions have none either - "which device for this situation" is not
+// answered by a picture of one device.
+export const QUESTION_PFDS: Partial<Record<string, PfdFormName>> = {
+  'pf-01': 'offshore-vest',
+  'pf-02': 'flotation-aid',
+  'pf-03': 'ring-buoy',
+  'pf-04': 'throwable-cushion',
+  'pf-05': 'inflatable',
+};
+
 export const QUESTION_SCENARIOS: Partial<Record<string, ScenarioType>> = {
   'vh-01': 'priority-nuc',
   'vh-02': 'sail-keeps-clear-ram',
@@ -298,6 +316,7 @@ const CATEGORY_ORDER: CategoryFilter[] = [
   'chart-symbols',
   'distress-signals',
   'vhf-procedure',
+  'pfd-types',
 ];
 
 // `sub` is the descriptor only - the question count is prepended at render
@@ -314,6 +333,7 @@ const CATEGORY_META: Record<CategoryFilter, { label: string; sub: string }> = {
   'chart-symbols':     { label: 'Chart symbols',          sub: 'symbols and abbreviations' },
   'distress-signals':  { label: 'Distress signals',       sub: 'the Annex IV list'        },
   'vhf-procedure':     { label: 'VHF procedure',          sub: 'priority calls on 16'     },
+  'pfd-types':         { label: 'PFD types',              sub: 'types and levels'         },
 };
 
 // The syllabus card a question belongs to, so its answer lands on the right

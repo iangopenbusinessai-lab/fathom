@@ -199,6 +199,24 @@ export const CATEGORIES: ChartCategory[] = [
     ],
   },
   {
+    id: 'pfd',
+    name: 'PFD types',
+    section: 'Seamanship',
+    rule: 'Life-saving equipment',
+    status: 'live',
+    source: 'pfd-types',
+    blurb:
+      'Which life jacket is which and which one the water you are on actually calls for - read in both labelling schemes, because the Type codes and the new performance levels are both aboard boats right now.',
+    topics: [
+      'Type I to Type V',
+      'Performance levels 50 to 150',
+      'Turning an unconscious wearer',
+      'Throwables are not wearables',
+      'Special-use devices must be worn',
+      'Matching the device to the water',
+    ],
+  },
+  {
     id: 'buoyage',
     name: 'Buoyage / IALA marks',
     section: 'Aids to navigation',
