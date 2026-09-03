@@ -4,7 +4,8 @@ export type ColregsCategory =
   | 'vessel-hierarchy'
   | 'day-shapes'
   | 'vessel-types'
-  | 'anchor-types';
+  | 'anchor-types'
+  | 'buoyage';
 
 export interface ColregsQuestion {
   id: string;
@@ -16,24 +17,37 @@ export interface ColregsQuestion {
 }
 
 // Not everything in this bank is governed by the COLREGS. Anchor types are
-// seamanship knowledge: there is no rule number to cite, so those explanations
-// carry a topic label instead ("Ground tackle:", "Holding ground:") and the
-// citation format test holds them to that shape rather than to "Rule N(x)".
+// seamanship knowledge and buoyage is a separate international system: there
+// is no rule number to cite for either, so those explanations carry a topic
+// label instead ("Ground tackle:", "IALA-B:") and the citation format test
+// holds them to that shape rather than to "Rule N(x)".
 //
 // This list is the single place that says which categories are outside the
-// rules, so the next seamanship topic - PFD types, fire safety - is added here
-// and every consumer follows. See src/lib/citation.ts and
+// rules, so the next one - PFD types, fire safety - is added here and every
+// consumer follows. See src/lib/citation.ts and
 // src/__tests__/citationFormat.test.ts.
-export const NON_COLREGS_CATEGORIES: ColregsCategory[] = ['anchor-types'];
+export const NON_COLREGS_CATEGORIES: ColregsCategory[] = ['anchor-types', 'buoyage'];
 
 export function isColregsGoverned(question: ColregsQuestion): boolean {
   return !NON_COLREGS_CATEGORIES.includes(question.category);
 }
 
-// The topic labels a non-COLREGS explanation may open with. Closed set for the
-// same reason the rule citation is a fixed shape: so a later edit cannot
-// quietly invent a sixth label that renders as a badge nobody recognises.
-export const SEAMANSHIP_LABELS = ['Ground tackle', 'Holding ground'] as const;
+// The topic labels a non-COLREGS explanation may open with, standing where the
+// rule citation stands on a governed one. Closed set for the same reason the
+// citation is a fixed shape: so a later edit cannot quietly invent a label
+// that renders as a badge nobody recognises.
+//
+// Each names the actual authority the content rests on, which is the whole
+// point of the badge - "IALA-B" is the buoyage region the United States lies
+// in, "US ATON" is the Coast Guard's own aid-to-navigation practice on top of
+// it (the ICW overlay lives there and nowhere in IALA), and the two ground
+// tackle labels are seamanship, which has no publication behind it at all.
+export const TOPIC_LABELS = [
+  'Ground tackle',
+  'Holding ground',
+  'IALA-B',
+  'US ATON',
+] as const;
 
 // --- NAVIGATION LIGHTS (20 questions) ---
 
@@ -1234,6 +1248,298 @@ const anchorTypesQuestions: ColregsQuestion[] = [
   },
 ];
 
+// --- BUOYAGE (18 questions) ---
+//
+// Not COLREGS: the buoyage system is IALA's, and the ICW overlay on top of it
+// is the US Coast Guard's, so these explanations open with a topic label from
+// TOPIC_LABELS rather than a rule number. See NON_COLREGS_CATEGORIES above.
+//
+// Everything here is written for IALA Region B, the region the United States
+// lies in, because that is the water this app is studied for. Region A is not
+// footnoted into every answer - it is drilled head-on in the last two
+// questions instead, which is where a boater who has chartered abroad needs
+// it. The one thing that must never be blurred is which parts differ: the
+// LATERAL marks reverse between the regions and nothing else does.
+//
+// A note on shapes. "Can" and "nun" are what a mark's shape is called on this
+// coast; IALA writes them as cylindrical and conical. Both are accepted usage
+// and the explanations name both, so a candidate who learned the formal words
+// does not read the answer as wrong.
+
+const buoyageQuestions: ColregsQuestion[] = [
+  {
+    id: 'by-01',
+    category: 'buoyage',
+    prompt:
+      'Entering a channel from seaward in the United States, you see a flat-topped cylindrical buoy painted solid green. What is it?',
+    options: [
+      'A port-hand lateral mark',
+      'A starboard-hand lateral mark',
+      'A special mark',
+      'A safe water mark',
+    ],
+    correctAnswer: 'A port-hand lateral mark',
+    explanation:
+      'IALA-B: A solid green can (cylindrical) buoy is the port-hand lateral mark of Region B - leave it to port when returning from seaward. It carries a green light if lit, and odd numbers that increase as you come upstream.',
+  },
+  {
+    id: 'by-02',
+    category: 'buoyage',
+    prompt:
+      'Entering a channel from seaward in the United States, you see a buoy that tapers to a blunt point at the top and is painted solid red. What is it?',
+    options: [
+      'A starboard-hand lateral mark',
+      'A port-hand lateral mark',
+      'An isolated danger mark',
+      'A special mark',
+    ],
+    correctAnswer: 'A starboard-hand lateral mark',
+    explanation:
+      'IALA-B: A solid red nun (conical) buoy is the starboard-hand lateral mark of Region B - leave it to starboard when returning from seaward. Red light if lit, and even numbers that increase upstream.',
+  },
+  {
+    id: 'by-03',
+    category: 'buoyage',
+    prompt: 'What does the phrase "red right returning" actually instruct you to do?',
+    options: [
+      'Keep the red marks on your starboard side when returning from seaward toward a harbour or upstream',
+      'Keep the red marks on your starboard side whenever they are in sight, whichever way you are heading',
+      'Keep the red marks on your port side when leaving a harbour for the sea',
+      'Keep the red marks on your starboard side only in the Intracoastal Waterway',
+    ],
+    correctAnswer:
+      'Keep the red marks on your starboard side when returning from seaward toward a harbour or upstream',
+    explanation:
+      'US ATON: The saying only works in the returning direction - coming in from sea, or going upstream. Head back out and every mark swaps sides, which is why the conventional direction of buoyage is defined for a waterway rather than left to the helmsman to guess.',
+  },
+  {
+    id: 'by-04',
+    category: 'buoyage',
+    prompt:
+      'A pillar buoy is painted black above yellow and carries two black cones one above the other, both pointing upward. What is it?',
+    options: [
+      'A north cardinal mark',
+      'A south cardinal mark',
+      'An east cardinal mark',
+      'An isolated danger mark',
+    ],
+    correctAnswer: 'A north cardinal mark',
+    explanation:
+      'IALA-B: Two cones pointing up, black band above yellow, is the north cardinal. The cones point to the black: for north the black is on top, so the cones point up. Pass to the north of it - that is the side the safe water is on.',
+  },
+  {
+    id: 'by-05',
+    category: 'buoyage',
+    prompt:
+      'A pillar buoy is painted yellow above black and carries two black cones one above the other, both pointing downward. What is it?',
+    options: [
+      'A south cardinal mark',
+      'A north cardinal mark',
+      'A west cardinal mark',
+      'A special mark',
+    ],
+    correctAnswer: 'A south cardinal mark',
+    explanation:
+      'IALA-B: Two cones pointing down, yellow band above black, is the south cardinal - the black band is at the bottom and the cones point to it. Safe water lies to the south of the mark.',
+  },
+  {
+    id: 'by-06',
+    category: 'buoyage',
+    prompt:
+      'A pillar buoy is painted black, yellow, black in horizontal bands and carries two black cones mounted base to base. What is it?',
+    options: [
+      'An east cardinal mark',
+      'A west cardinal mark',
+      'An isolated danger mark',
+      'A north cardinal mark',
+    ],
+    correctAnswer: 'An east cardinal mark',
+    explanation:
+      'IALA-B: Cones base to base - the wide ends meeting, the outline of an egg - is the east cardinal, black with a single yellow band. Pass to the east of it. The old memory hook is that the shape between the cones is an E on its side.',
+  },
+  {
+    id: 'by-07',
+    category: 'buoyage',
+    prompt:
+      'A pillar buoy is painted yellow, black, yellow in horizontal bands and carries two black cones mounted point to point. What is it?',
+    options: [
+      'A west cardinal mark',
+      'An east cardinal mark',
+      'A south cardinal mark',
+      'A safe water mark',
+    ],
+    correctAnswer: 'A west cardinal mark',
+    explanation:
+      'IALA-B: Cones point to point - the apexes meeting, the outline of a wine glass - is the west cardinal, yellow with a single black band. Pass to the west of it. "Wine glass for west" is the hook that survives an exam.',
+  },
+  {
+    id: 'by-08',
+    category: 'buoyage',
+    prompt: 'What is a cardinal mark telling you?',
+    options: [
+      'The named side of the mark is where the safe water is',
+      'The named side of the mark is where the danger is',
+      'The mark lies on the named side of the channel',
+      'The mark bears that direction from the harbour entrance',
+    ],
+    correctAnswer: 'The named side of the mark is where the safe water is',
+    explanation:
+      'IALA-B: A cardinal is named for the quadrant you should pass in, not for where the danger sits. A north cardinal means keep to the north of it - so the hazard is on the far side, to the south. Reading it the other way round puts you on the danger, which is why this is the question cardinals are failed on.',
+  },
+  {
+    id: 'by-09',
+    category: 'buoyage',
+    prompt:
+      'A buoy is painted black with one broad red horizontal band and carries two black spheres one above the other. What is it?',
+    options: [
+      'An isolated danger mark',
+      'A north cardinal mark',
+      'A safe water mark',
+      'A starboard-hand lateral mark',
+    ],
+    correctAnswer: 'An isolated danger mark',
+    explanation:
+      'IALA-B: Black with one or more red bands, and two black spheres in a vertical line, is the isolated danger mark. The two spheres are its own topmark and belong to nothing else in the system.',
+  },
+  {
+    id: 'by-10',
+    category: 'buoyage',
+    prompt: 'What does an isolated danger mark tell you about the water around it?',
+    options: [
+      'It is moored on or near a danger of limited extent that has navigable water all around it',
+      'It marks the outer edge of a large shoal that must be given a wide berth on one side',
+      'It marks the safe centre of a channel with danger on both sides',
+      'It marks a wreck that has not yet been surveyed and has no safe side',
+    ],
+    correctAnswer:
+      'It is moored on or near a danger of limited extent that has navigable water all around it',
+    explanation:
+      'IALA-B: The isolated danger mark is placed on or above a small, well-defined hazard - a rock, a wreck, a shoal patch - with clear water on every side of it. You can pass on any side; what you cannot do is run over the mark itself.',
+  },
+  {
+    id: 'by-11',
+    category: 'buoyage',
+    prompt:
+      'A buoy is painted in red and white vertical stripes and carries a single red sphere as a topmark. What is it?',
+    options: [
+      'A safe water mark',
+      'An isolated danger mark',
+      'A special mark',
+      'A port-hand lateral mark',
+    ],
+    correctAnswer: 'A safe water mark',
+    explanation:
+      'IALA-B: Red and white VERTICAL stripes with a single red spherical topmark is the safe water mark - a fairway, mid-channel or landfall buoy, with navigable water all round it. The stripes running vertically are what separate it at a distance from the horizontal bands of a cardinal or an isolated danger.',
+  },
+  {
+    id: 'by-12',
+    category: 'buoyage',
+    prompt:
+      'A can buoy is painted solid yellow and carries a single yellow X-shaped topmark. What is it?',
+    options: [
+      'A special mark',
+      'A safe water mark',
+      'A port-hand lateral mark',
+      'A cardinal mark',
+    ],
+    correctAnswer: 'A special mark',
+    explanation:
+      'IALA-B: All yellow, with a single yellow cross topmark if it carries one, is the special mark. Yellow belongs to no lateral or cardinal role in the system, which is what leaves it free for this one.',
+  },
+  {
+    id: 'by-13',
+    category: 'buoyage',
+    prompt: 'What is a special mark there to indicate?',
+    options: [
+      'A special area or feature described in the chart or the Notices to Mariners, not a navigational channel side',
+      'A hazard that is dangerous on every side and must not be approached',
+      'The side of the channel you should pass on in a traffic separation scheme',
+      'The point at which one buoyage region ends and the other begins',
+    ],
+    correctAnswer:
+      'A special area or feature described in the chart or the Notices to Mariners, not a navigational channel side',
+    explanation:
+      'IALA-B: A special mark carries no navigational meaning of its own - it points at something written down elsewhere: a spoil ground, a cable or pipeline, a military exercise area, an anchorage, a recreation zone. The chart is what tells you which, so a special mark you cannot account for is a reason to look it up.',
+  },
+  {
+    id: 'by-14',
+    category: 'buoyage',
+    prompt:
+      'A buoy on the Intracoastal Waterway carries a yellow triangle painted on it. Which side do you leave it on, following the ICW in the conventional direction?',
+    options: [
+      'Your starboard side',
+      'Your port side',
+      'Either side - the triangle marks the channel centre',
+      'Whichever side the buoy\'s own colour indicates',
+    ],
+    correctAnswer: 'Your starboard side',
+    explanation:
+      'US ATON: On the ICW a yellow TRIANGLE means starboard side, following the waterway in its conventional direction - southward along the Atlantic coast and westward along the Gulf. Triangle for starboard is the same pairing as the nun buoy, which is the way to remember it.',
+  },
+  {
+    id: 'by-15',
+    category: 'buoyage',
+    prompt:
+      'A buoy on the Intracoastal Waterway carries a yellow square painted on it. Which side do you leave it on, following the ICW in the conventional direction?',
+    options: [
+      'Your port side',
+      'Your starboard side',
+      'Either side - the square marks an anchorage',
+      'Whichever side the buoy\'s own colour indicates',
+    ],
+    correctAnswer: 'Your port side',
+    explanation:
+      'US ATON: On the ICW a yellow SQUARE means port side, following the waterway in its conventional direction. Square for port pairs with the can buoy, the flat-topped one, the way the triangle pairs with the nun.',
+  },
+  {
+    id: 'by-16',
+    category: 'buoyage',
+    prompt:
+      'You are running the ICW and come to a red nun buoy with a yellow SQUARE painted on it. How do you pass it?',
+    options: [
+      'Leave it to port, because the yellow square governs while you are following the ICW',
+      'Leave it to starboard, because a red nun is always left to starboard',
+      'Leave it to starboard, because the yellow square applies only to unlit marks',
+      'Either side - the two markings contradict each other, so the mark carries no instruction',
+    ],
+    correctAnswer:
+      'Leave it to port, because the yellow square governs while you are following the ICW',
+    explanation:
+      'US ATON: Where the ICW runs along another marked waterway, a mark serves both, and the two can disagree. The yellow overlay is read on its own: square to port, triangle to starboard, whatever the hull under it is painted. It is exactly this case - a red buoy telling an ICW boat to pass it on the port side - that the yellow shapes exist for.',
+  },
+  {
+    id: 'by-17',
+    category: 'buoyage',
+    prompt:
+      'You have chartered in Europe, which buoys under IALA Region A. What is different there from the system used in the United States?',
+    options: [
+      'The lateral marks are reversed: red is left to port entering from seaward, and green to starboard',
+      'The cardinal marks are reversed, and the lateral marks are the same',
+      'The lateral marks are the same, but red and green lights swap meanings',
+      'Nothing is reversed - only the numbering of the marks runs the other way',
+    ],
+    correctAnswer:
+      'The lateral marks are reversed: red is left to port entering from seaward, and green to starboard',
+    explanation:
+      'IALA-B: The LATERAL marks are the whole of the difference between the two regions. In Region A - Europe, Africa, most of Asia and Australasia - red cans are left to port coming in and green cones to starboard, the exact reverse of the United States. "Red right returning" is a Region B saying and will put you on the bank in Region A.',
+  },
+  {
+    id: 'by-18',
+    category: 'buoyage',
+    prompt:
+      'Which marks mean exactly the same thing in IALA Region A as they do in IALA Region B?',
+    options: [
+      'Cardinal, isolated danger, safe water and special marks',
+      'Lateral and cardinal marks',
+      'Only the safe water mark',
+      'None of them - the whole system is mirrored between the regions',
+    ],
+    correctAnswer: 'Cardinal, isolated danger, safe water and special marks',
+    explanation:
+      'IALA-B: Four of the five mark types are worldwide. A north cardinal is black over yellow with two cones up in every port on earth; so are the two black spheres of an isolated danger, the vertical red and white stripes of safe water, and the plain yellow of a special mark. Only the laterals change sides at the region boundary, which is why they are the ones to check on arrival.',
+  },
+];
+
 // --- COMBINED EXPORT ---
 
 export const COLREGS_QUESTIONS: ColregsQuestion[] = [
@@ -1243,6 +1549,7 @@ export const COLREGS_QUESTIONS: ColregsQuestion[] = [
   ...dayShapesQuestions,
   ...vesselTypesQuestions,
   ...anchorTypesQuestions,
+  ...buoyageQuestions,
 ];
 
 export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuestion[]> = {
@@ -1252,6 +1559,7 @@ export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuest
   'day-shapes': dayShapesQuestions,
   'vessel-types': vesselTypesQuestions,
   'anchor-types': anchorTypesQuestions,
+  'buoyage': buoyageQuestions,
 };
 
 export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
@@ -1261,4 +1569,5 @@ export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
   'day-shapes': 'Day Shapes',
   'vessel-types': 'Vessel Types',
   'anchor-types': 'Anchor Types',
+  'buoyage': 'Buoyage',
 };

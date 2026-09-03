@@ -184,11 +184,19 @@ export const CATEGORIES: ChartCategory[] = [
     id: 'buoyage',
     name: 'Buoyage / IALA marks',
     section: 'Aids to navigation',
-    rule: 'IALA A and B',
-    status: 'soon',
+    rule: 'IALA-B / US ATON',
+    status: 'live',
+    source: 'buoyage',
     blurb:
-      'Lateral, cardinal, isolated danger, safe water and special marks in both IALA regions.',
-    topics: ['Region A and B laterals', 'Cardinal marks', 'Isolated danger', 'Light rhythms'],
+      'The five mark types by shape, colour and topmark, read for IALA Region B as the United States buoys it - plus the ICW overlay, and what changes the day you charter in Region A.',
+    topics: [
+      'Lateral marks, red right returning',
+      'Cardinal marks and their cones',
+      'Isolated danger and safe water',
+      'Special marks',
+      'ICW triangle and square',
+      'Region A against Region B',
+    ],
   },
   {
     id: 'chart',

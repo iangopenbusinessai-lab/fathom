@@ -78,10 +78,11 @@ export const AboutScreen: React.FC = () => {
         The rules questions are drawn from the COLREGs 1972 as amended, and were
         checked by hand against the US Coast Guard Navigation Rules and 33 CFR
         83. Every explanation carries the rule it rests on, so you can go and
-        read the source rather than take this app's word for it. Seamanship
-        topics — anchors and what follows them — are not governed by the rules
-        and carry a topic label instead of a rule number, because inventing a
-        citation for them would be worse than admitting there isn't one.
+        read the source rather than take this app's word for it. Topics the
+        rules do not govern — buoyage, which is IALA's system, and seamanship,
+        which is nobody's — carry a topic label naming the authority they do
+        rest on instead of a rule number, because inventing a citation for them
+        would be worse than admitting there isn't one.
       </p>
       <p className="ct-measure" style={prose}>
         Automated checks keep every citation in a well-formed shape, but they

@@ -1,4 +1,4 @@
-import { ColregsQuestion, SEAMANSHIP_LABELS } from '../drills/colregs/constants';
+import { ColregsQuestion, TOPIC_LABELS } from '../drills/colregs/constants';
 
 // The design shows a rule citation beside every verdict and in the results
 // review. The bank does not carry a separate citation field - the citation is
@@ -12,15 +12,15 @@ import { ColregsQuestion, SEAMANSHIP_LABELS } from '../drills/colregs/constants'
 const CITATION = /\bRules?\s\d{1,2}(?:\([a-z]\)(?:\((?:i|ii|iii|iv|v|vi|vii|viii|ix|x)\))?)?/;
 const ANNEX = /\bAnnex\s[IVX]+/;
 
-// Not every category is governed by the COLREGS. Anchor types - and the rest
-// of the seamanship content earmarked behind them - have no rule number to
+// Not every category is governed by the COLREGS. Anchor types and buoyage -
+// and the rest of the content earmarked behind them - have no rule number to
 // point at, so those explanations open with a topic label from the closed set
 // in constants instead, and the badge shows that. Built from the exported list
 // rather than restated here, so a new label cannot be added in one place only.
-const SEAMANSHIP = new RegExp(`\\b(?:${SEAMANSHIP_LABELS.join('|')})\\b`);
+const TOPIC = new RegExp(`\\b(?:${TOPIC_LABELS.join('|')})\\b`);
 
 function firstMatch(text: string): string {
-  const hit = CITATION.exec(text) ?? ANNEX.exec(text) ?? SEAMANSHIP.exec(text);
+  const hit = CITATION.exec(text) ?? ANNEX.exec(text) ?? TOPIC.exec(text);
   return hit ? hit[0] : '';
 }
 

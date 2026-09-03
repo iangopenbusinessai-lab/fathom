@@ -31,6 +31,7 @@ import { ScenarioType } from './components/VesselScenario';
 import { BlastMark } from './components/SoundSignalDisplay';
 import { DayShapeName, MastPosition, ShapeArrangement } from './components/DayShapeDisplay';
 import { AnchorTypeName } from './components/AnchorDisplay';
+import { BuoyName } from './components/BuoyDisplay';
 
 type DrillState = 'idle' | 'playing' | 'finished';
 type DrillMode = 'practice' | 'exam';
@@ -187,6 +188,29 @@ export const QUESTION_ANCHORS: Partial<Record<string, AnchorTypeName>> = {
   'an-05': 'mushroom',
 };
 
+// The mark shown for the identification questions. Same contract as the
+// anchors and the vessel profiles: the picture is the whole question, so
+// nothing in it names the type.
+//
+// The questions about what a mark MEANS rather than what it looks like - the
+// direction "red right returning" applies in, which side of a cardinal the
+// safe water is on, what the two regions share - have no diagram on purpose.
+// A picture of one mark beside a question about the system would illustrate an
+// answer that is not being asked for.
+export const QUESTION_BUOYS: Partial<Record<string, BuoyName>> = {
+  'by-01': 'port-hand',
+  'by-02': 'starboard-hand',
+  'by-04': 'cardinal-north',
+  'by-05': 'cardinal-south',
+  'by-06': 'cardinal-east',
+  'by-07': 'cardinal-west',
+  'by-09': 'isolated-danger',
+  'by-11': 'safe-water',
+  'by-12': 'special',
+  'by-14': 'icw-triangle',
+  'by-15': 'icw-square',
+};
+
 export const QUESTION_SCENARIOS: Partial<Record<string, ScenarioType>> = {
   'vh-01': 'priority-nuc',
   'vh-02': 'sail-keeps-clear-ram',
@@ -249,6 +273,7 @@ const CATEGORY_ORDER: CategoryFilter[] = [
   'day-shapes',
   'vessel-types',
   'anchor-types',
+  'buoyage',
 ];
 
 // `sub` is the descriptor only - the question count is prepended at render
@@ -261,6 +286,7 @@ const CATEGORY_META: Record<CategoryFilter, { label: string; sub: string }> = {
   'day-shapes':        { label: 'Day shapes',            sub: 'shapes and marks'         },
   'vessel-types':      { label: 'Vessel types',          sub: 'identify by shape and rig' },
   'anchor-types':      { label: 'Anchor types',          sub: 'ground tackle and holding' },
+  'buoyage':           { label: 'Buoyage',                sub: 'IALA marks and the ICW'   },
 };
 
 // The syllabus card a question belongs to, so its answer lands on the right

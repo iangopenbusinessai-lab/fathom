@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { citationOf } from '../lib/citation';
 import {
   COLREGS_QUESTIONS,
-  SEAMANSHIP_LABELS,
+  TOPIC_LABELS,
   isColregsGoverned,
 } from '../drills/colregs/constants';
 
@@ -21,7 +21,7 @@ import {
 // those questions break the suite, or exempt them by listing their ids here,
 // the rule-citation checks below run over isColregsGoverned() questions only,
 // and a second describe block holds the non-COLREGS ones to the equivalent
-// standard for their own form: a topic label from the closed SEAMANSHIP_LABELS
+// standard for their own form: a topic label from the closed TOPIC_LABELS
 // set. Both lists come from constants, so adding the next seamanship category
 // needs no edit in this file.
 
@@ -47,7 +47,7 @@ function citationsIn(text: string): string[] {
 }
 
 const GOVERNED = COLREGS_QUESTIONS.filter(isColregsGoverned);
-const SEAMANSHIP = COLREGS_QUESTIONS.filter((q) => !isColregsGoverned(q));
+const UNGOVERNED = COLREGS_QUESTIONS.filter((q) => !isColregsGoverned(q));
 
 const ALL_TEXT = GOVERNED.map((q) => ({
   id: q.id,
@@ -55,8 +55,9 @@ const ALL_TEXT = GOVERNED.map((q) => ({
 }));
 
 // A non-COLREGS explanation opens with its topic label, the way a rule
-// citation opens a governed one: "Ground tackle: The fluke anchor ...".
-const SEAMANSHIP_OPENER = new RegExp(`^(?:${SEAMANSHIP_LABELS.join('|')}): \\S`);
+// citation opens a governed one: "Ground tackle: The fluke anchor ...",
+// "IALA-B: A solid green can ...".
+const TOPIC_OPENER = new RegExp(`^(?:${TOPIC_LABELS.join('|')}): \\S`);
 
 describe('citation format', () => {
   it('finds citations to check (guards against a dead regex)', () => {
@@ -116,17 +117,17 @@ describe('citation format: the regex itself', () => {
 
 describe('non-COLREGS categories are labelled, not cited', () => {
   it('has some to check (guards against the filter going empty)', () => {
-    expect(SEAMANSHIP.length).toBeGreaterThan(0);
+    expect(UNGOVERNED.length).toBeGreaterThan(0);
   });
 
-  it.each(SEAMANSHIP.map((q) => [q.id, q] as const))(
+  it.each(UNGOVERNED.map((q) => [q.id, q] as const))(
     '%s opens its explanation with a known topic label',
     (_id, q) => {
-      expect(q.explanation).toMatch(SEAMANSHIP_OPENER);
+      expect(q.explanation).toMatch(TOPIC_OPENER);
     }
   );
 
-  it.each(SEAMANSHIP.map((q) => [q.id, q] as const))(
+  it.each(UNGOVERNED.map((q) => [q.id, q] as const))(
     '%s cites no rule number, which would not exist for it',
     (_id, q) => {
       const text = `${q.prompt} ${q.options.join(' ')} ${q.explanation}`;
@@ -138,8 +139,8 @@ describe('non-COLREGS categories are labelled, not cited', () => {
   it('reads the label back as the badge the verdict shows', () => {
     // citationOf is what ScenarioCard renders beside the verdict. If it
     // returned '' here the answer screen would lose its source line entirely.
-    for (const q of SEAMANSHIP) {
-      expect(SEAMANSHIP_LABELS).toContain(citationOf(q) as (typeof SEAMANSHIP_LABELS)[number]);
+    for (const q of UNGOVERNED) {
+      expect(TOPIC_LABELS).toContain(citationOf(q) as (typeof TOPIC_LABELS)[number]);
     }
   });
 });
