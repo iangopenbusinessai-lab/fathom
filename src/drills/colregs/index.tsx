@@ -32,6 +32,7 @@ import { BlastMark } from './components/SoundSignalDisplay';
 import { DayShapeName, MastPosition, ShapeArrangement } from './components/DayShapeDisplay';
 import { AnchorTypeName } from './components/AnchorDisplay';
 import { BuoyName } from './components/BuoyDisplay';
+import { DistressSignalName } from './components/DistressDisplay';
 
 type DrillState = 'idle' | 'playing' | 'finished';
 type DrillMode = 'practice' | 'exam';
@@ -211,6 +212,26 @@ export const QUESTION_BUOYS: Partial<Record<string, BuoyName>> = {
   'by-15': 'icw-square',
 };
 
+// The distress signal shown for the eight that have a visual form. The rest of
+// Annex IV cannot be drawn - a gun fired at one-minute intervals, SOS by any
+// signalling method, a spoken Mayday, an EPIRB alert - and those are asked as
+// text questions instead.
+//
+// di-16 asks which signal is NOT on the list and di-09 asks for the interval a
+// gun is fired at: both are deliberately without a picture, the first because
+// it is about four signals at once and the second because the answer is a
+// duration. Neither is an oversight.
+export const QUESTION_DISTRESS: Partial<Record<string, DistressSignalName>> = {
+  'di-01': 'parachute-flare',
+  'di-02': 'hand-flare',
+  'di-03': 'orange-smoke',
+  'di-04': 'star-rocket',
+  'di-05': 'flag-nc',
+  'di-06': 'flag-and-ball',
+  'di-07': 'arms',
+  'di-08': 'flames',
+};
+
 export const QUESTION_SCENARIOS: Partial<Record<string, ScenarioType>> = {
   'vh-01': 'priority-nuc',
   'vh-02': 'sail-keeps-clear-ram',
@@ -275,6 +296,7 @@ const CATEGORY_ORDER: CategoryFilter[] = [
   'anchor-types',
   'buoyage',
   'chart-symbols',
+  'distress-signals',
 ];
 
 // `sub` is the descriptor only - the question count is prepended at render
@@ -289,6 +311,7 @@ const CATEGORY_META: Record<CategoryFilter, { label: string; sub: string }> = {
   'anchor-types':      { label: 'Anchor types',          sub: 'ground tackle and holding' },
   'buoyage':           { label: 'Buoyage',                sub: 'IALA marks and the ICW'   },
   'chart-symbols':     { label: 'Chart symbols',          sub: 'symbols and abbreviations' },
+  'distress-signals':  { label: 'Distress signals',       sub: 'the Annex IV list'        },
 };
 
 // The syllabus card a question belongs to, so its answer lands on the right

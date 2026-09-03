@@ -149,9 +149,18 @@ export const CATEGORIES: ChartCategory[] = [
     name: 'Distress signals',
     section: 'Signals and communication',
     rule: 'Annex IV',
-    status: 'soon',
-    blurb: 'Recognised distress signals under Annex IV.',
-    topics: ['Annex IV signals', 'Flares and EPIRB', 'Misuse of distress signals'],
+    status: 'live',
+    source: 'distress-signals',
+    blurb:
+      'The signals that say a vessel is in distress and needs help - pyrotechnics, flags, sound, radio and the ones improvised from what is aboard - and the ban on using any of them for anything else.',
+    topics: [
+      'Red flares and orange smoke',
+      'The code signal November over Charlie',
+      'Square flag with a ball',
+      'Arms raised and lowered',
+      'SOS, Mayday and EPIRB',
+      'Misuse of distress signals',
+    ],
   },
   {
     id: 'vhf',

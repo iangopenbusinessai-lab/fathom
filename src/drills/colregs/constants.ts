@@ -6,7 +6,8 @@ export type ColregsCategory =
   | 'vessel-types'
   | 'anchor-types'
   | 'buoyage'
-  | 'chart-symbols';
+  | 'chart-symbols'
+  | 'distress-signals';
 
 export interface ColregsQuestion {
   id: string;
@@ -1812,6 +1813,267 @@ const chartSymbolsQuestions: ColregsQuestion[] = [
   },
 ];
 
+// --- DISTRESS SIGNALS (16 questions) ---
+//
+// These ARE COLREGS. Annex IV to the 1972 Convention is headed "Distress
+// Signals" and lists them, and Rule 37 is the rule that sends a vessel in
+// distress to that list. So this category goes through the ordinary citation
+// path with every other governed one - "Annex IV:" opens the explanations that
+// are about what a signal means, and "Rule 37" opens the one that is about the
+// obligation to use them. It is NOT in NON_COLREGS_CATEGORIES and must not be
+// given a topic label: there is a real citation here, and inventing a label
+// where a citation exists is the same error as inventing a citation where one
+// does not.
+//
+// Colour is doing work in this category that shape does elsewhere. Red is what
+// makes a flare a distress signal and orange is what makes the smoke one, so a
+// question that asks what colour the signal must be gets no diagram - the
+// diagram would be the answer. See QUESTION_DISTRESS in ../index.tsx.
+
+const distressSignalsQuestions: ColregsQuestion[] = [
+  {
+    id: 'di-01',
+    category: 'distress-signals',
+    prompt:
+      'You see a bright red light burning as it descends slowly beneath a small canopy. What are you looking at?',
+    options: [
+      'A rocket parachute flare - a distress signal',
+      'A white anti-collision flare, warning you that you have not been seen',
+      'A flare used to mark a position for a helicopter, carrying no distress meaning',
+      'A signal that the vessel is engaged in fishing with gear out',
+    ],
+    correctAnswer: 'A rocket parachute flare - a distress signal',
+    explanation:
+      'Annex IV: A rocket parachute flare showing a red light is a listed distress signal. Fired to around 300 metres and hanging under its canopy for close to a minute, it is the signal meant to be seen from beyond the horizon, which is why it is the one fired first when help is not already in sight.',
+  },
+  {
+    id: 'di-02',
+    category: 'distress-signals',
+    prompt:
+      'A person on the deck of a small boat is holding up a burning red light at the end of a short case. What are they signalling?',
+    options: [
+      'Distress - a hand flare showing a red light',
+      'That the vessel is under sail and about to alter course',
+      'That the vessel is on pilotage duty and has a pilot aboard',
+      'That the vessel is anchored and showing a temporary light',
+    ],
+    correctAnswer: 'Distress - a hand flare showing a red light',
+    explanation:
+      'Annex IV: A hand flare showing a red light is listed alongside the rocket parachute flare. It burns for about a minute and is seen only a few miles, so it is the one held back until a searching vessel or aircraft is close enough to fix your position by it.',
+  },
+  {
+    id: 'di-03',
+    category: 'distress-signals',
+    prompt: 'A dense orange plume is rising from a small canister floating on the water. What is it?',
+    options: [
+      'A distress signal - a smoke signal giving off orange-coloured smoke',
+      'A marker showing the boundary of an area closed to navigation',
+      'A signal that the vessel nearby is engaged in dredging',
+      'A signal that the vessel nearby is carrying dangerous cargo',
+    ],
+    correctAnswer: 'A distress signal - a smoke signal giving off orange-coloured smoke',
+    explanation:
+      'Annex IV: Orange smoke is the daylight signal on the list. It shows up against sea and sky where a flare in sunshine will not, and it lies on the water long enough for an aircraft to run down on it, which is why it is carried alongside the flares rather than instead of them.',
+  },
+  {
+    id: 'di-04',
+    category: 'distress-signals',
+    prompt:
+      'A rocket climbs from a vessel and bursts into several separate red stars. Fired again a short while later, what is it?',
+    options: [
+      'A distress signal - rockets or shells throwing red stars, fired one at a time at short intervals',
+      'A line-throwing rocket, sent across to pass a towline',
+      'A signal that the vessel is about to alter course to starboard',
+      'A green star shell, used to acknowledge that a signal has been seen',
+    ],
+    correctAnswer:
+      'A distress signal - rockets or shells throwing red stars, fired one at a time at short intervals',
+    explanation:
+      'Annex IV: Rockets or shells throwing red stars, fired one at a time at short intervals, are a distress signal in their own right and separate from the parachute flare. Several stars from one burst, repeated, is what tells them apart at a distance from one light hanging under a canopy.',
+  },
+  {
+    id: 'di-05',
+    category: 'distress-signals',
+    prompt:
+      'A vessel hoists two code flags on one halyard: a blue and white chequered flag above a flag of five horizontal stripes, blue, white, red, white, blue. What is she saying?',
+    options: [
+      'She is in distress and requires assistance - the code signal November over Charlie',
+      'She requires a pilot',
+      'She is dragging her anchor',
+      'She is about to weigh anchor and get under way',
+    ],
+    correctAnswer:
+      'She is in distress and requires assistance - the code signal November over Charlie',
+    explanation:
+      'Annex IV: The International Code signal of distress is November over Charlie - the chequered flag above the five-striped one. It is on the list precisely because it needs no radio, no pyrotechnics and no power: two flags out of the locker, hoisted where they can be seen.',
+  },
+  {
+    id: 'di-06',
+    category: 'distress-signals',
+    prompt:
+      'A vessel has hoisted a plain square flag with a round black shape immediately above it. What does the pairing mean?',
+    options: [
+      'Distress - a square flag with a ball, or anything resembling a ball, above or below it',
+      'That she is at anchor and has a second anchor down',
+      'That she is not under command and cannot manoeuvre',
+      'That she has a pilot on board and is under his direction',
+    ],
+    correctAnswer:
+      'Distress - a square flag with a ball, or anything resembling a ball, above or below it',
+    explanation:
+      'Annex IV: A square flag with a ball above or below it is a distress signal, and "anything resembling a ball" is the wording - a fender, a bucket, a coiled warp. It is on the list as the improvised signal, for a vessel with nothing aboard that was made to be a signal.',
+  },
+  {
+    id: 'di-07',
+    category: 'distress-signals',
+    prompt:
+      'A person on a boat is slowly and repeatedly raising both outstretched arms to each side and lowering them again. What are they doing?',
+    options: [
+      'Making a distress signal - slowly and repeatedly raising and lowering arms outstretched to each side',
+      'Signalling that they have seen you and need no assistance',
+      'Signalling that their vessel is about to get under way',
+      'Waving a greeting, which carries no meaning under the Rules',
+    ],
+    correctAnswer:
+      'Making a distress signal - slowly and repeatedly raising and lowering arms outstretched to each side',
+    explanation:
+      'Annex IV: Arms outstretched to each side, raised and lowered slowly and repeatedly, is a listed distress signal. The slowness and the repetition are the whole of it - one wave is a greeting, and reading it as one is a mistake made from a distance every season.',
+  },
+  {
+    id: 'di-08',
+    category: 'distress-signals',
+    prompt: 'What does a vessel showing flames on board, as from a burning tar barrel, indicate?',
+    options: [
+      'Distress - flames on the vessel are a listed distress signal',
+      'That she is discharging or loading a flammable cargo',
+      'That she is engaged in mineclearance and others must keep clear',
+      'That she is burning waste and requires a wide berth',
+    ],
+    correctAnswer: 'Distress - flames on the vessel are a listed distress signal',
+    explanation:
+      'Annex IV: Flames on the vessel, as from a burning tar barrel or oil barrel, is on the list. It is one of the older entries and it survives for the same reason the square flag and the ball do: it can be made from what is aboard when everything manufactured for the purpose has been used up.',
+  },
+  {
+    id: 'di-09',
+    category: 'distress-signals',
+    prompt:
+      'A gun or other explosive signal is being fired as a distress signal. At what interval must it be fired?',
+    options: [
+      'At intervals of about a minute',
+      'At intervals of about five seconds',
+      'At intervals of about ten minutes',
+      'Continuously, with no interval',
+    ],
+    correctAnswer: 'At intervals of about a minute',
+    explanation:
+      'Annex IV: A gun or other explosive signal fired at intervals of about a minute is a distress signal. The interval is the signal - a single report is a report, and it is the deliberate repetition at about a minute that separates distress from any other bang heard over water.',
+  },
+  {
+    id: 'di-10',
+    category: 'distress-signals',
+    prompt: 'What does a continuous sounding with any fog-signalling apparatus mean?',
+    options: [
+      'Distress - it is a listed distress signal',
+      'That the vessel is under way in restricted visibility and making way',
+      'That the vessel doubts the intentions of another and is signalling so',
+      'That the vessel is aground in restricted visibility',
+    ],
+    correctAnswer: 'Distress - it is a listed distress signal',
+    explanation:
+      'Annex IV: A continuous sounding with any fog-signalling apparatus is a distress signal. Every other use of a fog signal is a rhythm of separated blasts with a gap between them, so a sound that simply does not stop is unmistakable even to someone who cannot see the vessel making it.',
+  },
+  {
+    id: 'di-11',
+    category: 'distress-signals',
+    prompt:
+      'A signal is being made as three short, three long and three short, by flashing light. What is it, and how may it be sent?',
+    options: [
+      'The group SOS - a distress signal, and it may be made by any signalling method',
+      'The group SOS - a distress signal, but valid only when sent by radiotelegraphy',
+      'The letter O repeated, a warning that a vessel is manoeuvring',
+      'An acknowledgement that a distress signal has been received',
+    ],
+    correctAnswer:
+      'The group SOS - a distress signal, and it may be made by any signalling method',
+    explanation:
+      'Annex IV: The signal is the Morse group SOS, and it is listed as a distress signal made by any signalling method - a lamp, a torch, a mirror, a whistle, a hand on a hull. That is what makes it the last signal available to a vessel that has lost everything else.',
+  },
+  {
+    id: 'di-12',
+    category: 'distress-signals',
+    prompt: 'What is the listed distress signal sent by radiotelephony?',
+    options: [
+      'The spoken word "Mayday"',
+      'The spoken word "Pan-Pan"',
+      'The spoken word "Seelonce"',
+      'The spoken word "Securite"',
+    ],
+    correctAnswer: 'The spoken word "Mayday"',
+    explanation:
+      'Annex IV: The distress signal by radiotelephony is the spoken word Mayday. The other three words are real radio procedure, but they are urgency, radio silence and safety respectively - none of them is the distress signal, and using one of them for distress is a call that will be answered as something less than it is.',
+  },
+  {
+    id: 'di-13',
+    category: 'distress-signals',
+    prompt:
+      'A crew member activates the vessel\'s EPIRB. Is that a distress signal in the same sense as a flare?',
+    options: [
+      'Yes - signals transmitted by emergency position-indicating radio beacons are on the same list',
+      'No - an EPIRB is a locating device and is not itself a distress signal',
+      'Yes, but only once it has been confirmed by a spoken distress call',
+      'No - an EPIRB signal counts as a distress signal only outside territorial waters',
+    ],
+    correctAnswer:
+      'Yes - signals transmitted by emergency position-indicating radio beacons are on the same list',
+    explanation:
+      'Annex IV: Signals transmitted by emergency position-indicating radio beacons are listed, as are approved signals transmitted by radiocommunication systems including survival craft radar transponders. The list was extended to them for exactly the reason it holds a burning tar barrel: it takes whatever the vessel actually has.',
+  },
+  {
+    id: 'di-14',
+    category: 'distress-signals',
+    prompt:
+      'You would like to use a red parachute flare to attract the attention of a friend ashore. What does the Convention say?',
+    options: [
+      'It is prohibited - these signals may not be used for anything except to indicate distress, nor may signals that could be confused with them',
+      'It is permitted, so long as no other vessel is in sight at the time',
+      'It is permitted, so long as the coastguard is informed beforehand',
+      'It is prohibited only for rockets, and hand flares may be used freely',
+    ],
+    correctAnswer:
+      'It is prohibited - these signals may not be used for anything except to indicate distress, nor may signals that could be confused with them',
+    explanation:
+      'Annex IV: The use or exhibition of any of these signals except to indicate distress and need of assistance is prohibited, and so is the use of any signal that may be confused with them. The reason is the cost of the answer: a lifeboat launched, a helicopter flown and a crew put at risk for a flare fired to say hello.',
+  },
+  {
+    id: 'di-15',
+    category: 'distress-signals',
+    prompt: 'What do the Rules require of a vessel in distress that requires assistance?',
+    options: [
+      'That she use or exhibit the signals set out in the annex on distress signals',
+      'That she sound the manoeuvring and warning signals until answered',
+      'That she exhibit the lights and shapes of a vessel not under command',
+      'That she anchor and wait to be found, if she is able to anchor',
+    ],
+    correctAnswer: 'That she use or exhibit the signals set out in the annex on distress signals',
+    explanation:
+      'Rule 37 is one sentence: a vessel in distress and requiring assistance shall use or exhibit the signals described in Annex IV. The rule itself lists nothing - it points at the annex, which is why the annex and not the rule is what has to be learned signal by signal.',
+  },
+  {
+    id: 'di-16',
+    category: 'distress-signals',
+    prompt: 'Which of these is NOT a distress signal?',
+    options: [
+      'A white flare',
+      'A hand flare showing a red light',
+      'A smoke signal giving off orange-coloured smoke',
+      'The International Code signal November over Charlie',
+    ],
+    correctAnswer: 'A white flare',
+    explanation:
+      'Annex IV: Every distress pyrotechnic on the list is red, or orange in the case of smoke. A white flare is not on it - white is used to say "I am here, I have seen you", most often to warn a vessel closing on a collision course that she has not been seen. Firing white where red was meant will be read as no distress at all.',
+  },
+];
+
 // --- COMBINED EXPORT ---
 
 export const COLREGS_QUESTIONS: ColregsQuestion[] = [
@@ -1823,6 +2085,7 @@ export const COLREGS_QUESTIONS: ColregsQuestion[] = [
   ...anchorTypesQuestions,
   ...buoyageQuestions,
   ...chartSymbolsQuestions,
+  ...distressSignalsQuestions,
 ];
 
 export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuestion[]> = {
@@ -1834,6 +2097,7 @@ export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuest
   'anchor-types': anchorTypesQuestions,
   'buoyage': buoyageQuestions,
   'chart-symbols': chartSymbolsQuestions,
+  'distress-signals': distressSignalsQuestions,
 };
 
 export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
@@ -1845,4 +2109,5 @@ export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
   'anchor-types': 'Anchor Types',
   'buoyage': 'Buoyage',
   'chart-symbols': 'Chart Symbols',
+  'distress-signals': 'Distress Signals',
 };
