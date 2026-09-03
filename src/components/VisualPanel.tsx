@@ -10,6 +10,7 @@ import {
   QUESTION_BUOYS,
   QUESTION_DISTRESS,
   QUESTION_PFDS,
+  QUESTION_BOAT_PARTS,
 } from '../drills/colregs';
 import { LightDisplay } from '../drills/colregs/components/LightDisplay';
 import { DayShapeDisplay } from '../drills/colregs/components/DayShapeDisplay';
@@ -20,6 +21,7 @@ import { AnchorDisplay } from '../drills/colregs/components/AnchorDisplay';
 import { BuoyDisplay } from '../drills/colregs/components/BuoyDisplay';
 import { DistressDisplay } from '../drills/colregs/components/DistressDisplay';
 import { PfdDisplay } from '../drills/colregs/components/PfdDisplay';
+import { BoatPartDisplay } from '../drills/colregs/components/BoatPartDisplay';
 
 // 75 of the 78 bank questions are answered from a picture rather than from the
 // prompt text - "identify this vessel from what she is showing". The canvas
@@ -50,7 +52,8 @@ export function hasVisual(questionId: string): boolean {
     QUESTION_ANCHORS[questionId] !== undefined ||
     QUESTION_BUOYS[questionId] !== undefined ||
     QUESTION_DISTRESS[questionId] !== undefined ||
-    QUESTION_PFDS[questionId] !== undefined
+    QUESTION_PFDS[questionId] !== undefined ||
+    QUESTION_BOAT_PARTS[questionId] !== undefined
   );
 }
 
@@ -64,6 +67,7 @@ export const VisualPanel: React.FC<VisualPanelProps> = ({ questionId, revealed }
   const buoy = QUESTION_BUOYS[questionId];
   const distress = QUESTION_DISTRESS[questionId];
   const pfd = QUESTION_PFDS[questionId];
+  const boatPart = QUESTION_BOAT_PARTS[questionId];
 
   let inner: React.ReactNode = null;
   if (vesselType) {
@@ -98,6 +102,8 @@ export const VisualPanel: React.FC<VisualPanelProps> = ({ questionId, revealed }
     inner = <DistressDisplay signal={distress} label="Signal" />;
   } else if (pfd) {
     inner = <PfdDisplay form={pfd} label="Device" />;
+  } else if (boatPart) {
+    inner = <BoatPartDisplay part={boatPart} label="Highlighted" />;
   }
 
   if (!inner) return null;

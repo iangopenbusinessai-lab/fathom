@@ -34,6 +34,7 @@ import { AnchorTypeName } from './components/AnchorDisplay';
 import { BuoyName } from './components/BuoyDisplay';
 import { DistressSignalName } from './components/DistressDisplay';
 import { PfdFormName } from './components/PfdDisplay';
+import { BoatPartName } from './components/BoatPartDisplay';
 
 type DrillState = 'idle' | 'playing' | 'finished';
 type DrillMode = 'practice' | 'exam';
@@ -250,6 +251,26 @@ export const QUESTION_PFDS: Partial<Record<string, PfdFormName>> = {
   'pf-05': 'inflatable',
 };
 
+// The part picked out in brass on the boat diagram. Only the nomenclature half
+// of the deck seamanship card has a picture: a rope term and a helm order are
+// both words about words, and drawing a rope beside "what is the standing
+// part" would show a rope with no knot in it and no part being worked.
+export const QUESTION_BOAT_PARTS: Partial<Record<string, BoatPartName>> = {
+  'dk-01': 'bow',
+  'dk-02': 'stern',
+  'dk-03': 'transom',
+  'dk-04': 'keel',
+  'dk-05': 'gunwale',
+  'dk-06': 'freeboard',
+  'dk-07': 'draft',
+  'dk-08': 'rudder',
+  'dk-09': 'waterline',
+  'dk-10': 'beam',
+  'dk-11': 'thwart',
+  'dk-12': 'amidships',
+  'dk-13': 'port-side',
+};
+
 export const QUESTION_SCENARIOS: Partial<Record<string, ScenarioType>> = {
   'vh-01': 'priority-nuc',
   'vh-02': 'sail-keeps-clear-ram',
@@ -318,6 +339,7 @@ const CATEGORY_ORDER: CategoryFilter[] = [
   'vhf-procedure',
   'pfd-types',
   'fire-safety',
+  'deck-seamanship',
 ];
 
 // `sub` is the descriptor only - the question count is prepended at render
@@ -336,6 +358,7 @@ const CATEGORY_META: Record<CategoryFilter, { label: string; sub: string }> = {
   'vhf-procedure':     { label: 'VHF procedure',          sub: 'priority calls on 16'     },
   'pfd-types':         { label: 'PFD types',              sub: 'types and levels'         },
   'fire-safety':       { label: 'Fire safety',            sub: 'classes and agents'       },
+  'deck-seamanship':   { label: 'Deck seamanship',        sub: 'boat, rope and helm'      },
 };
 
 // The syllabus card a question belongs to, so its answer lands on the right

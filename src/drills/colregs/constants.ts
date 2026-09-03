@@ -10,7 +10,8 @@ export type ColregsCategory =
   | 'distress-signals'
   | 'vhf-procedure'
   | 'pfd-types'
-  | 'fire-safety';
+  | 'fire-safety'
+  | 'deck-seamanship';
 
 export interface ColregsQuestion {
   id: string;
@@ -38,6 +39,7 @@ export const NON_COLREGS_CATEGORIES: ColregsCategory[] = [
   'vhf-procedure',
   'pfd-types',
   'fire-safety',
+  'deck-seamanship',
 ];
 
 // Distress signals are NOT in that list, and the near miss is worth saying out
@@ -75,6 +77,9 @@ export const TOPIC_LABELS = [
   'Radio procedure',
   'Life-saving equipment',
   'Fire safety',
+  'Hull and deck',
+  'Rigging',
+  'Helm orders',
 ] as const;
 
 // --- NAVIGATION LIGHTS (20 questions) ---
@@ -2759,6 +2764,354 @@ const fireSafetyQuestions: ColregsQuestion[] = [
   },
 ];
 
+// --- DECK SEAMANSHIP (27 questions) ---
+//
+// Seamanship, not COLREGS. One category holding three topics that are all the
+// same kind of knowledge - the working vocabulary of the deck:
+//
+//   dk-01 to dk-13   the parts of the boat            "Hull and deck"
+//   dk-14 to dk-22   rope and rigging terminology     "Rigging"
+//   dk-23 to dk-27   what an order to the helm means  "Helm orders"
+//
+// They are one card rather than three because each alone is too thin to be a
+// card and because the thing being drilled is identical in all three: someone
+// says a word, and you have to know what it points at. The topic labels keep
+// them apart on the answer screen, which is where the distinction is worth
+// something - the badge under a rope question says Rigging, not the name of
+// the whole card.
+//
+// The rope questions are terminology, not knot-tying. Which knot to use, and
+// how to tie it, cannot be examined honestly in multiple choice and cannot be
+// learned from a diagram either.
+
+const deckSeamanshipQuestions: ColregsQuestion[] = [
+  {
+    id: 'dk-01',
+    category: 'deck-seamanship',
+    prompt: 'What is the forward part of a boat called?',
+    options: ['The bow', 'The stern', 'The beam', 'The transom'],
+    correctAnswer: 'The bow',
+    explanation:
+      'Hull and deck: The bow is the forward part. Its leading edge, the upright timber or moulding that cuts the water, is the stem. Forward of the boat is ahead; something off the bow but not dead ahead is on the bow, port or starboard.',
+  },
+  {
+    id: 'dk-02',
+    category: 'deck-seamanship',
+    prompt: 'What is the after part of a boat called?',
+    options: ['The stern', 'The bow', 'The keel', 'The quarter'],
+    correctAnswer: 'The stern',
+    explanation:
+      'Hull and deck: The stern is the after part of the boat. The quarter is a narrower word for the same end - it is the part of the side between the beam and the stern, so a vessel astern of you and a little to port is on your port quarter.',
+  },
+  {
+    id: 'dk-03',
+    category: 'deck-seamanship',
+    prompt: 'What is the flat surface closing the after end of the hull called?',
+    options: ['The transom', 'The stern', 'The thwart', 'The gunwale'],
+    correctAnswer: 'The transom',
+    explanation:
+      'Hull and deck: The transom is the flat plate or board across the after end. It is not a synonym for the stern - the stern is the whole after part of the boat, and the transom is the one surface closing it, which is where an outboard hangs and where the boat\'s name goes.',
+  },
+  {
+    id: 'dk-04',
+    category: 'deck-seamanship',
+    prompt: 'What is the backbone running fore and aft along the bottom of the hull called?',
+    options: ['The keel', 'The chine', 'The rudder', 'The gunwale'],
+    correctAnswer: 'The keel',
+    explanation:
+      'Hull and deck: The keel is the boat\'s backbone, running the length of her along the bottom centreline. Everything else is built off it, and on a sailing boat the part that hangs below the hull to resist leeway is named for it too.',
+  },
+  {
+    id: 'dk-05',
+    category: 'deck-seamanship',
+    prompt: 'What is the upper edge of a boat\'s side called?',
+    options: ['The gunwale', 'The thwart', 'The transom', 'The waterline'],
+    correctAnswer: 'The gunwale',
+    explanation:
+      'Hull and deck: The gunwale - said "gunnel" - is the upper edge of the side, running from bow to stern. It is the edge you grip stepping aboard and the edge a boat is swamped over, which is why the distance from it down to the water has a name of its own.',
+  },
+  {
+    id: 'dk-06',
+    category: 'deck-seamanship',
+    prompt:
+      'What is the distance from the waterline up to the lowest point of the gunwale called?',
+    options: ['Freeboard', 'Draft', 'Beam', 'Trim'],
+    correctAnswer: 'Freeboard',
+    explanation:
+      'Hull and deck: Freeboard is how much boat there is between the sea and the deck edge - the margin before water comes aboard. Loading a boat down reduces it, which is why an overloaded boat is dangerous in a chop long before it is anywhere near sinking.',
+  },
+  {
+    id: 'dk-07',
+    category: 'deck-seamanship',
+    prompt: 'What is the distance from the waterline down to the lowest point of the hull called?',
+    options: ['Draft', 'Freeboard', 'Beam', 'Bilge'],
+    correctAnswer: 'Draft',
+    explanation:
+      'Hull and deck: Draft is how deep she sits - the depth of water she needs to float. It is the figure read against the charted depth, and the one that decides whether a sounding on the chart is water you can cross or ground you will hit.',
+  },
+  {
+    id: 'dk-08',
+    category: 'deck-seamanship',
+    prompt: 'What is the blade hung aft, below the waterline, that steers the boat called?',
+    options: ['The rudder', 'The keel', 'The tiller', 'The transom'],
+    correctAnswer: 'The rudder',
+    explanation:
+      'Hull and deck: The rudder is the blade in the water. The tiller or the wheel is what the helmsman holds; the rudder is what it moves. A boat with no way on has no water flowing past the rudder, which is why steering does nothing until she is moving.',
+  },
+  {
+    id: 'dk-09',
+    category: 'deck-seamanship',
+    prompt: 'What is the line where the hull meets the surface of the water called?',
+    options: ['The waterline', 'The chine', 'The gunwale', 'The keel line'],
+    correctAnswer: 'The waterline',
+    explanation:
+      'Hull and deck: The waterline is where the surface cuts the hull. It divides freeboard above from draft below, and its length - the waterline length rather than the overall length - is what largely sets how fast a displacement hull can go.',
+  },
+  {
+    id: 'dk-10',
+    category: 'deck-seamanship',
+    prompt: 'What is the width of a boat at her widest point called?',
+    options: ['The beam', 'The freeboard', 'The draft', 'The bilge'],
+    correctAnswer: 'The beam',
+    explanation:
+      'Hull and deck: Beam is the width at the widest point. The word does double duty for direction as well: something abeam is off the side at a right angle to the boat, which is where the widest part of her is.',
+  },
+  {
+    id: 'dk-11',
+    category: 'deck-seamanship',
+    prompt: 'What is a seat fitted athwartships in an open boat called?',
+    options: ['A thwart', 'A gunwale', 'A bulkhead', 'A sole'],
+    correctAnswer: 'A thwart',
+    explanation:
+      'Hull and deck: A thwart is a seat set across the boat - the word is the old one for "across", the same one in athwartships. It is structural as well as somewhere to sit: it braces the two sides apart.',
+  },
+  {
+    id: 'dk-12',
+    category: 'deck-seamanship',
+    prompt: 'What is the middle part of a boat, along her length, called?',
+    options: ['Amidships', 'Abeam', 'Abaft', 'Aloft'],
+    correctAnswer: 'Amidships',
+    explanation:
+      'Hull and deck: Amidships is the middle of the boat between bow and stern. The word turns up again at the helm, where "midships" means to bring the rudder back to the centreline rather than to go anywhere near the middle of the boat.',
+  },
+  {
+    id: 'dk-13',
+    category: 'deck-seamanship',
+    prompt: 'Looking forward from the stern, which side of the boat is the port side?',
+    options: [
+      'The left-hand side',
+      'The right-hand side',
+      'Whichever side the helm is on',
+      'Whichever side is to windward',
+    ],
+    correctAnswer: 'The left-hand side',
+    explanation:
+      'Hull and deck: Port is the left side looking forward, starboard the right. They are used instead of left and right precisely because they do not depend on which way the person speaking happens to be facing - the port side is the port side whether you are looking forward or aft.',
+  },
+  {
+    id: 'dk-14',
+    category: 'deck-seamanship',
+    prompt: 'What is a bend?',
+    options: [
+      'A knot that joins two ropes together',
+      'A knot that makes a rope fast to an object',
+      'A curve put in a rope where the ends do not cross',
+      'The direction in which the strands of a rope are twisted',
+    ],
+    correctAnswer: 'A knot that joins two ropes together',
+    explanation:
+      'Rigging: A bend joins rope to rope - the sheet bend and the carrick bend are named for what they do. It is worth keeping the three words apart: a bend joins two ropes, a hitch makes fast to something else, and a knot is either the general word or one tied in the rope itself.',
+  },
+  {
+    id: 'dk-15',
+    category: 'deck-seamanship',
+    prompt: 'What is a hitch?',
+    options: [
+      'A knot that makes a rope fast to an object such as a ring, a rail or a spar',
+      'A knot that joins two ropes of different sizes',
+      'The free end of a rope, the end not in use',
+      'A heavy rope used for towing or mooring',
+    ],
+    correctAnswer: 'A knot that makes a rope fast to an object such as a ring, a rail or a spar',
+    explanation:
+      'Rigging: A hitch attaches a rope to something that is not another rope - a clove hitch round a piling, a rolling hitch on a spar. Most hitches depend on the object they are tied round; take that away and they fall apart, which is exactly what separates them from bends.',
+  },
+  {
+    id: 'dk-16',
+    category: 'deck-seamanship',
+    prompt: 'What is the bitter end of a rope?',
+    options: [
+      'The free end - the last of the rope, the end not made fast or in use',
+      'The end permanently spliced to the anchor',
+      'The middle of the rope, where it is doubled back',
+      'The end that has been whipped to stop it fraying',
+    ],
+    correctAnswer: 'The free end - the last of the rope, the end not made fast or in use',
+    explanation:
+      'Rigging: The bitter end is the tail - the end you are left holding. The phrase comes off the bitts an anchor cable was made fast to: run the cable out to the bitter end and there is nothing left to pay out, which is where the everyday saying comes from.',
+  },
+  {
+    id: 'dk-17',
+    category: 'deck-seamanship',
+    prompt: 'What is the standing part of a rope?',
+    options: [
+      'The part not being worked - the length between the working end and the bitter end',
+      'The part of the rope already made fast to a cleat',
+      'The end being used to tie the knot',
+      'A loop formed when the rope crosses itself',
+    ],
+    correctAnswer:
+      'The part not being worked - the length between the working end and the bitter end',
+    explanation:
+      'Rigging: The standing part is the inactive length, as against the working end that is doing the tying. Every knot description depends on the pair: "pass the working end round the standing part" is a sentence that means nothing unless both words are solid.',
+  },
+  {
+    id: 'dk-18',
+    category: 'deck-seamanship',
+    prompt: 'What is a bight?',
+    options: [
+      'A curve or slack loop in a rope where the ends do not cross',
+      'A loop where the rope crosses over itself',
+      'The free end of the rope',
+      'A knot tied in the middle of a rope',
+    ],
+    correctAnswer: 'A curve or slack loop in a rope where the ends do not cross',
+    explanation:
+      'Rigging: A bight is a U in the rope - a curve with no crossing. Let the two parts cross and it becomes a loop, which is a different word doing different work in a knot. "Tied in the bight" means tied in the middle of the rope without using either end.',
+  },
+  {
+    id: 'dk-19',
+    category: 'deck-seamanship',
+    prompt: 'What does the lay of a rope refer to?',
+    options: [
+      'The direction in which its strands are twisted together',
+      'The way it is coiled down on deck',
+      'The material the rope is made from',
+      'The load the rope is rated to carry',
+    ],
+    correctAnswer: 'The direction in which its strands are twisted together',
+    explanation:
+      'Rigging: Lay is the twist. Most three-strand rope is right-hand laid, which is why it is coiled clockwise - coil it the other way and it fights you and puts kinks in. Braided rope has no lay in this sense, and coils either way.',
+  },
+  {
+    id: 'dk-20',
+    category: 'deck-seamanship',
+    prompt: 'What is a hawser?',
+    options: [
+      'A heavy rope or cable used for towing or mooring',
+      'A light line thrown across to another vessel to pass a heavier one',
+      'The wire that supports a mast',
+      'A rope with a thimble spliced into one end',
+    ],
+    correctAnswer: 'A heavy rope or cable used for towing or mooring',
+    explanation:
+      'Rigging: A hawser is the heavy stuff - the rope a vessel is towed or moored by. The light line thrown first, to haul the hawser across with, is a heaving line, and the pipe the cable runs out through in the bow is the hawsehole, named from the same root.',
+  },
+  {
+    id: 'dk-21',
+    category: 'deck-seamanship',
+    prompt:
+      'Why is nylon the usual choice for an anchor rode and for dock lines, rather than polyester or polypropylene?',
+    options: [
+      'It stretches under load, absorbing shock loads that would otherwise come straight onto the boat',
+      'It floats, so it stays clear of the propeller',
+      'It has almost no stretch, so the boat is held exactly where she is put',
+      'It is the only one of the three that resists sunlight',
+    ],
+    correctAnswer:
+      'It stretches under load, absorbing shock loads that would otherwise come straight onto the boat',
+    explanation:
+      'Rigging: Nylon\'s elasticity is the point - it takes the snatch out of a rode in a swell and out of dock lines in a wake. Polyester is chosen where stretch is the enemy, on halyards and sheets. Polypropylene floats, which makes it a heaving line or a ski rope, but it is weaker and it degrades in sunlight.',
+  },
+  {
+    id: 'dk-22',
+    category: 'deck-seamanship',
+    prompt: 'Which rope floats, and what is that useful for?',
+    options: [
+      'Polypropylene - it makes a heaving line or a rescue line that stays on the surface',
+      'Nylon - it makes an anchor rode that will not chafe on the bottom',
+      'Polyester - it makes a mooring line that stays clear of the propeller',
+      'Manila - it makes a towline that can be seen in the water',
+    ],
+    correctAnswer:
+      'Polypropylene - it makes a heaving line or a rescue line that stays on the surface',
+    explanation:
+      'Rigging: Polypropylene is the one that floats, which is exactly what you want in a line thrown to someone in the water and exactly what you do not want fouling a propeller. Its weaknesses are strength and sunlight: it is not the rope for a mooring left out all season.',
+  },
+  {
+    id: 'dk-23',
+    category: 'deck-seamanship',
+    prompt: 'The order "midships" is given. What does the helmsman do?',
+    options: [
+      'Bring the rudder to the centreline, so there is no rudder angle either way',
+      'Steer for the middle of the channel',
+      'Take the boat to the middle of her turn and hold it',
+      'Move to the middle of the boat to trim her',
+    ],
+    correctAnswer: 'Bring the rudder to the centreline, so there is no rudder angle either way',
+    explanation:
+      'Helm orders: Midships is an order about the rudder, not about position - take the angle off and leave the rudder fore and aft. The boat carries on swinging for a while afterwards, which is why the order is given before the heading you want, not when you reach it.',
+  },
+  {
+    id: 'dk-24',
+    category: 'deck-seamanship',
+    prompt: 'The order "steady as she goes" is given. What does the helmsman do?',
+    options: [
+      'Hold the heading the boat is on at the moment the order is given, and report that heading',
+      'Hold the rudder exactly where it is and change nothing',
+      'Return to the heading the boat was on before the last order',
+      'Reduce speed until the boat stops swinging',
+    ],
+    correctAnswer:
+      'Hold the heading the boat is on at the moment the order is given, and report that heading',
+    explanation:
+      'Helm orders: Steady as she goes fixes the heading at the instant of the order - the helmsman notes what is under the lubber line, checks the swing, steers back to it and reports the course. It is an order about a heading; the rudder does whatever is needed to hold it.',
+  },
+  {
+    id: 'dk-25',
+    category: 'deck-seamanship',
+    prompt: 'The order "shift your rudder" is given. What does the helmsman do?',
+    options: [
+      'Put on the same amount of rudder on the opposite side',
+      'Put the rudder hard over the other way',
+      'Bring the rudder to the centreline and wait',
+      'Ease the rudder by half and hold it there',
+    ],
+    correctAnswer: 'Put on the same amount of rudder on the opposite side',
+    explanation:
+      'Helm orders: Shift your rudder means the same angle, the other way - twenty degrees of right rudder becomes twenty degrees of left. It is a single, unambiguous order for a manoeuvre that would otherwise take two, and it does not mean hard over.',
+  },
+  {
+    id: 'dk-26',
+    category: 'deck-seamanship',
+    prompt: 'The order "meet her" is given while the boat is swinging. What does the helmsman do?',
+    options: [
+      'Use rudder the opposite way to check the swing, without turning the boat back',
+      'Put the rudder hard over the opposite way to reverse the turn',
+      'Centre the rudder and let the swing die out on its own',
+      'Hold the present rudder angle until told otherwise',
+    ],
+    correctAnswer: 'Use rudder the opposite way to check the swing, without turning the boat back',
+    explanation:
+      'Helm orders: Meet her is enough opposite rudder to stop the swing where it is - the boat carries her turn after the rudder comes off, and this is the order that catches her before she goes past the heading wanted. Ease the rudder, by contrast, only reduces the angle you already have.',
+  },
+  {
+    id: 'dk-27',
+    category: 'deck-seamanship',
+    prompt: 'What does a helmsman do on receiving a helm order?',
+    options: [
+      'Repeat the order back word for word, carry it out, and report when it has been carried out',
+      'Carry it out and say nothing unless there is a problem',
+      'Acknowledge with "aye" and report only if the order cannot be carried out',
+      'Repeat the order back only if it differs from the one before it',
+    ],
+    correctAnswer:
+      'Repeat the order back word for word, carry it out, and report when it has been carried out',
+    explanation:
+      'Helm orders: The order is repeated back so that a mishearing is caught before the rudder moves, and the completion is reported so the conning officer knows the boat is doing what was asked without having to look. Silence at the helm is how a wrong rudder angle survives long enough to matter.',
+  },
+];
+
 // --- COMBINED EXPORT ---
 
 export const COLREGS_QUESTIONS: ColregsQuestion[] = [
@@ -2774,6 +3127,7 @@ export const COLREGS_QUESTIONS: ColregsQuestion[] = [
   ...vhfProcedureQuestions,
   ...pfdTypesQuestions,
   ...fireSafetyQuestions,
+  ...deckSeamanshipQuestions,
 ];
 
 export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuestion[]> = {
@@ -2789,6 +3143,7 @@ export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuest
   'vhf-procedure': vhfProcedureQuestions,
   'pfd-types': pfdTypesQuestions,
   'fire-safety': fireSafetyQuestions,
+  'deck-seamanship': deckSeamanshipQuestions,
 };
 
 export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
@@ -2804,4 +3159,5 @@ export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
   'vhf-procedure': 'VHF Procedure',
   'pfd-types': 'PFD Types',
   'fire-safety': 'Fire Safety',
+  'deck-seamanship': 'Deck Seamanship',
 };

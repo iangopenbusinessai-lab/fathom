@@ -235,6 +235,24 @@ export const CATEGORIES: ChartCategory[] = [
     ],
   },
   {
+    id: 'deck',
+    name: 'Deck seamanship',
+    section: 'Seamanship',
+    rule: 'Hull, rigging and helm',
+    status: 'live',
+    source: 'deck-seamanship',
+    blurb:
+      'The working vocabulary of the deck: naming the parts of a boat off a diagram, the words for the parts of a rope and what it is made of, and what an order to the helm actually asks the helmsman to do.',
+    topics: [
+      'Bow, stern, transom, keel',
+      'Freeboard, draft and beam',
+      'Knot, hitch and bend',
+      'Bitter end, standing part, bight',
+      'Rope materials and lay',
+      'Midships, steady, shift your rudder',
+    ],
+  },
+  {
     id: 'buoyage',
     name: 'Buoyage / IALA marks',
     section: 'Aids to navigation',
