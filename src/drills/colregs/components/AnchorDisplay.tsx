@@ -18,14 +18,29 @@ interface AnchorDisplayProps {
 // answer the bottom-matching questions for free - sand under the fluke anchor
 // is the answer to an-06 written into the picture.
 //
-// Each silhouette is built from the features that actually tell the types
-// apart on a foredeck, not from stylistic differences invented to make five
-// shapes look distinct:
-//   fluke     two broad flat plates hinged at the crown, stock across it
-//   plow      one plowshare, wings up and a single point down
-//   claw      three heavy curved tines off one crown, no stock, short shank
-//   grapnel   four thin hooked tines around a long shaft
-//   mushroom  an inverted bowl on a plain shank
+// Each silhouette is built to the proportions the real anchor has, taken off
+// maker drawings rather than invented to make five shapes look different. The
+// numbers that matter are ratios against the shank, because that is what the
+// eye actually compares:
+//
+//   fluke     Danforth pattern. Two LONG tapering plates - about as long as
+//             half the shank - opening ~30 deg either side of it, and a stock
+//             through the crown that is wider than the fluke span. The earlier
+//             drawing had short stubby plates and a stock narrower than the
+//             tips, which is why it read as a generic grappling shape.
+//   plow      CQR / Delta. The share is WIDER THAN IT IS LONG (about 80:47),
+//             one point down, wings swept up and out, and only a shallow
+//             saddle between them. The deep saddle it had before made a heart.
+//   claw      Bruce pattern. One casting, and the thing that identifies it is
+//             that it is a broad hollow SCOOP - a wide crown with three lobes
+//             off it, wider than tall. Three separate round strokes read as a
+//             bird's foot, which is what it was doing.
+//   grapnel   Long bare shaft, four tines curving out and back UP to finish
+//             near mid-shaft, each ending in its own small fluke. The fore-and
+//             -aft pair are foreshortened, so they are drawn shorter, thinner
+//             and with smaller flukes - not omitted.
+//   mushroom  An inverted bowl about twice as wide as it is deep, with a thick
+//             rim, and a boss where the shank enters the crown of the dome.
 //
 // The shackle ring is common to all five and drawn in brass so the eye finds
 // the top of the shank first; everything below it is navy plate with a slate
@@ -67,107 +82,135 @@ function shank(toY: number, width = 2.6) {
 
 function anchorBody(type: AnchorTypeName): React.ReactNode {
   switch (type) {
-    // Wide flat flukes hinged at a crown, with the stock across it. The plates
-    // are what give it its holding power for its weight in sand and mud.
+    // Danforth. Long slender shank down to a crown low in the frame, the stock
+    // laid through that crown, and two long tapering plates opening from it.
+    // The plates run from y=106 to y=154 against a shank of 78, so they read
+    // as roughly half the shank - the real ratio - instead of as stubs.
     case 'fluke':
       return (
         <g>
-          {shank(118)}
-          {/* Stock, across the crown */}
+          {shank(116, 2.4)}
+          {/* Stock, through the crown and wider than the fluke span. Drawn
+              first so the plates and the crown sit over it. */}
           <line
-            x1={64} y1={116} x2={156} y2={116}
-            stroke={DETAIL_STROKE} strokeWidth="2.2" strokeLinecap="round"
+            x1={46} y1={112} x2={174} y2={112}
+            stroke={DETAIL_STROKE} strokeWidth="2.4" strokeLinecap="round"
           />
-          <circle cx={64} cy={116} r={2.6} fill={PLATE_FILL} stroke={DETAIL_STROKE} strokeWidth="1" />
-          <circle cx={156} cy={116} r={2.6} fill={PLATE_FILL} stroke={DETAIL_STROKE} strokeWidth="1" />
-          {/* Crown */}
-          <circle cx={CX} cy={118} r={5} fill={PLATE_FILL} stroke={PLATE_STROKE} strokeWidth="1.1" />
-          {/* Two broad plates, widening to the tips */}
-          <path d="M 106 116 L 58 150 L 80 156 L 106 130 Z" {...plate} />
-          <path d="M 114 116 L 162 150 L 140 156 L 114 130 Z" {...plate} />
+          <circle cx={46} cy={112} r={3} fill={PLATE_FILL} stroke={DETAIL_STROKE} strokeWidth="1" />
+          <circle cx={174} cy={112} r={3} fill={PLATE_FILL} stroke={DETAIL_STROKE} strokeWidth="1" />
+          {/* The two plates: wide where they meet the crown, tapering to a
+              point at the tip, opening about 30 deg either side of the shank. */}
+          <path d="M 105 105 L 112 124 L 64 155 L 55 145 Z" {...plate} />
+          <path d="M 115 105 L 108 124 L 156 155 L 165 145 Z" {...plate} />
+          <circle cx={CX} cy={114} r={5.5} fill={PLATE_FILL} stroke={PLATE_STROKE} strokeWidth="1.2" />
         </g>
       );
 
-    // One plowshare: two wings sweeping up and out from a single point, with a
-    // deep saddle between them where the shank lands. The saddle is what keeps
-    // it from reading as a spade - a spade has a straight top edge.
+    // CQR / Delta. One plowshare, 80 wide by 47 deep: wider than it is long,
+    // which is what stops it reading as a spade or a heart. The saddle between
+    // the wings is shallow - a fold, not a cleft - and the ridge runs from it
+    // down to the single point.
     case 'plow':
       return (
         <g>
-          {shank(126)}
+          {shank(118)}
           <path
-            d="M 110 158 C 92 150, 68 130, 76 98 L 110 128 L 144 98 C 152 130, 128 150, 110 158 Z"
+            d="M 110 157 C 90 148, 72 132, 70 110 L 110 132 L 150 110 C 148 132, 130 148, 110 157 Z"
             {...plate}
           />
-          {/* Ridge down the share */}
+          {/* The fold down the middle of the share */}
           <line
-            x1={CX} y1={128} x2={CX} y2={150}
+            x1={CX} y1={133} x2={CX} y2={153}
             stroke={DETAIL_STROKE} strokeWidth="1" strokeLinecap="round"
           />
-          {/* Hinge collar - the CQR's shank pivots here, the Delta's does not.
-              Drawn as a fitting, small enough not to answer an-10 by itself. */}
-          <circle cx={CX} cy={124} r={4.5} fill={PLATE_FILL} stroke={DETAIL_STROKE} strokeWidth="1.1" />
+          {/* Hinge collar - the CQR pivots here, the Delta does not. Drawn as
+              a fitting, small enough not to answer an-10 by itself. */}
+          <circle cx={CX} cy={124} r={4.5} fill={PLATE_FILL} stroke={DETAIL_STROKE} strokeWidth="1.2" />
         </g>
       );
 
-    // Three heavy curved tines off one crown, short shank, no stock: a single
-    // casting. Drawn as thick round-capped strokes rather than outlined plates
-    // because the tines are round in section - outlining them made them taper
-    // to points at both ends and read as leaves.
+    // Bruce. A single casting read as one broad hollow scoop, 84 wide by 58
+    // deep, on a short shank: a wide crown with two outer tines curling up at
+    // the ends and a centre lobe dropping between them. Outlined as one plate
+    // because it IS one piece of steel - three separate strokes made a claw
+    // out of sticks.
     case 'claw':
       return (
         <g>
-          {shank(106)}
-          <g fill="none" stroke={PLATE_STROKE} strokeWidth="7.5" strokeLinecap="round">
-            <path d="M 110 110 C 92 120, 78 134, 74 152" />
-            <path d="M 110 110 C 108 128, 110 142, 116 156" />
-            <path d="M 110 110 C 128 118, 140 132, 146 148" />
-          </g>
-          <circle cx={CX} cy={108} r={8} fill={PLATE_FILL} stroke={PLATE_STROKE} strokeWidth="1.4" />
+          {shank(102)}
+          <path
+            d="M 110 100
+               C 134 103, 155 117, 163 146
+               C 153 154, 141 151, 135 140
+               C 131 152, 122 159, 110 159
+               C 98 159, 89 152, 85 140
+               C 79 151, 67 154, 57 146
+               C 65 117, 86 103, 110 100 Z"
+            {...plate}
+          />
+          {/* The hollow of the scoop, so the casting reads as concave rather
+              than as a flat plate cut to shape. */}
+          <path
+            d="M 94 120 C 100 132, 103 145, 102 155"
+            fill="none" stroke={DETAIL_STROKE} strokeWidth="1.1" strokeLinecap="round"
+          />
+          <path
+            d="M 126 120 C 120 132, 117 145, 118 155"
+            fill="none" stroke={DETAIL_STROKE} strokeWidth="1.1" strokeLinecap="round"
+          />
+          {/* Crown boss where the shank lands */}
+          <circle cx={CX} cy={104} r={6.5} fill={PLATE_FILL} stroke={PLATE_STROKE} strokeWidth="1.3" />
         </g>
       );
 
-    // Four thin hooked tines around a long bare shaft, each ending in a small
-    // fluke: it holds by catching on something rather than by burying, so it is
-    // drawn as hooks with points, not as plates.
+    // Long bare shaft with four tines off the crown, curving out and back up to
+    // finish around mid-shaft. All four carry a fluke; the fore-and-aft pair
+    // are foreshortened, so they are shorter, thinner and their flukes smaller.
     case 'grapnel':
       return (
         <g>
-          {shank(146, 2.2)}
-          <g fill="none" stroke={PLATE_STROKE} strokeWidth="3.6" strokeLinecap="round">
-            {/* Outer pair, sweeping furthest and highest */}
-            <path d="M 110 146 C 96 144, 78 134, 68 104" />
-            <path d="M 110 146 C 124 144, 142 134, 152 104" />
+          {shank(148, 2.2)}
+          {/* Outer pair, in the plane of the drawing */}
+          <g fill="none" stroke={PLATE_STROKE} strokeWidth="3.4" strokeLinecap="round">
+            <path d="M 110 147 C 93 146, 71 133, 63 96" />
+            <path d="M 110 147 C 127 146, 149 133, 157 96" />
           </g>
-          <g fill="none" stroke={DETAIL_STROKE} strokeWidth="3" strokeLinecap="round">
-            {/* Inner pair, foreshortened - the tines fore and aft of the shaft */}
-            <path d="M 110 146 C 102 142, 92 134, 88 116" />
-            <path d="M 110 146 C 118 142, 128 134, 132 116" />
+          {/* Inner pair, fore and aft of the shaft */}
+          <g fill="none" stroke={DETAIL_STROKE} strokeWidth="2.6" strokeLinecap="round">
+            <path d="M 110 147 C 100 143, 89 133, 85 110" />
+            <path d="M 110 147 C 120 143, 131 133, 135 110" />
           </g>
-          {/* Tip flukes on the outer pair */}
-          <polygon points="68,98 61,114 77,110" {...plate} strokeWidth={1} />
-          <polygon points="152,98 143,110 159,114" {...plate} strokeWidth={1} />
-          {/* Crown collar */}
-          <circle cx={CX} cy={147} r={5} fill={PLATE_FILL} stroke={PLATE_STROKE} strokeWidth="1.2" />
+          {/* Tip flukes: the outer pair full size, the inner pair reduced */}
+          <polygon points="63,88 54,106 72,104" {...plate} strokeWidth={1} />
+          <polygon points="157,88 148,104 166,106" {...plate} strokeWidth={1} />
+          <polygon points="85,103 78,117 92,116" {...plate} strokeWidth={0.9} />
+          <polygon points="135,103 128,116 142,117" {...plate} strokeWidth={0.9} />
+          <circle cx={CX} cy={148} r={5} fill={PLATE_FILL} stroke={PLATE_STROKE} strokeWidth="1.2" />
         </g>
       );
 
-    // An inverted bowl on a plain shank. Nothing bites: it holds by its own
-    // weight and by silting in over time.
+    // An inverted bowl, 108 across by 52 deep - about twice as wide as it is
+    // deep, which is the proportion these are cast in - with a thick rim and a
+    // boss where the shank enters the crown. Nothing on it bites: it holds by
+    // weight and by silting in.
     case 'mushroom':
       return (
         <g>
-          {shank(110)}
+          {shank(96)}
           <path
-            d="M 58 128 C 58 84, 162 84, 162 128 C 136 142, 84 142, 58 128 Z"
+            d="M 56 136 C 56 88, 164 88, 164 136 C 164 148, 56 148, 56 136 Z"
             {...plate}
           />
-          {/* The rim of the bowl, so it reads as a cap and not as a solid dome */}
+          {/* Far rim, arcing up inside the near one, so the cap reads as a
+              hollow bowl rather than as a solid dome. */}
           <path
-            d="M 58 128 C 84 142, 136 142, 162 128"
-            fill="none"
-            stroke={DETAIL_STROKE}
-            strokeWidth="1.2"
+            d="M 57 133 C 80 122, 140 122, 163 133"
+            fill="none" stroke={DETAIL_STROKE} strokeWidth="1.2"
+          />
+          {/* Boss at the crown, where the shank enters */}
+          <ellipse
+            cx={CX} cy={97} rx={9} ry={4}
+            fill={PLATE_FILL} stroke={DETAIL_STROKE} strokeWidth="1.1"
           />
         </g>
       );

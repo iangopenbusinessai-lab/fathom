@@ -40,42 +40,26 @@ interface VisualPanelProps {
   revealed: boolean;
 }
 
-// Same precedence the colregs drill uses, so a question with more than one
+// One resolver, used by both the panel and the "is there a picture?" question
+// the quiz grid asks. They used to be two independent lists - `hasVisual`
+// tested `!== undefined` on ten maps while the panel tested each value for
+// truthiness - and they agreed only because no map happens to hold a falsy
+// value. A single falsy entry would have made `hasVisual` true and the panel
+// null: the quiz body would reserve its 260px diagram column and draw nothing
+// in it. Deriving one from the other removes that class of drift entirely.
+//
+// Precedence is the colregs drill's own, so a question carrying more than one
 // mapping renders the same visual in both places.
-export function hasVisual(questionId: string): boolean {
-  return (
-    QUESTION_VESSEL_TYPES[questionId] !== undefined ||
-    QUESTION_LIGHTS[questionId] !== undefined ||
-    QUESTION_SOUNDS[questionId] !== undefined ||
-    QUESTION_SHAPES[questionId] !== undefined ||
-    QUESTION_SCENARIOS[questionId] !== undefined ||
-    QUESTION_ANCHORS[questionId] !== undefined ||
-    QUESTION_BUOYS[questionId] !== undefined ||
-    QUESTION_DISTRESS[questionId] !== undefined ||
-    QUESTION_PFDS[questionId] !== undefined ||
-    QUESTION_BOAT_PARTS[questionId] !== undefined
-  );
-}
-
-export const VisualPanel: React.FC<VisualPanelProps> = ({ questionId, revealed }) => {
+function resolveVisual(questionId: string, revealed: boolean): React.ReactNode {
   const vesselType = QUESTION_VESSEL_TYPES[questionId];
-  const lights = QUESTION_LIGHTS[questionId];
-  const sounds = QUESTION_SOUNDS[questionId];
-  const shapes = QUESTION_SHAPES[questionId];
-  const scenario = QUESTION_SCENARIOS[questionId];
-  const anchor = QUESTION_ANCHORS[questionId];
-  const buoy = QUESTION_BUOYS[questionId];
-  const distress = QUESTION_DISTRESS[questionId];
-  const pfd = QUESTION_PFDS[questionId];
-  const boatPart = QUESTION_BOAT_PARTS[questionId];
+  if (vesselType) return <VesselProfile type={vesselType} label="Vessel" />;
 
-  let inner: React.ReactNode = null;
-  if (vesselType) {
-    inner = <VesselProfile type={vesselType} label="Vessel" />;
-  } else if (lights) {
-    inner = <LightDisplay active={lights} label="Vessel Lights" />;
-  } else if (sounds) {
-    inner = (
+  const lights = QUESTION_LIGHTS[questionId];
+  if (lights) return <LightDisplay active={lights} label="Vessel Lights" />;
+
+  const sounds = QUESTION_SOUNDS[questionId];
+  if (sounds) {
+    return (
       <SoundSignalDisplay
         key={questionId}
         sequence={sounds}
@@ -83,8 +67,11 @@ export const VisualPanel: React.FC<VisualPanelProps> = ({ questionId, revealed }
         label="Blast Sequence"
       />
     );
-  } else if (shapes) {
-    inner = (
+  }
+
+  const shapes = QUESTION_SHAPES[questionId];
+  if (shapes) {
+    return (
       <DayShapeDisplay
         shapes={shapes.shapes}
         position={shapes.position}
@@ -92,20 +79,42 @@ export const VisualPanel: React.FC<VisualPanelProps> = ({ questionId, revealed }
         label="Day Shapes"
       />
     );
-  } else if (scenario) {
-    inner = <VesselScenario scenario={scenario} label="Scenario" revealed={revealed} />;
-  } else if (anchor) {
-    inner = <AnchorDisplay type={anchor} label="Anchor" />;
-  } else if (buoy) {
-    inner = <BuoyDisplay type={buoy} label="Mark" />;
-  } else if (distress) {
-    inner = <DistressDisplay signal={distress} label="Signal" />;
-  } else if (pfd) {
-    inner = <PfdDisplay form={pfd} label="Device" />;
-  } else if (boatPart) {
-    inner = <BoatPartDisplay part={boatPart} label="Highlighted" />;
   }
 
+  const scenario = QUESTION_SCENARIOS[questionId];
+  if (scenario) return <VesselScenario scenario={scenario} label="Scenario" revealed={revealed} />;
+
+  const anchor = QUESTION_ANCHORS[questionId];
+  if (anchor) return <AnchorDisplay type={anchor} label="Anchor" />;
+
+  const buoy = QUESTION_BUOYS[questionId];
+  if (buoy) return <BuoyDisplay type={buoy} label="Mark" />;
+
+  const distress = QUESTION_DISTRESS[questionId];
+  if (distress) return <DistressDisplay signal={distress} label="Signal" />;
+
+  const pfd = QUESTION_PFDS[questionId];
+  if (pfd) return <PfdDisplay form={pfd} label="Device" />;
+
+  const boatPart = QUESTION_BOAT_PARTS[questionId];
+  if (boatPart) return <BoatPartDisplay part={boatPart} label="Highlighted" />;
+
+  return null;
+}
+
+// Whether this question is answered from a picture. `revealed` cannot change
+// the answer - every branch above either has a mapping or does not - so the
+// grid can ask this before it knows whether the question has been answered.
+export function hasVisual(questionId: string): boolean {
+  return resolveVisual(questionId, false) !== null;
+}
+
+export const VisualPanel: React.FC<VisualPanelProps> = ({ questionId, revealed }) => {
+  const inner = resolveVisual(questionId, revealed);
+
+  // A question with no mapping draws nothing at all. The caller keys this
+  // component on the question id as well, so a diagram can never survive into
+  // the next question even for a frame.
   if (!inner) return null;
 
   return (
