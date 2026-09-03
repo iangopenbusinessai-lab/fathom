@@ -9,7 +9,8 @@ export type ColregsCategory =
   | 'chart-symbols'
   | 'distress-signals'
   | 'vhf-procedure'
-  | 'pfd-types';
+  | 'pfd-types'
+  | 'fire-safety';
 
 export interface ColregsQuestion {
   id: string;
@@ -36,6 +37,7 @@ export const NON_COLREGS_CATEGORIES: ColregsCategory[] = [
   'chart-symbols',
   'vhf-procedure',
   'pfd-types',
+  'fire-safety',
 ];
 
 // Distress signals are NOT in that list, and the near miss is worth saying out
@@ -72,6 +74,7 @@ export const TOPIC_LABELS = [
   'Chart No. 1',
   'Radio procedure',
   'Life-saving equipment',
+  'Fire safety',
 ] as const;
 
 // --- NAVIGATION LIGHTS (20 questions) ---
@@ -2566,6 +2569,196 @@ const pfdTypesQuestions: ColregsQuestion[] = [
   },
 ];
 
+// --- FIRE SAFETY (12 questions) ---
+//
+// Seamanship, not COLREGS: what burns and what puts it out is not a rule of
+// the road, so these explanations open with the topic label "Fire safety".
+//
+// The classes are the American ones - A, B, C, D and K. Other countries letter
+// them differently, and a question that quoted a class without saying whose
+// would be wrong somewhere, so the wording stays with the class letters a US
+// extinguisher is actually stamped with.
+//
+// No diagram. A fire class is a category of fuel, not a thing with a shape,
+// and the extinguisher label that carries the letter is a label - drawing one
+// would be drawing the answer in type.
+
+const fireSafetyQuestions: ColregsQuestion[] = [
+  {
+    id: 'fs-01',
+    category: 'fire-safety',
+    prompt: 'What burns in a Class A fire?',
+    options: [
+      'Ordinary combustibles - wood, cloth, paper, canvas',
+      'Flammable liquids - fuel, oil, grease',
+      'Energised electrical equipment',
+      'Cooking oils and fats',
+    ],
+    correctAnswer: 'Ordinary combustibles - wood, cloth, paper, canvas',
+    explanation:
+      'Fire safety: Class A is ordinary combustible material - the bunk cushions, the charts, the woodwork. It is the one class that water is the right answer for, because water works by cooling and there is nothing here for it to spread or conduct.',
+  },
+  {
+    id: 'fs-02',
+    category: 'fire-safety',
+    prompt: 'What burns in a Class B fire?',
+    options: [
+      'Flammable liquids - petrol, diesel, oil, grease',
+      'Ordinary combustibles such as wood and cloth',
+      'Energised electrical equipment',
+      'Combustible metals',
+    ],
+    correctAnswer: 'Flammable liquids - petrol, diesel, oil, grease',
+    explanation:
+      'Fire safety: Class B is flammable liquids, which on a boat means the fuel, the oil and everything in the engine space. It is the class most marine extinguishers are bought for, and the class water must never be used on.',
+  },
+  {
+    id: 'fs-03',
+    category: 'fire-safety',
+    prompt: 'What burns in a Class C fire?',
+    options: [
+      'Energised electrical equipment - wiring, panels, motors',
+      'Cooking oils and fats',
+      'Combustible metals such as magnesium',
+      'Ordinary combustibles such as wood and cloth',
+    ],
+    correctAnswer: 'Energised electrical equipment - wiring, panels, motors',
+    explanation:
+      'Fire safety: Class C is a fire in equipment that is still live. The class is really about the electricity rather than the fuel: kill the power and what is left burning is a Class A or a Class B fire, and can be fought as one.',
+  },
+  {
+    id: 'fs-04',
+    category: 'fire-safety',
+    prompt: 'What burns in a Class D fire?',
+    options: [
+      'Combustible metals - magnesium, titanium, sodium',
+      'Cooking oils and fats',
+      'Flammable liquids',
+      'Energised electrical equipment',
+    ],
+    correctAnswer: 'Combustible metals - magnesium, titanium, sodium',
+    explanation:
+      'Fire safety: Class D is burning metal, and it needs a dry powder agent made for the metal in question. Water is dangerous on it - a burning metal can strip water apart and take the oxygen out of it, feeding the fire with what was meant to smother it.',
+  },
+  {
+    id: 'fs-05',
+    category: 'fire-safety',
+    prompt: 'What burns in a Class K fire, and what puts it out?',
+    options: [
+      'Cooking oils and fats - put out with a wet chemical agent',
+      'Cooking oils and fats - put out with water',
+      'Galley gas from a leaking cylinder - put out by smothering with a blanket',
+      'Alcohol stove fuel - put out with dry powder only',
+    ],
+    correctAnswer: 'Cooking oils and fats - put out with a wet chemical agent',
+    explanation:
+      'Fire safety: Class K is the galley class - cooking oil and fat, burning far hotter than the flash point of the oil around it. A wet chemical agent turns the surface to a soapy crust and seals it. Water thrown into hot oil flashes to steam under the surface and throws burning oil across the galley.',
+  },
+  {
+    id: 'fs-06',
+    category: 'fire-safety',
+    prompt: 'Why must water never be used on a burning fuel spill?',
+    options: [
+      'The fuel floats on the water and the fire is carried wherever the water runs',
+      'The water reacts chemically with the fuel and explodes',
+      'The water cools the fuel below its flash point and it reignites later',
+      'It is permitted, provided the water is applied as a fine spray',
+    ],
+    correctAnswer:
+      'The fuel floats on the water and the fire is carried wherever the water runs',
+    explanation:
+      'Fire safety: Water sinks, the fuel floats, and the burning layer goes with it - down into the bilge, aft under the sole, wherever the water drains. A liquid fire is put out by smothering it: foam, dry chemical or carbon dioxide, cutting the flame off from the air.',
+  },
+  {
+    id: 'fs-07',
+    category: 'fire-safety',
+    prompt: 'What three things must be present together for a fire to burn?',
+    options: [
+      'Fuel, heat and oxygen',
+      'Fuel, fumes and confinement',
+      'Heat, pressure and oxygen',
+      'Fuel, oxygen and an electrical source',
+    ],
+    correctAnswer: 'Fuel, heat and oxygen',
+    explanation:
+      'Fire safety: Fuel, heat and oxygen - the fire triangle. Every method of fighting a fire is the removal of one of the three: shutting off the fuel supply, cooling with water, or smothering to keep the air out. Knowing which one an extinguisher does is what tells you whether it suits the fire in front of you.',
+  },
+  {
+    id: 'fs-08',
+    category: 'fire-safety',
+    prompt: 'What do the four steps of PASS stand for when using a portable extinguisher?',
+    options: [
+      'Pull the pin, Aim at the base, Squeeze the handle, Sweep side to side',
+      'Point the nozzle, Advance, Spray, Stand clear',
+      'Prepare, Approach, Sound the alarm, Spray',
+      'Pull the pin, Approach upwind, Squeeze, Stop',
+    ],
+    correctAnswer: 'Pull the pin, Aim at the base, Squeeze the handle, Sweep side to side',
+    explanation:
+      'Fire safety: Pull, Aim, Squeeze, Sweep. The step people get wrong is the aim: a portable extinguisher holds only seconds of agent, and every second spent on the flames rather than on what is burning underneath them is wasted.',
+  },
+  {
+    id: 'fs-09',
+    category: 'fire-safety',
+    prompt: 'Where do you aim the extinguisher?',
+    options: [
+      'At the base of the flames, where the fuel is',
+      'At the top of the flames, where the fire is hottest',
+      'At the smoke above the fire',
+      'At the bulkhead behind the fire, to cool it',
+    ],
+    correctAnswer: 'At the base of the flames, where the fuel is',
+    explanation:
+      'Fire safety: The flame is the fuel already burning; the fire is the fuel about to. Aiming at the base is what cuts the two apart. Sweeping across it, rather than holding on one spot, is what covers the whole of the burning surface before the extinguisher empties.',
+  },
+  {
+    id: 'fs-10',
+    category: 'fire-safety',
+    prompt:
+      'You have a fire in the engine compartment and the boat is under way. What do you do before fighting it?',
+    options: [
+      'Stop, shut off the fuel and the blowers, and turn the boat so the fire is downwind of the crew',
+      'Increase speed to blow the smoke clear of the cockpit',
+      'Turn the boat so the wind carries the flames forward over the deck',
+      'Open the hatch fully at once to see what is burning',
+    ],
+    correctAnswer:
+      'Stop, shut off the fuel and the blowers, and turn the boat so the fire is downwind of the crew',
+    explanation:
+      'Fire safety: Stopping ends the airflow that a moving boat forces into the compartment; shutting off fuel and blowers takes away the supply and the draught. Turning so the fire is downwind keeps the flame and the smoke off the people who have to fight it and off the way out.',
+  },
+  {
+    id: 'fs-11',
+    category: 'fire-safety',
+    prompt:
+      'Why should you not throw open the engine hatch to fight a fire in the compartment?',
+    options: [
+      'Opening it feeds the fire a rush of air - use the fire port, or open only enough to discharge into the space',
+      'Opening it will let the extinguishing agent escape before it can work',
+      'The hatch will warp and cannot be closed again',
+      'It is only a problem on a diesel engine, not a petrol one',
+    ],
+    correctAnswer:
+      'Opening it feeds the fire a rush of air - use the fire port, or open only enough to discharge into the space',
+    explanation:
+      'Fire safety: A fire in a closed space is already short of oxygen. Flinging the hatch back hands it a lungful and can put the flame straight into your face. That is what the small fire port in the hatch is for - the extinguisher goes through it and the space stays shut.',
+  },
+  {
+    id: 'fs-12',
+    category: 'fire-safety',
+    prompt: 'What does the letter in an extinguisher rating such as B-I tell you?',
+    options: [
+      'The class of fire the extinguisher is rated to fight',
+      'The year the extinguisher was manufactured',
+      'The pressure the extinguisher is charged to',
+      'The size of vessel it may be carried aboard',
+    ],
+    correctAnswer: 'The class of fire the extinguisher is rated to fight',
+    explanation:
+      'Fire safety: The letter is the class - a B rating is for flammable liquids - and the numeral that follows it is the size, with a larger numeral meaning more agent. Recent extinguishers carry numeric ratings such as 5-B and 20-B instead, but the letter means the same thing on both.',
+  },
+];
+
 // --- COMBINED EXPORT ---
 
 export const COLREGS_QUESTIONS: ColregsQuestion[] = [
@@ -2580,6 +2773,7 @@ export const COLREGS_QUESTIONS: ColregsQuestion[] = [
   ...distressSignalsQuestions,
   ...vhfProcedureQuestions,
   ...pfdTypesQuestions,
+  ...fireSafetyQuestions,
 ];
 
 export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuestion[]> = {
@@ -2594,6 +2788,7 @@ export const COLREGS_QUESTIONS_BY_CATEGORY: Record<ColregsCategory, ColregsQuest
   'distress-signals': distressSignalsQuestions,
   'vhf-procedure': vhfProcedureQuestions,
   'pfd-types': pfdTypesQuestions,
+  'fire-safety': fireSafetyQuestions,
 };
 
 export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
@@ -2608,4 +2803,5 @@ export const CATEGORY_LABELS: Record<ColregsCategory, string> = {
   'distress-signals': 'Distress Signals',
   'vhf-procedure': 'VHF Procedure',
   'pfd-types': 'PFD Types',
+  'fire-safety': 'Fire Safety',
 };

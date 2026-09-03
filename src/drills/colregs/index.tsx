@@ -317,6 +317,7 @@ const CATEGORY_ORDER: CategoryFilter[] = [
   'distress-signals',
   'vhf-procedure',
   'pfd-types',
+  'fire-safety',
 ];
 
 // `sub` is the descriptor only - the question count is prepended at render
@@ -334,6 +335,7 @@ const CATEGORY_META: Record<CategoryFilter, { label: string; sub: string }> = {
   'distress-signals':  { label: 'Distress signals',       sub: 'the Annex IV list'        },
   'vhf-procedure':     { label: 'VHF procedure',          sub: 'priority calls on 16'     },
   'pfd-types':         { label: 'PFD types',              sub: 'types and levels'         },
+  'fire-safety':       { label: 'Fire safety',            sub: 'classes and agents'       },
 };
 
 // The syllabus card a question belongs to, so its answer lands on the right

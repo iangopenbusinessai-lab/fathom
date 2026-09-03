@@ -217,6 +217,24 @@ export const CATEGORIES: ChartCategory[] = [
     ],
   },
   {
+    id: 'fire',
+    name: 'Fire safety',
+    section: 'Seamanship',
+    rule: 'Fire safety',
+    status: 'live',
+    source: 'fire-safety',
+    blurb:
+      'What is burning decides what puts it out. The five classes of fire, the agent each one takes, and the handful of moves - shut the fuel off, do not fling the hatch open - that decide how a small fire ends.',
+    topics: [
+      'Classes A, B, C, D and K',
+      'Why water is wrong on fuel',
+      'The fire triangle',
+      'Using an extinguisher: PASS',
+      'Engine compartment fires',
+      'Extinguisher ratings',
+    ],
+  },
+  {
     id: 'buoyage',
     name: 'Buoyage / IALA marks',
     section: 'Aids to navigation',
