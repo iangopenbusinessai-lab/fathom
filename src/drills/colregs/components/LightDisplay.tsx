@@ -17,6 +17,7 @@ export type LightName =
   | 'allRoundGreen2'
   | 'allRoundGreen3'
   | 'allRoundYellow'
+  | 'allRoundYellowFlashing'
   | 'cylinder';
 
 interface LightDisplayProps {
@@ -24,22 +25,20 @@ interface LightDisplayProps {
   label?: string;
 }
 
-// This was the first visual component in the app and it predates the rule the
+// This was the first visual component in the app and it predated the rule the
 // later ones are built to: the diagram may be the stimulus of a question,
-// never its answer. It does not obey that rule by itself and cannot be made
-// to, because what it draws IS a light configuration - it is honest only
-// beside a question that shows a pattern and asks what vessel it is.
+// never its answer. It has been brought into line, in two steps.
 //
-// It is worse than a plain silhouette in one specific way: every lit light is
-// captioned with its own name, and the hull is captioned BOW, STERN, PORT and
-// STBD. So it does not merely depict the answer to "what colour is her
-// starboard sidelight", it writes it out. That caption is why the whole
-// navigation lights bank was taken off diagrams rather than some of it - see
-// QUESTION_LIGHTS in ../index.tsx, which records the audit.
+// It used to caption every lit light with its own type - "Masthead", "Port",
+// "All-Rd Red" - which named the thing being asked about. Those captions are
+// gone. What is left is the hull with BOW, STERN, PORT and STBD on it, which
+// is orientation and not an answer, the same as every other component here.
 //
-// Nothing maps to this component today. Keep the captions in mind before
-// mapping anything to it: a question that asks what is being shown is safe
-// here, and any question that asks what a named vessel shows is not.
+// What it draws is a light CONFIGURATION, so it is honest in one direction
+// only: a pattern shown, the vessel or situation named. It must never be put
+// beside a question that names the vessel and asks which lights she shows -
+// that question is answered by the picture. QUESTION_LIGHTS in ../index.tsx
+// records the audit that established this and holds only the safe direction.
 
 const LIGHT_COLORS: Record<LightName, string> = {
   masthead:      '#ffffff',
@@ -58,6 +57,7 @@ const LIGHT_COLORS: Record<LightName, string> = {
   allRoundGreen2:'#22c55e',
   allRoundGreen3:'#22c55e',
   allRoundYellow:'#eab308',
+  allRoundYellowFlashing: '#eab308',
   cylinder:      '#1e293b',
 };
 
@@ -78,6 +78,7 @@ const LIGHT_GLOWS: Record<LightName, string> = {
   allRoundGreen2:'rgba(34,197,94,0.9)',
   allRoundGreen3:'rgba(34,197,94,0.9)',
   allRoundYellow:'rgba(234,179,8,0.9)',
+  allRoundYellowFlashing: 'rgba(234,179,8,0.9)',
   cylinder:      'rgba(100,116,139,0.5)',
 };
 
@@ -107,24 +108,31 @@ function arcPath(cx: number, cy: number, r: number, startDeg: number, endDeg: nu
 
 // Fixed light positions in the 200×260 SVG viewBox
 // Vessel bow at top, stern at bottom; hull occupies roughly y 30–220, center x=100
-const LIGHT_POSITIONS: Record<LightName, { cx: number; cy: number; label: string; arc?: ArcDef }> = {
-  masthead:     { cx: 100, cy: 65,  label: 'Masthead',   arc: { cx: 100, cy: 65,  r: 40, startDeg: 247.5, endDeg: 112.5, color: 'rgba(255,255,255,0.07)' } },
-  masthead2:    { cx: 100, cy: 105, label: 'Masthead 2', arc: { cx: 100, cy: 105, r: 40, startDeg: 247.5, endDeg: 112.5, color: 'rgba(255,255,255,0.05)' } },
-  masthead3:    { cx: 100, cy: 85,  label: 'Masthead 3', arc: { cx: 100, cy: 85,  r: 40, startDeg: 247.5, endDeg: 112.5, color: 'rgba(255,255,255,0.04)' } },
-  port:         { cx: 62,  cy: 130, label: 'Port',       arc: { cx: 62,  cy: 130, r: 42, startDeg: 337.5, endDeg: 90,    color: 'rgba(239,68,68,0.08)'    } },
-  starboard:    { cx: 138, cy: 130, label: 'Stbd',       arc: { cx: 138, cy: 130, r: 42, startDeg: 270,   endDeg: 22.5,  color: 'rgba(34,197,94,0.08)'    } },
-  stern:        { cx: 100, cy: 205, label: 'Stern',      arc: { cx: 100, cy: 205, r: 40, startDeg: 112.5, endDeg: 247.5, color: 'rgba(255,255,255,0.06)' } },
-  anchor:       { cx: 100, cy: 90,  label: 'Anchor',     arc: { cx: 100, cy: 90,  r: 44, startDeg: 0,     endDeg: 360,   color: 'rgba(255,255,255,0.05)' } },
-  allRoundRed1: { cx: 100, cy: 80,  label: 'All-Rd Red', arc: { cx: 100, cy: 80,  r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(239,68,68,0.07)'    } },
-  allRoundRed2: { cx: 100, cy: 110, label: 'All-Rd Red', arc: { cx: 100, cy: 110, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(239,68,68,0.05)'    } },
-  allRoundRed3: { cx: 100, cy: 140, label: 'All-Rd Red', arc: { cx: 100, cy: 140, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(239,68,68,0.04)'    } },
-  allRoundWhite:{ cx: 100, cy: 130, label: 'All-Rd Wht', arc: { cx: 100, cy: 130, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(255,255,255,0.05)' } },
-  allRoundWhite2:{ cx: 100, cy: 110, label: 'All-Rd Wht', arc: { cx: 100, cy: 110, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(255,255,255,0.05)' } },
-  allRoundGreen1:{ cx: 100, cy: 80,  label: 'All-Rd Grn', arc: { cx: 100, cy: 80,  r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(34,197,94,0.07)'    } },
-  allRoundGreen2:{ cx: 100, cy: 110, label: 'All-Rd Grn', arc: { cx: 100, cy: 110, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(34,197,94,0.05)'    } },
-  allRoundGreen3:{ cx: 100, cy: 140, label: 'All-Rd Grn', arc: { cx: 100, cy: 140, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(34,197,94,0.04)'    } },
-  allRoundYellow:{ cx: 100, cy: 170,label: 'All-Rd Ylw', arc: { cx: 100, cy: 170, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(234,179,8,0.06)'    } },
-  cylinder:     { cx: 100, cy: 40,  label: 'Cylinder',   },
+const LIGHT_POSITIONS: Record<LightName, { cx: number; cy: number; arc?: ArcDef }> = {
+  masthead:     { cx: 100, cy: 65,  arc: { cx: 100, cy: 65,  r: 40, startDeg: 247.5, endDeg: 112.5, color: 'rgba(255,255,255,0.07)' } },
+  masthead2:    { cx: 100, cy: 105, arc: { cx: 100, cy: 105, r: 40, startDeg: 247.5, endDeg: 112.5, color: 'rgba(255,255,255,0.05)' } },
+  masthead3:    { cx: 100, cy: 85,  arc: { cx: 100, cy: 85,  r: 40, startDeg: 247.5, endDeg: 112.5, color: 'rgba(255,255,255,0.04)' } },
+  port:         { cx: 62,  cy: 130, arc: { cx: 62,  cy: 130, r: 42, startDeg: 337.5, endDeg: 90,    color: 'rgba(239,68,68,0.08)'    } },
+  starboard:    { cx: 138, cy: 130, arc: { cx: 138, cy: 130, r: 42, startDeg: 270,   endDeg: 22.5,  color: 'rgba(34,197,94,0.08)'    } },
+  stern:        { cx: 100, cy: 205, arc: { cx: 100, cy: 205, r: 40, startDeg: 112.5, endDeg: 247.5, color: 'rgba(255,255,255,0.06)' } },
+  anchor:       { cx: 100, cy: 90,  arc: { cx: 100, cy: 90,  r: 44, startDeg: 0,     endDeg: 360,   color: 'rgba(255,255,255,0.05)' } },
+  allRoundRed1: { cx: 100, cy: 80,  arc: { cx: 100, cy: 80,  r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(239,68,68,0.07)'    } },
+  allRoundRed2: { cx: 100, cy: 110, arc: { cx: 100, cy: 110, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(239,68,68,0.05)'    } },
+  allRoundRed3: { cx: 100, cy: 140, arc: { cx: 100, cy: 140, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(239,68,68,0.04)'    } },
+  allRoundWhite:{ cx: 100, cy: 130, arc: { cx: 100, cy: 130, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(255,255,255,0.05)' } },
+  allRoundWhite2:{ cx: 100, cy: 110, arc: { cx: 100, cy: 110, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(255,255,255,0.05)' } },
+  allRoundGreen1:{ cx: 100, cy: 80,  arc: { cx: 100, cy: 80,  r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(34,197,94,0.07)'    } },
+  allRoundGreen2:{ cx: 100, cy: 110, arc: { cx: 100, cy: 110, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(34,197,94,0.05)'    } },
+  allRoundGreen3:{ cx: 100, cy: 140, arc: { cx: 100, cy: 140, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(34,197,94,0.04)'    } },
+  allRoundYellow:{ cx: 100, cy: 170,arc: { cx: 100, cy: 170, r: 40, startDeg: 0,     endDeg: 360,   color: 'rgba(234,179,8,0.06)'    } },
+  // Rule 23(b) puts the air-cushion vessel's yellow light "where it can best
+  // be seen" and prescribes no position, so it is drawn high and clear of the
+  // towing light below - far enough apart that the two yellows are never
+  // mistaken for each other, without asserting a position the rule does not.
+  // The rule prescribes a FLASHING light, which a still drawing cannot carry:
+  // any question using this light says so in its prompt.
+  allRoundYellowFlashing: { cx: 100, cy: 45, arc: { cx: 100, cy: 45, r: 34, startDeg: 0, endDeg: 360, color: 'rgba(234,179,8,0.06)' } },
+  cylinder:     { cx: 100, cy: 40,  },
 };
 
 export const LightDisplay: React.FC<LightDisplayProps> = ({ active, label }) => {
@@ -224,32 +232,6 @@ export const LightDisplay: React.FC<LightDisplayProps> = ({ active, label }) => 
                   style={lit ? { filter: `drop-shadow(0 0 6px ${glow})` } : undefined}
                   opacity={lit ? 1 : 0.4}
                 />
-              );
-            }
-          )}
-
-          {/* Light labels (only active lights) */}
-          {(Object.entries(LIGHT_POSITIONS) as [LightName, typeof LIGHT_POSITIONS[LightName]][]).map(
-            ([name, pos]) => {
-              if (!isLit(name) || name === 'cylinder') return null;
-              const isPort = pos.cx < 100;
-              const isStbd = pos.cx > 100;
-              const labelX = isPort ? pos.cx - 12 : isStbd ? pos.cx + 12 : pos.cx;
-              const anchor = isPort ? 'end' : isStbd ? 'start' : 'middle';
-              return (
-                <text
-                  key={`lbl-${name}`}
-                  x={labelX}
-                  y={pos.cy + 1}
-                  textAnchor={anchor}
-                  dominantBaseline="middle"
-                  fontSize="7"
-                  fill={LIGHT_COLORS[name]}
-                  opacity="0.7"
-                  fontFamily="monospace"
-                >
-                  {pos.label}
-                </text>
               );
             }
           )}

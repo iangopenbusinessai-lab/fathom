@@ -72,10 +72,35 @@ const EXAM_QUESTION_MS = 15000;
 // makes for the meaning questions and DistressDisplay makes for the colour
 // ones.
 //
-// LightDisplay itself is kept and is still wired through VisualPanel. What it
-// wants is a question asked the other way round - a pattern shown, the vessel
-// named - and the day this bank gains one, it is a line in this map.
-export const QUESTION_LIGHTS: Partial<Record<string, LightName[]>> = {};
+// nl-21 onward are that other direction, written for it. Each shows an
+// arrangement and asks what she is, so the picture is the stimulus and the
+// answer is a vessel or a situation the picture does not name. The twenty
+// original questions keep no diagram and are not listed here.
+//
+// Two pairs are deliberately one light apart, because that one light is the
+// question: nl-30 and nl-31 differ by a third masthead light, which is the
+// signal for a tow over 200 metres, and nl-22 and nl-32 differ by the second,
+// lower anchor light that a vessel of 50 metres or more must show. Drawing
+// them any other way would make the pair unanswerable.
+export const QUESTION_LIGHTS: Partial<Record<string, LightName[]>> = {
+  'nl-21': ['masthead', 'port', 'starboard', 'stern'],
+  'nl-22': ['anchor'],
+  'nl-23': ['allRoundRed1', 'allRoundRed2'],
+  // Rule 29(a): white OVER red. The old map had these two the wrong way up,
+  // which drew the fishing signal beside the pilot question.
+  'nl-24': ['allRoundWhite2', 'allRoundRed3', 'port', 'starboard', 'stern'],
+  'nl-25': ['port', 'starboard', 'stern'],
+  'nl-26': ['allRoundWhite', 'port', 'starboard'],
+  'nl-27': ['allRoundGreen1', 'allRoundWhite2', 'port', 'starboard', 'stern'],
+  'nl-28': ['allRoundRed1', 'allRoundWhite2'],
+  'nl-29': ['allRoundRed1', 'allRoundWhite2', 'allRoundRed3'],
+  // Rule 24(a)(i): two masthead lights for a tow of 200 m or less, three for
+  // more. The old map drew one, which is no towing vessel at all.
+  'nl-30': ['masthead', 'masthead2', 'port', 'starboard', 'stern', 'allRoundYellow'],
+  'nl-31': ['masthead', 'masthead2', 'masthead3', 'port', 'starboard', 'stern', 'allRoundYellow'],
+  'nl-32': ['anchor', 'allRoundWhite'],
+  'nl-33': ['masthead', 'port', 'starboard', 'stern', 'allRoundYellowFlashing'],
+};
 
 export interface DayShapeSpec {
   shapes: DayShapeName[];

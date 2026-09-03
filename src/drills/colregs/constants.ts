@@ -335,6 +335,210 @@ const navigationLightsQuestions: ColregsQuestion[] = [
     explanation:
       'Rule 21(b): Each sidelight shows an unbroken light over an arc of 112.5 degrees, from right ahead to 22.5 degrees abaft the beam on its own side. The two sidelights and the 135 degree sternlight together make up the full 360.',
   },
+  // --- Identify direction (nl-21 onward) -------------------------------
+  //
+  // The twenty questions above name a vessel and ask which lights she shows.
+  // These name nothing and show the lights: the picture is the stimulus and
+  // the answer is what she is. That is the only direction LightDisplay can be
+  // used in honestly - see the note beside QUESTION_LIGHTS in ../index.tsx -
+  // and the facts here are the same verified facts as above, read the other
+  // way round.
+  //
+  // Where the arrangement alone would not settle it, the prompt says so: "the
+  // only lights she is showing" is what separates a vessel not making way from
+  // one that is, and nl-33 states in words that its yellow light is flashing,
+  // because a still drawing cannot carry a rhythm.
+  {
+    id: 'nl-21',
+    category: 'navigation-lights',
+    prompt: 'A vessel is showing the lights above. What is she?',
+    options: [
+      'A power-driven vessel underway and making way',
+      'A sailing vessel underway',
+      'A vessel at anchor',
+      'A vessel not under command',
+    ],
+    correctAnswer: 'A power-driven vessel underway and making way',
+    explanation:
+      'Rule 23(a): A masthead light forward, sidelights and a sternlight is the ordinary power-driven vessel underway. The masthead light is the one that says power-driven - a sailing vessel shows the same sidelights and sternlight without it.',
+  },
+  {
+    id: 'nl-22',
+    category: 'navigation-lights',
+    prompt: 'This single all-round white light is the only light a vessel is showing. What is she?',
+    options: [
+      'A vessel at anchor, less than 50 metres in length',
+      'A power-driven vessel of less than 12 metres underway',
+      'A vessel aground',
+      'A vessel restricted in her ability to manoeuvre',
+    ],
+    correctAnswer: 'A vessel at anchor, less than 50 metres in length',
+    explanation:
+      'Rule 30(b): A vessel of less than 50 metres at anchor may show one all-round white light where it can best be seen. A power-driven vessel under 12 metres shows an all-round white too, but with her sidelights alongside it - one white light on its own, with nothing else, is a vessel at anchor.',
+  },
+  {
+    id: 'nl-23',
+    category: 'navigation-lights',
+    prompt: 'These two all-round red lights are the only lights a vessel is showing. What is she?',
+    options: [
+      'A vessel not under command and not making way through the water',
+      'A vessel constrained by her draught',
+      'A vessel aground',
+      'A vessel engaged in fishing other than trawling',
+    ],
+    correctAnswer: 'A vessel not under command and not making way through the water',
+    explanation:
+      'Rule 27(a): Two all-round red lights in a vertical line is not under command. She adds sidelights and a sternlight when making way through the water, so two reds and nothing else says she is stopped as well as unable to manoeuvre.',
+  },
+  {
+    id: 'nl-24',
+    category: 'navigation-lights',
+    prompt:
+      'A vessel is showing an all-round white over an all-round red, with sidelights and a sternlight. What is she?',
+    options: [
+      'A vessel engaged on pilotage duty, underway',
+      'A vessel engaged in fishing other than trawling',
+      'A vessel restricted in her ability to manoeuvre',
+      'A vessel constrained by her draught',
+    ],
+    correctAnswer: 'A vessel engaged on pilotage duty, underway',
+    explanation:
+      'Rule 29(a): White over red at or near the masthead is the pilot vessel on duty, with sidelights and a sternlight when underway. Reverse the two and you have red over white, which is a vessel fishing - the order of the pair is the whole of the difference.',
+  },
+  {
+    id: 'nl-25',
+    category: 'navigation-lights',
+    prompt:
+      'A vessel is showing sidelights and a sternlight, and no masthead light at all. What is she?',
+    options: [
+      'A sailing vessel underway',
+      'A power-driven vessel underway',
+      'A vessel being towed',
+      'A vessel at anchor',
+    ],
+    correctAnswer: 'A sailing vessel underway',
+    explanation:
+      'Rule 25(a): A sailing vessel underway shows sidelights and a sternlight and nothing above them. The absence of the masthead light is the signal: the moment she starts her engine she becomes a power-driven vessel and must show one.',
+  },
+  {
+    id: 'nl-26',
+    category: 'navigation-lights',
+    prompt: 'A vessel is showing an all-round white light and sidelights. What is she?',
+    options: [
+      'A power-driven vessel of less than 12 metres in length, underway',
+      'A vessel at anchor with her deck lights on',
+      'A vessel engaged in trawling',
+      'A pilot vessel on station',
+    ],
+    correctAnswer: 'A power-driven vessel of less than 12 metres in length, underway',
+    explanation:
+      'Rule 23(d)(i): A power-driven vessel of less than 12 metres may show an all-round white light and sidelights in place of the masthead light and sternlight. The all-round white is standing in for both of them at once, which is why it is legal to have neither.',
+  },
+  {
+    id: 'nl-27',
+    category: 'navigation-lights',
+    prompt:
+      'A vessel is showing an all-round green over an all-round white, with sidelights and a sternlight. What is she?',
+    options: [
+      'A vessel engaged in trawling, making way through the water',
+      'A vessel engaged in fishing other than trawling',
+      'A vessel engaged in dredging',
+      'A vessel restricted in her ability to manoeuvre',
+    ],
+    correctAnswer: 'A vessel engaged in trawling, making way through the water',
+    explanation:
+      'Rule 26(b): Green over white is trawling - dragging a dredge or other apparatus through the water. The sidelights and sternlight say she is making way as well as fishing. "Green over white, trawling tonight" is the rhyme that keeps it apart from the other fishing pair.',
+  },
+  {
+    id: 'nl-28',
+    category: 'navigation-lights',
+    prompt:
+      'These two lights - an all-round red over an all-round white - are the only lights a vessel is showing. What is she?',
+    options: [
+      'A vessel engaged in fishing other than trawling, not making way',
+      'A vessel engaged in trawling',
+      'A vessel engaged on pilotage duty',
+      'A vessel not under command',
+    ],
+    correctAnswer: 'A vessel engaged in fishing other than trawling, not making way',
+    explanation:
+      'Rule 26(c): Red over white is fishing other than trawling - "red over white, fishing at night". She shows sidelights and a sternlight in addition when making way, so this pair alone is a fishing vessel lying stopped to her gear.',
+  },
+  {
+    id: 'nl-29',
+    category: 'navigation-lights',
+    prompt:
+      'These three all-round lights - red, white, red in a vertical line - are the only lights a vessel is showing. What is she?',
+    options: [
+      'A vessel restricted in her ability to manoeuvre, not making way',
+      'A vessel constrained by her draught',
+      'A vessel not under command',
+      'A vessel aground',
+    ],
+    correctAnswer: 'A vessel restricted in her ability to manoeuvre, not making way',
+    explanation:
+      'Rule 27(b)(i): Red over white over red is restricted in her ability to manoeuvre - the white in the middle is what separates her from the three reds of a vessel constrained by her draught and from the two reds of one not under command. Sidelights and a sternlight are added when making way.',
+  },
+  {
+    id: 'nl-30',
+    category: 'navigation-lights',
+    prompt:
+      'A vessel is showing two masthead lights in a vertical line, sidelights, a sternlight, and a yellow light directly above that sternlight. What is she?',
+    options: [
+      'A power-driven vessel towing astern, the length of the tow 200 metres or less',
+      'A power-driven vessel towing astern, the length of the tow more than 200 metres',
+      'A vessel engaged in pushing ahead',
+      'An air-cushion vessel in the non-displacement mode',
+    ],
+    correctAnswer: 'A power-driven vessel towing astern, the length of the tow 200 metres or less',
+    explanation:
+      'Rule 24(a): A vessel towing shows two masthead lights in a vertical line and a yellow towing light above her sternlight. The towing light is what names her; the number of masthead lights is what tells you how long the tow is, and two of them means 200 metres or less.',
+  },
+  {
+    id: 'nl-31',
+    category: 'navigation-lights',
+    prompt:
+      'A vessel is showing three masthead lights in a vertical line, sidelights, a sternlight, and a yellow light above that sternlight. What is she?',
+    options: [
+      'A power-driven vessel towing, the length of the tow exceeding 200 metres',
+      'A power-driven vessel towing, the length of the tow 200 metres or less',
+      'A vessel not under command with way on',
+      'A vessel engaged in dredging',
+    ],
+    correctAnswer: 'A power-driven vessel towing, the length of the tow exceeding 200 metres',
+    explanation:
+      'Rule 24(a)(i): Three masthead lights in a vertical line instead of two is the signal that the tow, measured from the stern of the towing vessel to the after end of the tow, exceeds 200 metres. Counting them is the only way to know how much water astern of her has to be left alone.',
+  },
+  {
+    id: 'nl-32',
+    category: 'navigation-lights',
+    prompt:
+      'A vessel is showing two all-round white lights, one in the fore part and a lower one at the after end, and nothing else. What is she?',
+    options: [
+      'A vessel at anchor, 50 metres or more in length',
+      'A vessel at anchor, less than 50 metres in length',
+      'A vessel aground',
+      'A vessel engaged in mineclearance',
+    ],
+    correctAnswer: 'A vessel at anchor, 50 metres or more in length',
+    explanation:
+      'Rule 30(a): A vessel at anchor shows an all-round white light in the fore part and a second, lower one at or near the stern. The second light is what a vessel of 50 metres or more must show, so seeing two rather than one tells you both that she is anchored and that she is big.',
+  },
+  {
+    id: 'nl-33',
+    category: 'navigation-lights',
+    prompt:
+      'A vessel is showing the lights of a power-driven vessel underway plus the all-round yellow light above, which is FLASHING. What is she?',
+    options: [
+      'An air-cushion vessel operating in the non-displacement mode',
+      'A vessel towing astern',
+      'A vessel engaged in dredging with an obstruction on one side',
+      'A submarine on the surface',
+    ],
+    correctAnswer: 'An air-cushion vessel operating in the non-displacement mode',
+    explanation:
+      'Rule 23(b): An air-cushion vessel in the non-displacement mode shows an all-round flashing yellow light in addition to her ordinary power-driven lights. The flash is the whole signal - a steady yellow above the sternlight is a towing light and means something else entirely.',
+  },
 ];
 
 // --- SOUND SIGNALS (16 questions) ---
